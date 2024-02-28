@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fiber Number Color Code Lookup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: rgb(231, 231, 231);
+        }
+        input[type="text"] {
+            width: 200px;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #249629;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #367e2f;
+        }
+        table {
+            margin: auto;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid black;
+        }
+        /* Set background color for tubes */
+        .tube-bg-1 {
+            background-color: blue;
+            color: white;
+        }
+        .tube-bg-2 {
+            background-color: orange;
+        }
+        .tube-bg-3 {
+            background-color: green;
+        }
+        .tube-bg-4 {
+            background-color: brown;
+        }
+        .tube-bg-5 {
+            background-color: gray;
+        }
+        .tube-bg-6 {
+            background-color: white;
+        }
+        .tube-bg-7 {
+            background-color: red;
+        }
+        .tube-bg-8 {
+            background-color: black;
+            color: white;
+        }
+        .tube-bg-9 {
+            background-color: yellow;
+        }
+        .tube-bg-10 {
+            background-color: purple;
+            color: white;
+        }
+        .tube-bg-11 {
+            background-color: #db4c94; /* Rose color */;
+        }
+        .tube-bg-12 {
+            background-color: aqua;
+        }
+        .tube-bg-13 {
+            background-color: blue;
+            color: white;
+        }
+        .tube-bg-14 {
+            background-color: orange;
+        }
+        .tube-bg-15 {
+            background-color: green;
+        }
+        .tube-bg-16 {
+            background-color: brown;
+        }
+        .tube-bg-17 {
+            background-color: gray;
+        }
+        .tube-bg-18 {
+            background-color: white;
+        }
+        .tube-bg-19 {
+            background-color: red;
+        }
+        .tube-bg-20 {
+            background-color: black;
+            color: white;
+        }
+        .tube-bg-21 {
+            background-color: yellow;
+        }
+        .tube-bg-22 {
+            background-color: purple;
+            color: white;
+        }
+        .tube-bg-23 {
+            background-color: #db4c94; /* Rose color */;
+        }
+        .tube-bg-24 {
+            background-color: aqua;
+        }
+        .tube-bg-25 {
+            background-color: blue;
+            color: white;
+        }
+        .tube-bg-26 {
+            background-color: orange;
+        }
+        .tube-bg-27 {
+            background-color: green;
+        }
+        .tube-bg-28 {
+            background-color: brown;
+        }
+        .tube-bg-29 {
+            background-color: gray;
+        }
+        .tube-bg-30 {
+            background-color: white;
+        }
+        .tube-bg-31 {
+            background-color: red;
+        }
+        .tube-bg-32 {
+            background-color: black;
+            color: white;
+        }
+        .tube-bg-33 {
+            background-color: yellow;
+        }
+        .tube-bg-34 {
+            background-color: purple;
+            color: white;
+        }
+        .tube-bg-35 {
+            background-color: #db4c94; /* Rose color */;
+        }
+        .tube-bg-36 {
+            background-color: aqua;
+        }        
+
+        /* Set background color for fibers */
+        .blue-bg {
+            background-color: blue;
+            color: white;
+        }
+        .orange-bg {
+            background-color: orange;
+        }
+        .green-bg {
+            background-color: green;
+        }
+        .brown-bg {
+            background-color: brown;
+        }
+        .slate-bg {
+            background-color: grey;
+        }
+        .white-bg {
+            background-color: white;
+        }
+        .red-bg {
+            background-color: red;
+        }
+        .black-bg {
+            background-color: black;
+            color: white; /* Text color for black fibers */
+        }
+        .yellow-bg {
+            background-color: yellow;
+        }
+        .violet-bg {
+            background-color: purple;
+        }
+        .rose-bg {
+            background-color: #db4c94; /* Rose color */
+        }
+        .aqua-bg {
+            background-color: aqua;
+        }
+    </style>
+</head>
+<body>
+    <h2>Fiber Number Color Code</h2>
+    <input type="text" id="fiberInput" placeholder="Enter fiber number or range (e.g., 1-12)">
+    <br>
+    <button onclick="locateFiber()">Lookup</button>
+    <br>
+    <div id="result"></div>
+
+    <script>
+        // Define fiber mappings
+        var fiberMappings = {
+			1: { tube: 1, color: "Blue" },
+			2: { tube: 1, color: "Orange" },
+			3: { tube: 1, color: "Green" },
+			4: { tube: 1, color: "Brown" },
+			5: { tube: 1, color: "Slate" },
+			6: { tube: 1, color: "White" },
+			7: { tube: 1, color: "Red" },
+			8: { tube: 1, color: "Black" },
+			9: { tube: 1, color: "Yellow" },
+			10: { tube: 1, color: "Violet" },
+			11: { tube: 1, color: "Rose" },
+			12: { tube: 1, color: "Aqua" },
+			13: { tube: 2, color: "Blue" },
+			14: { tube: 2, color: "Orange" },
+			15: { tube: 2, color: "Green" },
+			16: { tube: 2, color: "Brown" },
+			17: { tube: 2, color: "Slate" },
+			18: { tube: 2, color: "White" },
+			19: { tube: 2, color: "Red" },
+			20: { tube: 2, color: "Black" },
+			21: { tube: 2, color: "Yellow" },
+			22: { tube: 2, color: "Violet" },
+			23: { tube: 2, color: "Rose" },
+			24: { tube: 2, color: "Aqua" },
+			25: { tube: 3, color: "Blue" },
+			26: { tube: 3, color: "Orange" },
+			27: { tube: 3, color: "Green" },
+			28: { tube: 3, color: "Brown" },
+			29: { tube: 3, color: "Slate" },
+			30: { tube: 3, color: "White" },
+			31: { tube: 3, color: "Red" },
+			32: { tube: 3, color: "Black" },
+			33: { tube: 3, color: "Yellow" },
+			34: { tube: 3, color: "Violet" },
+			35: { tube: 3, color: "Rose" },
+			36: { tube: 3, color: "Aqua" },
+			37: { tube: 4, color: "Blue" },
+			38: { tube: 4, color: "Orange" },
+			39: { tube: 4, color: "Green" },
+			40: { tube: 4, color: "Brown" },
+			41: { tube: 4, color: "Slate" },
+			42: { tube: 4, color: "White" },
+			43: { tube: 4, color: "Red" },
+			44: { tube: 4, color: "Black" },
+			45: { tube: 4, color: "Yellow" },
+			46: { tube: 4, color: "Violet" },
+			47: { tube: 4, color: "Rose" },
+			48: { tube: 4, color: "Aqua" },
+			49: { tube: 5, color: "Blue" },
+			50: { tube: 5, color: "Orange" },
+			51: { tube: 5, color: "Green" },
+			52: { tube: 5, color: "Brown" },
+			53: { tube: 5, color: "Slate" },
+			54: { tube: 5, color: "White" },
+			55: { tube: 5, color: "Red" },
+			56: { tube: 5, color: "Black" },
+			57: { tube: 5, color: "Yellow" },
+			58: { tube: 5, color: "Violet" },
+			59: { tube: 5, color: "Rose" },
+			60: { tube: 5, color: "Aqua" },
+			61: { tube: 6, color: "Blue" },
+			62: { tube: 6, color: "Orange" },
+			63: { tube: 6, color: "Green" },
+			64: { tube: 6, color: "Brown" },
+			65: { tube: 6, color: "Slate" },
+			66: { tube: 6, color: "White" },
+			67: { tube: 6, color: "Red" },
+			68: { tube: 6, color: "Black" },
+			69: { tube: 6, color: "Yellow" },
+			70: { tube: 6, color: "Violet" },
+			71: { tube: 6, color: "Rose" },
+			72: { tube: 6, color: "Aqua" },
+			73: { tube: 7, color: "Blue" },
+			74: { tube: 7, color: "Orange" },
+			75: { tube: 7, color: "Green" },
+			76: { tube: 7, color: "Brown" },
+			77: { tube: 7, color: "Slate" },
+			78: { tube: 7, color: "White" },
+			79: { tube: 7, color: "Red" },
+			80: { tube: 7, color: "Black" },
+			81: { tube: 7, color: "Yellow" },
+			82: { tube: 7, color: "Violet" },
+			83: { tube: 7, color: "Rose" },
+			84: { tube: 7, color: "Aqua" },
+			85: { tube: 8, color: "Blue" },
+			86: { tube: 8, color: "Orange" },
+			87: { tube: 8, color: "Green" },
+			88: { tube: 8, color: "Brown" },
+			89: { tube: 8, color: "Slate" },
+			90: { tube: 8, color: "White" },
+			91: { tube: 8, color: "Red" },
+			92: { tube: 8, color: "Black" },
+			93: { tube: 8, color: "Yellow" },
+			94: { tube: 8, color: "Violet" },
+			95: { tube: 8, color: "Rose" },
+			96: { tube: 8, color: "Aqua" },
+			97: { tube: 9, color: "Blue" },
+			98: { tube: 9, color: "Orange" },
+			99: { tube: 9, color: "Green" },
+			100: { tube: 9, color: "Brown" },
+			101: { tube: 9, color: "Slate" },
+			102: { tube: 9, color: "White" },
+			103: { tube: 9, color: "Red" },
+			104: { tube: 9, color: "Black" },
+			105: { tube: 9, color: "Yellow" },
+			106: { tube: 9, color: "Violet" },
+			107: { tube: 9, color: "Rose" },
+			108: { tube: 9, color: "Aqua" },
+			109: { tube: 10, color: "Blue" },
+			110: { tube: 10, color: "Orange" },
+			111: { tube: 10, color: "Green" },
+			112: { tube: 10, color: "Brown" },
+			113: { tube: 10, color: "Slate" },
+			114: { tube: 10, color: "White" },
+			115: { tube: 10, color: "Red" },
+			116: { tube: 10, color: "Black" },
+			117: { tube: 10, color: "Yellow" },
+			118: { tube: 10, color: "Violet" },
+			119: { tube: 10, color: "Rose" },
+			120: { tube: 10, color: "Aqua" },
+			121: { tube: 11, color: "Blue" },
+			122: { tube: 11, color: "Orange" },
+			123: { tube: 11, color: "Green" },
+			124: { tube: 11, color: "Brown" },
+			125: { tube: 11, color: "Slate" },
+			126: { tube: 11, color: "White" },
+			127: { tube: 11, color: "Red" },
+			128: { tube: 11, color: "Black" },
+			129: { tube: 11, color: "Yellow" },
+			130: { tube: 11, color: "Violet" },
+			131: { tube: 11, color: "Rose" },
+			132: { tube: 11, color: "Aqua" },
+			133: { tube: 12, color: "Blue" },
+			134: { tube: 12, color: "Orange" },
+			135: { tube: 12, color: "Green" },
+			136: { tube: 12, color: "Brown" },
+			137: { tube: 12, color: "Slate" },
+			138: { tube: 12, color: "White" },
+			139: { tube: 12, color: "Red" },
+			140: { tube: 12, color: "Black" },
+			141: { tube: 12, color: "Yellow" },
+			142: { tube: 12, color: "Violet" },
+			143: { tube: 12, color: "Rose" },
+			144: { tube: 12, color: "Aqua" },
+			145: { tube: 13, color: "Blue" },
+			146: { tube: 13, color: "Orange" },
+			147: { tube: 13, color: "Green" },
+			148: { tube: 13, color: "Brown" },
+			149: { tube: 13, color: "Slate" },
+			150: { tube: 13, color: "White" },
+			151: { tube: 13, color: "Red" },
+			152: { tube: 13, color: "Black" },
+			153: { tube: 13, color: "Yellow" },
+			154: { tube: 13, color: "Violet" },
+			155: { tube: 13, color: "Rose" },
+			156: { tube: 13, color: "Aqua" },
+			157: { tube: 14, color: "Blue" },
+			158: { tube: 14, color: "Orange" },
+			159: { tube: 14, color: "Green" },
+			160: { tube: 14, color: "Brown" },
+			161: { tube: 14, color: "Slate" },
+			162: { tube: 14, color: "White" },
+			163: { tube: 14, color: "Red" },
+			164: { tube: 14, color: "Black" },
+			165: { tube: 14, color: "Yellow" },
+			166: { tube: 14, color: "Violet" },
+			167: { tube: 14, color: "Rose" },
+			168: { tube: 14, color: "Aqua" },
+			169: { tube: 15, color: "Blue" },
+			170: { tube: 15, color: "Orange" },
+			171: { tube: 15, color: "Green" },
+			172: { tube: 15, color: "Brown" },
+			173: { tube: 15, color: "Slate" },
+			174: { tube: 15, color: "White" },
+			175: { tube: 15, color: "Red" },
+			176: { tube: 15, color: "Black" },
+			177: { tube: 15, color: "Yellow" },
+			178: { tube: 15, color: "Violet" },
+			179: { tube: 15, color: "Rose" },
+			180: { tube: 15, color: "Aqua" },
+			181: { tube: 16, color: "Blue" },
+			182: { tube: 16, color: "Orange" },
+			183: { tube: 16, color: "Green" },
+			184: { tube: 16, color: "Brown" },
+			185: { tube: 16, color: "Slate" },
+			186: { tube: 16, color: "White" },
+			187: { tube: 16, color: "Red" },
+			188: { tube: 16, color: "Black" },
+			189: { tube: 16, color: "Yellow" },
+			190: { tube: 16, color: "Violet" },
+			191: { tube: 16, color: "Rose" },
+			192: { tube: 16, color: "Aqua" },
+			193: { tube: 17, color: "Blue" },
+			194: { tube: 17, color: "Orange" },
+			195: { tube: 17, color: "Green" },
+			196: { tube: 17, color: "Brown" },
+			197: { tube: 17, color: "Slate" },
+			198: { tube: 17, color: "White" },
+			199: { tube: 17, color: "Red" },
+			200: { tube: 17, color: "Black" },
+			201: { tube: 17, color: "Yellow" },
+			202: { tube: 17, color: "Violet" },
+			203: { tube: 17, color: "Rose" },
+			204: { tube: 17, color: "Aqua" },
+			205: { tube: 18, color: "Blue" },
+			206: { tube: 18, color: "Orange" },
+			207: { tube: 18, color: "Green" },
+			208: { tube: 18, color: "Brown" },
+			209: { tube: 18, color: "Slate" },
+			210: { tube: 18, color: "White" },
+			211: { tube: 18, color: "Red" },
+			212: { tube: 18, color: "Black" },
+			213: { tube: 18, color: "Yellow" },
+			214: { tube: 18, color: "Violet" },
+			215: { tube: 18, color: "Rose" },
+			216: { tube: 18, color: "Aqua" },
+			217: { tube: 19, color: "Blue" },
+			218: { tube: 19, color: "Orange" },
+			219: { tube: 19, color: "Green" },
+			220: { tube: 19, color: "Brown" },
+			221: { tube: 19, color: "Slate" },
+			222: { tube: 19, color: "White" },
+			223: { tube: 19, color: "Red" },
+			224: { tube: 19, color: "Black" },
+			225: { tube: 19, color: "Yellow" },
+			226: { tube: 19, color: "Violet" },
+			227: { tube: 19, color: "Rose" },
+			228: { tube: 19, color: "Aqua" },
+			229: { tube: 20, color: "Blue" },
+			230: { tube: 20, color: "Orange" },
+			231: { tube: 20, color: "Green" },
+			232: { tube: 20, color: "Brown" },
+			233: { tube: 20, color: "Slate" },
+			234: { tube: 20, color: "White" },
+			235: { tube: 20, color: "Red" },
+			236: { tube: 20, color: "Black" },
+			237: { tube: 20, color: "Yellow" },
+			238: { tube: 20, color: "Violet" },
+			239: { tube: 20, color: "Rose" },
+			240: { tube: 20, color: "Aqua" },
+			241: { tube: 21, color: "Blue" },
+			242: { tube: 21, color: "Orange" },
+			243: { tube: 21, color: "Green" },
+			244: { tube: 21, color: "Brown" },
+			245: { tube: 21, color: "Slate" },
+			246: { tube: 21, color: "White" },
+			247: { tube: 21, color: "Red" },
+			248: { tube: 21, color: "Black" },
+			249: { tube: 21, color: "Yellow" },
+			250: { tube: 21, color: "Violet" },
+			251: { tube: 21, color: "Rose" },
+			252: { tube: 21, color: "Aqua" },
+			253: { tube: 22, color: "Blue" },
+			254: { tube: 22, color: "Orange" },
+			255: { tube: 22, color: "Green" },
+			256: { tube: 22, color: "Brown" },
+			257: { tube: 22, color: "Slate" },
+			258: { tube: 22, color: "White" },
+			259: { tube: 22, color: "Red" },
+			260: { tube: 22, color: "Black" },
+			261: { tube: 22, color: "Yellow" },
+			262: { tube: 22, color: "Violet" },
+			263: { tube: 22, color: "Rose" },
+			264: { tube: 22, color: "Aqua" },
+			265: { tube: 23, color: "Blue" },
+			266: { tube: 23, color: "Orange" },
+			267: { tube: 23, color: "Green" },
+			268: { tube: 23, color: "Brown" },
+			269: { tube: 23, color: "Slate" },
+			270: { tube: 23, color: "White" },
+			271: { tube: 23, color: "Red" },
+			272: { tube: 23, color: "Black" },
+			273: { tube: 23, color: "Yellow" },
+			274: { tube: 23, color: "Violet" },
+			275: { tube: 23, color: "Rose" },
+			276: { tube: 23, color: "Aqua" },
+			277: { tube: 24, color: "Blue" },
+			278: { tube: 24, color: "Orange" },
+			279: { tube: 24, color: "Green" },
+			280: { tube: 24, color: "Brown" },
+			281: { tube: 24, color: "Slate" },
+			282: { tube: 24, color: "White" },
+			283: { tube: 24, color: "Red" },
+			284: { tube: 24, color: "Black" },
+			285: { tube: 24, color: "Yellow" },
+			286: { tube: 24, color: "Violet" },
+			287: { tube: 24, color: "Rose" },
+			288: { tube: 24, color: "Aqua" },
+			289: { tube: 25, color: "Blue" },
+			290: { tube: 25, color: "Orange" },
+			291: { tube: 25, color: "Green" },
+			292: { tube: 25, color: "Brown" },
+			293: { tube: 25, color: "Slate" },
+			294: { tube: 25, color: "White" },
+			295: { tube: 25, color: "Red" },
+			296: { tube: 25, color: "Black" },
+			297: { tube: 25, color: "Yellow" },
+			298: { tube: 25, color: "Violet" },
+			299: { tube: 25, color: "Rose" },
+			300: { tube: 25, color: "Aqua" },
+			301: { tube: 26, color: "Blue" },
+			302: { tube: 26, color: "Orange" },
+			303: { tube: 26, color: "Green" },
+			304: { tube: 26, color: "Brown" },
+			305: { tube: 26, color: "Slate" },
+			306: { tube: 26, color: "White" },
+			307: { tube: 26, color: "Red" },
+			308: { tube: 26, color: "Black" },
+			309: { tube: 26, color: "Yellow" },
+			310: { tube: 26, color: "Violet" },
+			311: { tube: 26, color: "Rose" },
+			312: { tube: 26, color: "Aqua" },
+			313: { tube: 27, color: "Blue" },
+			314: { tube: 27, color: "Orange" },
+			315: { tube: 27, color: "Green" },
+			316: { tube: 27, color: "Brown" },
+			317: { tube: 27, color: "Slate" },
+			318: { tube: 27, color: "White" },
+			319: { tube: 27, color: "Red" },
+			320: { tube: 27, color: "Black" },
+			321: { tube: 27, color: "Yellow" },
+			322: { tube: 27, color: "Violet" },
+			323: { tube: 27, color: "Rose" },
+			324: { tube: 27, color: "Aqua" },
+			325: { tube: 28, color: "Blue" },
+			326: { tube: 28, color: "Orange" },
+			327: { tube: 28, color: "Green" },
+			328: { tube: 28, color: "Brown" },
+			329: { tube: 28, color: "Slate" },
+			330: { tube: 28, color: "White" },
+			331: { tube: 28, color: "Red" },
+			332: { tube: 28, color: "Black" },
+			333: { tube: 28, color: "Yellow" },
+			334: { tube: 28, color: "Violet" },
+			335: { tube: 28, color: "Rose" },
+			336: { tube: 28, color: "Aqua" },
+			337: { tube: 29, color: "Blue" },
+			338: { tube: 29, color: "Orange" },
+			339: { tube: 29, color: "Green" },
+			340: { tube: 29, color: "Brown" },
+			341: { tube: 29, color: "Slate" },
+			342: { tube: 29, color: "White" },
+			343: { tube: 29, color: "Red" },
+			344: { tube: 29, color: "Black" },
+			345: { tube: 29, color: "Yellow" },
+			346: { tube: 29, color: "Violet" },
+			347: { tube: 29, color: "Rose" },
+			348: { tube: 29, color: "Aqua" },
+			349: { tube: 30, color: "Blue" },
+			350: { tube: 30, color: "Orange" },
+			351: { tube: 30, color: "Green" },
+			352: { tube: 30, color: "Brown" },
+			353: { tube: 30, color: "Slate" },
+			354: { tube: 30, color: "White" },
+			355: { tube: 30, color: "Red" },
+			356: { tube: 30, color: "Black" },
+			357: { tube: 30, color: "Yellow" },
+			358: { tube: 30, color: "Violet" },
+			359: { tube: 30, color: "Rose" },
+			360: { tube: 30, color: "Aqua" },
+			361: { tube: 31, color: "Blue" },
+			362: { tube: 31, color: "Orange" },
+			363: { tube: 31, color: "Green" },
+			364: { tube: 31, color: "Brown" },
+			365: { tube: 31, color: "Slate" },
+			366: { tube: 31, color: "White" },
+			367: { tube: 31, color: "Red" },
+			368: { tube: 31, color: "Black" },
+			369: { tube: 31, color: "Yellow" },
+			370: { tube: 31, color: "Violet" },
+			371: { tube: 31, color: "Rose" },
+			372: { tube: 31, color: "Aqua" },
+			373: { tube: 32, color: "Blue" },
+			374: { tube: 32, color: "Orange" },
+			375: { tube: 32, color: "Green" },
+			376: { tube: 32, color: "Brown" },
+			377: { tube: 32, color: "Slate" },
+			378: { tube: 32, color: "White" },
+			379: { tube: 32, color: "Red" },
+			380: { tube: 32, color: "Black" },
+			381: { tube: 32, color: "Yellow" },
+			382: { tube: 32, color: "Violet" },
+			383: { tube: 32, color: "Rose" },
+			384: { tube: 32, color: "Aqua" },
+			385: { tube: 33, color: "Blue" },
+			386: { tube: 33, color: "Orange" },
+			387: { tube: 33, color: "Green" },
+			388: { tube: 33, color: "Brown" },
+			389: { tube: 33, color: "Slate" },
+			390: { tube: 33, color: "White" },
+			391: { tube: 33, color: "Red" },
+			392: { tube: 33, color: "Black" },
+			393: { tube: 33, color: "Yellow" },
+			394: { tube: 33, color: "Violet" },
+			395: { tube: 33, color: "Rose" },
+			396: { tube: 33, color: "Aqua" },
+			397: { tube: 34, color: "Blue" },
+			398: { tube: 34, color: "Orange" },
+			399: { tube: 34, color: "Green" },
+			400: { tube: 34, color: "Brown" },
+			401: { tube: 34, color: "Slate" },
+			402: { tube: 34, color: "White" },
+			403: { tube: 34, color: "Red" },
+			404: { tube: 34, color: "Black" },
+			405: { tube: 34, color: "Yellow" },
+			406: { tube: 34, color: "Violet" },
+			407: { tube: 34, color: "Rose" },
+			408: { tube: 34, color: "Aqua" },
+			409: { tube: 35, color: "Blue" },
+			410: { tube: 35, color: "Orange" },
+			411: { tube: 35, color: "Green" },
+			412: { tube: 35, color: "Brown" },
+			413: { tube: 35, color: "Slate" },
+			414: { tube: 35, color: "White" },
+			415: { tube: 35, color: "Red" },
+			416: { tube: 35, color: "Black" },
+			417: { tube: 35, color: "Yellow" },
+			418: { tube: 35, color: "Violet" },
+			419: { tube: 35, color: "Rose" },
+			420: { tube: 35, color: "Aqua" },
+			421: { tube: 36, color: "Blue" },
+			422: { tube: 36, color: "Orange" },
+			423: { tube: 36, color: "Green" },
+			424: { tube: 36, color: "Brown" },
+			425: { tube: 36, color: "Slate" },
+			426: { tube: 36, color: "White" },
+			427: { tube: 36, color: "Red" },
+			428: { tube: 36, color: "Black" },
+			429: { tube: 36, color: "Yellow" },
+			430: { tube: 36, color: "Violet" },
+			431: { tube: 36, color: "Rose" },
+			432: { tube: 36, color: "Aqua" },
+
+        };
+
+        function findFiberInfo(input) {
+            var result = "<table><tr><th>Tube</th><th>Fiber</th><th>Color</th></tr>";
+            var fiberRange = input.split("-");
+            if (fiberRange.length === 1) {
+                // Single fiber number
+                var fiberNumber = parseInt(fiberRange[0]);
+                if (fiberMappings.hasOwnProperty(fiberNumber)) {
+                    var info = fiberMappings[fiberNumber];
+                    var tubeBgClass = "tube-bg-" + info.tube;
+                    var fiberBgClass = info.color.toLowerCase() + "-bg";
+                    var textColorClass = info.color.toLowerCase() === "black" ? "black-bg" : "";
+                    result += "<tr><td class='" + tubeBgClass + "'>" + info.tube + "</td><td>" + fiberNumber + "</td><td class='" + fiberBgClass + " " + textColorClass + "'>" + info.color + "</td></tr>";
+                } else {
+                    result = "<tr><td colspan='3'>Fiber " + fiberNumber + " not found.</td></tr>";
+                }
+            } else if (fiberRange.length === 2) {
+                // Fiber range
+                var start = parseInt(fiberRange[0]);
+                var end = parseInt(fiberRange[1]);
+                for (var i = start; i <= end; i++) {
+                    if (fiberMappings.hasOwnProperty(i)) {
+                        var info = fiberMappings[i];
+                        var tubeBgClass = "tube-bg-" + info.tube;
+                        var fiberBgClass = info.color.toLowerCase() + "-bg";
+                        var textColorClass = info.color.toLowerCase() === "black" ? "black-bg" : "";
+                        result += "<tr><td class='" + tubeBgClass + "'>" + info.tube + "</td><td>" + i + "</td><td class='" + fiberBgClass + " " + textColorClass + "'>" + info.color + "</td></tr>";
+                    }
+                }
+                if (result === "<table><tr><th>Tube</th><th>Fiber</th><th>Color</th></tr>") {
+                    result = "<tr><td colspan='3'>No fibers found in the specified range.</td></tr>";
+                }
+            } else {
+                result = "<tr><td colspan='3'>Invalid input format. Please enter a single fiber number or a range (e.g., 1-12).</td></tr>";
+            }
+            result += "</table>";
+            return result;
+        }
+
+        function locateFiber() {
+            var input = document.getElementById("fiberInput").value;
+            var resultDiv = document.getElementById("result");
+            var result = findFiberInfo(input);
+            resultDiv.innerHTML = result;
+        }
+    </script>
+</body>
+</html>
