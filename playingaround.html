@@ -15,7 +15,7 @@
         body {
             font-family: 'Roboto', Arial, sans-serif;
             margin: 30px;
-            color: #111111; /* Table background grey color */
+            color: #111111; /* Text color */
             background-color: #ffffff; /* full background color */
         }
 
@@ -48,7 +48,7 @@
         }
 
         .block {
-            background-color: #f0f0f0;
+            background-color: #F5FAFA; /* Table color background color */
             border-radius: 6px;
             padding: 16px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
@@ -80,7 +80,7 @@
         th {
             background-color: #336699; /* Color of Address Background */
             color: #ffffff;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 500;
         }
 
@@ -92,7 +92,7 @@
             color: #fff;
             border: none;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 12px;
             border-radius: 4px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
         }
@@ -118,9 +118,17 @@
             }
 
             .grid-container {
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                /* grid-template-columns: repeat(2, 1fr); */
-                gap: 20px;
+              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adjust column width as needed */
+              gap: 10px;  /* Reduce gap between columns */
+            }
+
+            th, td {
+              padding: 2px;  /* Reduce cell padding */
+              font-size: 12px;  /* Slightly smaller font for more data */
+            }
+
+            body {
+              margin: 5px;  /* Minimal margin for print area */
             }
 
             .block {
