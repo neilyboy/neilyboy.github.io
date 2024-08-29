@@ -118,18 +118,143 @@
         let sortedData = [];
 
         function processFile() {
-            // ... (rest of your JavaScript code)
+            const fileInput = document.getElementById('csvFile');
+            const file = fileInput.files[0];
+
+            if (file) {
+                Papa.parse(file, {
+                    complete: function(results) {
+                        sortAndDisplayData(results.data);
+                    }
+                });
+            } else {
+                alert('Please select a CSV file');
+            }
         }
 
-        // ... (rest of your JavaScript code)
+        function sortAndDisplayData(data) {
+            if (!data || data.length === 0) {
+                alert('The CSV file appears to be empty');
+                return;
+            }
 
+            const headerRow = data[0];
+            const facilityIndex = headerRow.findIndex(col => col.toLowerCase() === 'facility');
+            
+            if (facilityIndex === -1) {
+                alert('Facility column not found in the CSV.');
+                return;
+            }
+
+            sortedData = data.slice(1).sort((a, b) => {
+                const facA = a[facilityIndex] || '';
+                const facB = b[facilityIndex] || '';
+                return compareFacilities(facA, facB);
+            });
+
+            sortedData.unshift(headerRow);
+            updateView();
+        }
+
+        function compareFacilities(a, b) {
+            if (!a) return b ? 1 : 0;
+            if (!b) return -1;
+
+            const partsA = a.split('-');
+            const partsB = b.split('-');
+
+            const alphaA = partsA[0].replace(/[0-9]/g, '');
+            const alphaB = partsB[0].replace(/[0-9]/g, '');
+            if (alphaA !== alphaB) {
+                return alphaA.localeCompare(alphaB);
+            }
+
+            for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+                const numA = parseInt(partsA[i]?.match(/\d+/)?.[0] || '0', 10);
+                const numB = parseInt(partsB[i]?.match(/\d+/)?.[0] || '0', 10);
+                if (numA !== numB) {
+                    return numA - numB;
+                }
+            }
+
+            return 0;
+        }
+
+        function updateView() {
+            const viewType = document.querySelector('input[name="view"]:checked').value;
+            if (viewType === 'table') {
+                displayTableData(sortedData);
+                document.getElementById('rawCSV').style.display = 'none';
+                document.getElementById('tableOutput').style.display = 'block';
+                document.querySelector('.copy-button').style.display = 'none';
+            } else {
+                displayRawCSV(sortedData);
+                document.getElementById('rawCSV').style.display = 'block';
+                document.getElementById('tableOutput').style.display = 'none';
+                document.querySelector('.copy-button').style.display = 'block';
+            }
+        }
+
+        function displayTableData(data) {
+            const output = document.getElementById('tableOutput');
+            if (data.length === 0) {
+                output.innerHTML = 'No data to display';
+                return;
+            }
+
+            let html = '<table><tr>';
+            data[0].forEach(header => {
+                html += `<th>${header}</th>`;
+            });
+            html += '</tr>';
+
+            for (let i = 1; i < data.length; i++) {
+                html += '<tr>';
+                data[i].forEach(cell => {
+                    html += `<td>${cell || ''}</td>`;
+                });
+                html += '</tr>';
+            }
+
+            html += '</table>';
+            output.innerHTML = html;
+        }
+
+        function displayRawCSV(data) {
+            if (data.length === 0) {
+                document.getElementById('rawCSV').textContent = 'No data to display';
+                return;
+            }
+
+            const csvContent = data.map(row => 
+                row.map(cell => `"${(cell || '').replace(/"/g, '""')}"`).join(',')
+            ).join('\n');
+
+            document.getElementById('rawCSV').textContent = csvContent;
+        }
+
+        function copyToClipboard() {
+            const rawCSV = document.getElementById('rawCSV');
+            const textArea = document.createElement('textarea');
+            textArea.value = rawCSV.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('CSV data copied to clipboard!');
+        }
+
+        document.querySelectorAll('input[name="view"]').forEach(radio => {
+            radio.addEventListener('change', updateView);
+        });
         // Add this to toggle the theme
         const themeButton = document.getElementById('themeButton');
         const body = document.body;
 
         themeButton.addEventListener('click', () => {
             body.classList.toggle('dark-mode');
-        });
+        
     </script>
+
 </body>
 </html>
