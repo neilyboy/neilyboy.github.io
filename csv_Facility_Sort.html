@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Sorter App</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        #rawCSV {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .view-toggle {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSV Sorter App</h1>
+    <input type="file" id="csvFile" accept=".csv">
+    <button onclick="processFile()">Sort CSV</button>
+    <div class="view-toggle">
+        <label><input type="radio" name="view" value="table" checked> Table View</label>
+        <label><input type="radio" name="view" value="raw"> Raw CSV View</label>
+    </div>
+    <div id="rawCSV" style="display: none;"></div>
+    <div id="tableOutput"></div>
+
+    <script>
+        let sortedData = [];
+
+        function processFile() {
+            const fileInput = document.getElementById('csvFile');
+            const file = fileInput.files[0];
+
+            if (file) {
+                Papa.parse(file, {
+                    complete: function(results) {
+                        sortAndDisplayData(results.data);
+                    },
+                    header: true,
+                    skipEmptyLines: true
+                });
+            } else {
+                alert('Please select a CSV file');
+            }
+        }
+
+        function sortAndDisplayData(data) {
+            if (!data || data.length === 0) {
+                alert('The CSV file appears to be empty');
+                return;
+            }
+
+            if (!data[0].hasOwnProperty('Facility')) {
+                alert('Could not find a "Facility" column in the CSV');
+                return;
+            }
+
+            sortedData = data.sort((a, b) => compareFacilities(a.Facility, b.Facility));
+            updateView();
+        }
+
+        function compareFacilities(a, b) {
+            if (!a) return b ? 1 : 0;
+            if (!b) return -1;
+
+            const partsA = a.split('-');
+            const partsB = b.split('-');
+
+            const alphaA = partsA[0].replace(/[0-9]/g, '');
+            const alphaB = partsB[0].replace(/[0-9]/g, '');
+            if (alphaA !== alphaB) {
+                return alphaA.localeCompare(alphaB);
+            }
+
+            for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+                const numA = parseInt(partsA[i]?.match(/\d+/)?.[0] || '0', 10);
+                const numB = parseInt(partsB[i]?.match(/\d+/)?.[0] || '0', 10);
+                if (numA !== numB) {
+                    return numA - numB;
+                }
+            }
+
+            return 0;
+        }
+
+        function updateView() {
+            const viewType = document.querySelector('input[name="view"]:checked').value;
+            if (viewType === 'table') {
+                displayTableData(sortedData);
+                document.getElementById('rawCSV').style.display = 'none';
+                document.getElementById('tableOutput').style.display = 'block';
+            } else {
+                displayRawCSV(sortedData);
+                document.getElementById('rawCSV').style.display = 'block';
+                document.getElementById('tableOutput').style.display = 'none';
+            }
+        }
+
+        function displayTableData(data) {
+            const output = document.getElementById('tableOutput');
+            if (data.length === 0) {
+                output.innerHTML = 'No data to display';
+                return;
+            }
+
+            let html = '<table><tr>';
+            Object.keys(data[0]).forEach(header => {
+                html += `<th>${header}</th>`;
+            });
+            html += '</tr>';
+
+            data.forEach(row => {
+                html += '<tr>';
+                Object.values(row).forEach(cell => {
+                    html += `<td>${cell || ''}</td>`;
+                });
+                html += '</tr>';
+            });
+
+            html += '</table>';
+            output.innerHTML = html;
+        }
+
+        function displayRawCSV(data) {
+            if (data.length === 0) {
+                document.getElementById('rawCSV').textContent = 'No data to display';
+                return;
+            }
+
+            const headers = Object.keys(data[0]);
+            const csvContent = [
+                headers.map(h => `"${h}"`).join(','),
+                ...data.map(row => 
+                    headers.map(header => `"${(row[header] || '').replace(/"/g, '""')}"`).join(',')
+                )
+            ].join('\n');
+
+            document.getElementById('rawCSV').textContent = csvContent;
+        }
+
+        document.querySelectorAll('input[name="view"]').forEach(radio => {
+            radio.addEventListener('change', updateView);
+        });
+    </script>
+</body>
+</html>
