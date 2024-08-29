@@ -35,8 +35,12 @@
             padding: 10px;
             box-sizing: border-box;
         }
-        .view-toggle {
+        .view-toggle, .copy-button {
             margin-bottom: 10px;
+        }
+        button {
+            padding: 5px 10px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -47,6 +51,9 @@
     <div class="view-toggle">
         <label><input type="radio" name="view" value="table" checked> Table View</label>
         <label><input type="radio" name="view" value="raw"> Raw CSV View</label>
+    </div>
+    <div class="copy-button" style="display: none;">
+        <button onclick="copyToClipboard()">Copy to Clipboard</button>
     </div>
     <div id="rawCSV" style="display: none;"></div>
     <div id="tableOutput"></div>
@@ -62,9 +69,7 @@
                 Papa.parse(file, {
                     complete: function(results) {
                         sortAndDisplayData(results.data);
-                    },
-                    header: true,
-                    skipEmptyLines: true
+                    }
                 });
             } else {
                 alert('Please select a CSV file');
@@ -77,12 +82,21 @@
                 return;
             }
 
-            if (!data[0].hasOwnProperty('Facility')) {
-                alert('Could not find a "Facility" column in the CSV');
+            const headerRow = data[0];
+            const facilityIndex = headerRow.findIndex(col => col.toLowerCase() === 'facility');
+            
+            if (facilityIndex === -1) {
+                alert('Facility column not found in the CSV.');
                 return;
             }
 
-            sortedData = data.sort((a, b) => compareFacilities(a.Facility, b.Facility));
+            sortedData = data.slice(1).sort((a, b) => {
+                const facA = a[facilityIndex] || '';
+                const facB = b[facilityIndex] || '';
+                return compareFacilities(facA, facB);
+            });
+
+            sortedData.unshift(headerRow);
             updateView();
         }
 
@@ -116,10 +130,12 @@
                 displayTableData(sortedData);
                 document.getElementById('rawCSV').style.display = 'none';
                 document.getElementById('tableOutput').style.display = 'block';
+                document.querySelector('.copy-button').style.display = 'none';
             } else {
                 displayRawCSV(sortedData);
                 document.getElementById('rawCSV').style.display = 'block';
                 document.getElementById('tableOutput').style.display = 'none';
+                document.querySelector('.copy-button').style.display = 'block';
             }
         }
 
@@ -131,18 +147,18 @@
             }
 
             let html = '<table><tr>';
-            Object.keys(data[0]).forEach(header => {
+            data[0].forEach(header => {
                 html += `<th>${header}</th>`;
             });
             html += '</tr>';
 
-            data.forEach(row => {
+            for (let i = 1; i < data.length; i++) {
                 html += '<tr>';
-                Object.values(row).forEach(cell => {
+                data[i].forEach(cell => {
                     html += `<td>${cell || ''}</td>`;
                 });
                 html += '</tr>';
-            });
+            }
 
             html += '</table>';
             output.innerHTML = html;
@@ -154,15 +170,22 @@
                 return;
             }
 
-            const headers = Object.keys(data[0]);
-            const csvContent = [
-                headers.map(h => `"${h}"`).join(','),
-                ...data.map(row => 
-                    headers.map(header => `"${(row[header] || '').replace(/"/g, '""')}"`).join(',')
-                )
-            ].join('\n');
+            const csvContent = data.map(row => 
+                row.map(cell => `"${(cell || '').replace(/"/g, '""')}"`).join(',')
+            ).join('\n');
 
             document.getElementById('rawCSV').textContent = csvContent;
+        }
+
+        function copyToClipboard() {
+            const rawCSV = document.getElementById('rawCSV');
+            const textArea = document.createElement('textarea');
+            textArea.value = rawCSV.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('CSV data copied to clipboard!');
         }
 
         document.querySelectorAll('input[name="view"]').forEach(radio => {
