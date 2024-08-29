@@ -5,73 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CSV Facility Sort</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <style>
-        /* Base styles */
         body {
             font-family: Arial, sans-serif;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #fff; /* Light mode default */
-            color: #333;
-            font-size: 16px;
         }
-
-        /* Dark mode styles */
-        body.dark-mode {
-            background-color: #222;
-            color: #ddd;
-        }
-
-        /* Theme toggle button */
-        .theme-toggle {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
-
-        .theme-icon {
-            display: none;
-        }
-
-        .dark-mode .theme-icon:first-child {
-            display: none;
-        }
-
-        .dark-mode .theme-icon:last-child {
-            display: block;
-        }
-
-        /* Table styles */
         table {
             border-collapse: collapse;
             width: 100%;
             margin-bottom: 20px;
-            background-color: #f2f2f2; /* Light mode default */
         }
-
         th, td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
-
         th {
-            background-color: #f2f2f2; /* Light mode default */
-            color: #333;
+            background-color: #f2f2f2;
         }
-
-        .dark-mode table {
-            background-color: #333;
-        }
-
-        .dark-mode th {
-            background-color: #444;
-            color: #fff;
-        }
-
-        /* Other elements */
         #rawCSV {
             width: 100%;
             height: 200px;
@@ -82,11 +35,9 @@
             padding: 10px;
             box-sizing: border-box;
         }
-
         .view-toggle, .copy-button {
             margin-bottom: 10px;
         }
-
         button {
             padding: 5px 10px;
             cursor: pointer;
@@ -94,13 +45,6 @@
     </style>
 </head>
 <body>
-    <div class="theme-toggle">
-        <button id="themeButton">
-            <i class="material-icons">brightness_medium</i>
-            <i class="material-icons">brightness_high</i>
-        </button>
-    </div>
-
     <h1>CSV Sort By Facility</h1>
     <input type="file" id="csvFile" accept=".csv">
     <button onclick="processFile()">Sort CSV</button>
@@ -247,14 +191,6 @@
         document.querySelectorAll('input[name="view"]').forEach(radio => {
             radio.addEventListener('change', updateView);
         });
-        // Add this to toggle the theme
-        const themeButton = document.getElementById('themeButton');
-        const body = document.body;
-
-        themeButton.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-        
     </script>
-
 </body>
 </html>
