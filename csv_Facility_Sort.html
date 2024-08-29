@@ -5,26 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CSV Facility Sort</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <style>
+        /* Base styles */
         body {
             font-family: Arial, sans-serif;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            background-color: #fff; /* Light mode default */
+            color: #333;
+            font-size: 16px;
         }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #222;
+            color: #ddd;
+        }
+
+        /* Theme toggle button */
+        .theme-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .theme-icon {
+            display: none;
+        }
+
+        .dark-mode .theme-icon:first-child {
+            display: none;
+        }
+
+        .dark-mode .theme-icon:last-child {
+            display: block;
+        }
+
+        /* Table styles */
         table {
             border-collapse: collapse;
             width: 100%;
             margin-bottom: 20px;
+            background-color: #f2f2f2; /* Light mode default */
         }
+
         th, td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
+
         th {
-            background-color: #f2f2f2;
+            background-color: #f2f2f2; /* Light mode default */
+            color: #333;
         }
+
+        .dark-mode table {
+            background-color: #333;
+        }
+
+        .dark-mode th {
+            background-color: #444;
+            color: #fff;
+        }
+
+        /* Other elements */
         #rawCSV {
             width: 100%;
             height: 200px;
@@ -35,9 +82,11 @@
             padding: 10px;
             box-sizing: border-box;
         }
+
         .view-toggle, .copy-button {
             margin-bottom: 10px;
         }
+
         button {
             padding: 5px 10px;
             cursor: pointer;
@@ -45,6 +94,13 @@
     </style>
 </head>
 <body>
+    <div class="theme-toggle">
+        <button id="themeButton">
+            <i class="material-icons">brightness_medium</i>
+            <i class="material-icons">brightness_high</i>
+        </button>
+    </div>
+
     <h1>CSV Sort By Facility</h1>
     <input type="file" id="csvFile" accept=".csv">
     <button onclick="processFile()">Sort CSV</button>
@@ -62,134 +118,17 @@
         let sortedData = [];
 
         function processFile() {
-            const fileInput = document.getElementById('csvFile');
-            const file = fileInput.files[0];
-
-            if (file) {
-                Papa.parse(file, {
-                    complete: function(results) {
-                        sortAndDisplayData(results.data);
-                    }
-                });
-            } else {
-                alert('Please select a CSV file');
-            }
+            // ... (rest of your JavaScript code)
         }
 
-        function sortAndDisplayData(data) {
-            if (!data || data.length === 0) {
-                alert('The CSV file appears to be empty');
-                return;
-            }
+        // ... (rest of your JavaScript code)
 
-            const headerRow = data[0];
-            const facilityIndex = headerRow.findIndex(col => col.toLowerCase() === 'facility');
-            
-            if (facilityIndex === -1) {
-                alert('Facility column not found in the CSV.');
-                return;
-            }
+        // Add this to toggle the theme
+        const themeButton = document.getElementById('themeButton');
+        const body = document.body;
 
-            sortedData = data.slice(1).sort((a, b) => {
-                const facA = a[facilityIndex] || '';
-                const facB = b[facilityIndex] || '';
-                return compareFacilities(facA, facB);
-            });
-
-            sortedData.unshift(headerRow);
-            updateView();
-        }
-
-        function compareFacilities(a, b) {
-            if (!a) return b ? 1 : 0;
-            if (!b) return -1;
-
-            const partsA = a.split('-');
-            const partsB = b.split('-');
-
-            const alphaA = partsA[0].replace(/[0-9]/g, '');
-            const alphaB = partsB[0].replace(/[0-9]/g, '');
-            if (alphaA !== alphaB) {
-                return alphaA.localeCompare(alphaB);
-            }
-
-            for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
-                const numA = parseInt(partsA[i]?.match(/\d+/)?.[0] || '0', 10);
-                const numB = parseInt(partsB[i]?.match(/\d+/)?.[0] || '0', 10);
-                if (numA !== numB) {
-                    return numA - numB;
-                }
-            }
-
-            return 0;
-        }
-
-        function updateView() {
-            const viewType = document.querySelector('input[name="view"]:checked').value;
-            if (viewType === 'table') {
-                displayTableData(sortedData);
-                document.getElementById('rawCSV').style.display = 'none';
-                document.getElementById('tableOutput').style.display = 'block';
-                document.querySelector('.copy-button').style.display = 'none';
-            } else {
-                displayRawCSV(sortedData);
-                document.getElementById('rawCSV').style.display = 'block';
-                document.getElementById('tableOutput').style.display = 'none';
-                document.querySelector('.copy-button').style.display = 'block';
-            }
-        }
-
-        function displayTableData(data) {
-            const output = document.getElementById('tableOutput');
-            if (data.length === 0) {
-                output.innerHTML = 'No data to display';
-                return;
-            }
-
-            let html = '<table><tr>';
-            data[0].forEach(header => {
-                html += `<th>${header}</th>`;
-            });
-            html += '</tr>';
-
-            for (let i = 1; i < data.length; i++) {
-                html += '<tr>';
-                data[i].forEach(cell => {
-                    html += `<td>${cell || ''}</td>`;
-                });
-                html += '</tr>';
-            }
-
-            html += '</table>';
-            output.innerHTML = html;
-        }
-
-        function displayRawCSV(data) {
-            if (data.length === 0) {
-                document.getElementById('rawCSV').textContent = 'No data to display';
-                return;
-            }
-
-            const csvContent = data.map(row => 
-                row.map(cell => `"${(cell || '').replace(/"/g, '""')}"`).join(',')
-            ).join('\n');
-
-            document.getElementById('rawCSV').textContent = csvContent;
-        }
-
-        function copyToClipboard() {
-            const rawCSV = document.getElementById('rawCSV');
-            const textArea = document.createElement('textarea');
-            textArea.value = rawCSV.textContent;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            alert('CSV data copied to clipboard!');
-        }
-
-        document.querySelectorAll('input[name="view"]').forEach(radio => {
-            radio.addEventListener('change', updateView);
+        themeButton.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
         });
     </script>
 </body>
