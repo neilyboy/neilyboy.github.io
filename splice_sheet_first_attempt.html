@@ -20,12 +20,12 @@
             margin: 0 auto;
             padding: 20px;
         }
-        h1 {
+        h2 {
             color: #2c3e50;
             text-align: center;
-            font-size: 24px;
             margin: 0 0 20px 0;
             padding: 0;
+            font-size: 20px;
         }
         .controls {
             background-color: #f4f4f4;
@@ -53,30 +53,16 @@
             background-color: #2980b9;
         }
         #output {
-            column-count: 2;
-            column-gap: 20px;
-        }
-        .group {
-            background-color: #fff;
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            break-inside: avoid-column;
-            page-break-inside: avoid;
-        }
-        .group h2 {
-            color: #2c3e50;
-            margin: 0 0 10px 0;
-            font-size: 16px;
+            width: 100%;
         }
         table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 10px;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 6px;
+            padding: 4px;
             text-align: left;
         }
         th {
@@ -96,11 +82,15 @@
             font-size: 14px;
         }
         #uploadedImage {
+            display: block;
             max-width: 100%;
             height: auto;
-            margin-top: 20px;
+            margin: 20px auto;
         }
         @media print {
+            @page {
+                size: landscape;
+            }
             body {
                 margin: 0;
                 padding: 0;
@@ -112,31 +102,18 @@
             .controls {
                 display: none;
             }
-            h1 {
-                font-size: 18px;
-                margin-bottom: 10px;
-                page-break-after: avoid;
-            }
-            #output {
-                column-count: 2;
-                column-gap: 20px;
-            }
-            .group {
-                break-inside: avoid-column;
-                page-break-inside: avoid;
-            }
-            th, td {
-                padding: 4px;
-            }
-            tr:nth-child(even) {
-                background-color: #f2f2f2;
+            h2 { font-size: 18px; }
+            table { font-size: 8px; }
+            th, td { padding: 2px; }
+            #uploadedImage {
+                max-height: 300px;
+                object-fit: contain;
             }
         }
     </style>
 </head>
 <body>
     <div id="container">
-        <h1>XLSX Processor</h1>
         <div class="controls">
             <label for="file-upload" class="btn">Choose XLSX File</label>
             <input type="file" id="file-upload" accept=".xlsx" />
@@ -194,7 +171,6 @@
                     const fiberCount = fiberCountMatch ? fiberCountMatch[1] + ' Fiber' : 'N/A';
                     const incomingFiber = row[2] || '';
                     const groupInfo = (row[3] || '').split('=');
-                    const group = (groupInfo[0] || '').trim();
                     const groupFiberCount = (groupInfo[1] || '').trim();
                     const originatingInfo = (row[5] || '').split(':::');
                     const originatingVault = (originatingInfo[0] || '').trim();
@@ -208,7 +184,6 @@
                         endingVault,
                         fiberCount,
                         incomingFiber,
-                        group,
                         groupFiberCount,
                         originatingVault,
                         addressOrVault,
@@ -230,51 +205,38 @@
             if (data.length === 0) {
                 html += '<p class="error">No valid data found in the Excel file. Please check the file format and try again.</p>';
             } else {
-                const groupedData = data.reduce((acc, row) => {
-                    if (!acc[row.group]) {
-                        acc[row.group] = [];
-                    }
-                    acc[row.group].push(row);
-                    return acc;
-                }, {});
-
-                for (const [group, rows] of Object.entries(groupedData)) {
-                    html += `
-                        <div class="group">
-                            <h2>${group}</h2>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Beginning Vault</th>
-                                        <th>Ending Vault</th>
-                                        <th>Feed Fiber Size</th>
-                                        <th>Incoming Fiber</th>
-                                        <th>Group Fiber Count</th>
-                                        <th>Originating Vault</th>
-                                        <th>Address or Vault</th>
-                                        <th>Out Fiber Count</th>
-                                        <th>Out Fiber</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${rows.map(row => `
-                                        <tr>
-                                            <td>${row.beginningVault}</td>
-                                            <td>${row.endingVault}</td>
-                                            <td>${row.fiberCount}</td>
-                                            <td>${row.incomingFiber}</td>
-                                            <td>${row.groupFiberCount}</td>
-                                            <td>${row.originatingVault}</td>
-                                            <td>${row.addressOrVault}</td>
-                                            <td>${row.outFiberCount}</td>
-                                            <td>${row.outFiber}</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    `;
-                }
+                html += `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Beginning Vault</th>
+                                <th>Ending Vault</th>
+                                <th>Feed Fiber Size</th>
+                                <th>Incoming Fiber</th>
+                                <th>Group Fiber Count</th>
+                                <th>Originating Vault</th>
+                                <th>Address or Vault</th>
+                                <th>Out Fiber Count</th>
+                                <th>Out Fiber</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(row => `
+                                <tr>
+                                    <td>${row.beginningVault}</td>
+                                    <td>${row.endingVault}</td>
+                                    <td>${row.fiberCount}</td>
+                                    <td>${row.incomingFiber}</td>
+                                    <td>${row.groupFiberCount}</td>
+                                    <td>${row.originatingVault}</td>
+                                    <td>${row.addressOrVault}</td>
+                                    <td>${row.outFiberCount}</td>
+                                    <td>${row.outFiber}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
             }
 
             // Add image placeholder
