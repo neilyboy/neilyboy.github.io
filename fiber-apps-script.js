@@ -205,3 +205,74 @@ function displayDistributionTable(data, splitterName) {
                             <th>Fiber Size</th>
                             <th>Fibers Used</th>
                             <th>LCP Fiber Count</th>
+
+function displaySpliceReport(data, title, imageFile) {
+    const output = document.getElementById('output');
+    let html = `
+        <div class="splice-report">
+            <h2>${title}</h2>
+            <div class="table-container">
+    `;
+    
+    if (data.length === 0) {
+        html += '<p class="error">No valid data found in the Excel file. Please check the file format and try again.</p>';
+    } else {
+        html += `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Beginning Vault</th>
+                        <th>Ending Vault</th>
+                        <th>Feed Fiber Size</th>
+                        <th>Incoming Fiber</th>
+                        <th>Tube Color</th>
+                        <th>Fiber Color</th>
+                        <th>Group Fiber Count</th>
+                        <th>Originating Vault</th>
+                        <th>Address or Vault</th>
+                        <th>Out Fiber Count</th>
+                        <th>Out Fiber</th>
+                        <th>Out Fiber Color</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.map(row => `
+                        <tr>
+                            <td>${row.beginningVault}</td>
+                            <td>${row.endingVault}</td>
+                            <td>${row.fiberCount}</td>
+                            <td>${row.incomingFiber}</td>
+                            <td class="color-cell" style="background-color: ${row.tubeColor.hex}; color: ${row.tubeColor.name === 'Black' ? 'white' : 'black'}">${row.tubeColor.name}</td>
+                            <td class="color-cell" style="background-color: ${row.fiberColor.hex}; color: ${row.fiberColor.name === 'Black' ? 'white' : 'black'}">${row.fiberColor.name}</td>
+                            <td>${row.groupFiberCount}</td>
+                            <td>${row.originatingVault}</td>
+                            <td>${row.addressOrVault}</td>
+                            <td>${row.outFiberCount}</td>
+                            <td>${row.outFiber}</td>
+                            <td class="color-cell" style="background-color: ${row.outFiberColor.hex}; color: ${row.outFiberColor.name === 'Black' ? 'white' : 'black'}">${row.outFiberColor.name}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    html += `
+            </div>
+            <div class="image-container">
+                <img id="uploadedImage" alt="Uploaded Image" />
+            </div>
+        </div>
+    `;
+
+    output.innerHTML = html;
+
+    // Load and display the image
+    if (imageFile) {
+        const imageReader = new FileReader();
+        imageReader.onload = function(e) {
+            document.getElementById('uploadedImage').src = e.target.result;
+        };
+        imageReader.readAsDataURL(imageFile);
+    }
+}
