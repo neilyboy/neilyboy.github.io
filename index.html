@@ -3,354 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fiber Layout Applications</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <title>Fiber Network Tools</title>
     <style>
-        body, html {
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
             margin: 0;
             padding: 0;
-            font-family: 'Arial', sans-serif;
-            line-height: 1.4;
-            color: #333;
-            font-size: 12px;
-            background-color: #fff;
+            background-color: #f4f4f4;
         }
-        #container {
-            max-width: 1200px;
-            margin: 0 auto;
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
             padding: 20px;
         }
-        h1 {
-            color: #2c3e50;
+        header {
+            background: #35424a;
+            color: #ffffff;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #e8491d 3px solid;
+        }
+        header h1 {
+            margin: 0;
             text-align: center;
-            font-size: 24px;
-            margin: 0 0 20px 0;
-            padding: 0;
+            padding-bottom: 20px;
         }
-        .controls {
-            background-color: #f4f4f4;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+        .app-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .app-card h2 {
+            color: #35424a;
+        }
+        .app-card p {
             margin-bottom: 20px;
         }
-        #file-upload {
-            display: none;
-        }
-        .btn {
+        .button {
             display: inline-block;
-            background-color: #3498db;
-            color: #fff;
-            padding: 8px 16px;
+            padding: 10px 20px;
+            background: #e8491d;
+            color: #ffffff;
+            text-decoration: none;
             border-radius: 5px;
-            cursor: pointer;
             transition: background-color 0.3s ease;
-            font-size: 14px;
-            border: none;
-            margin: 5px;
         }
-        .btn:hover {
-            background-color: #2980b9;
-        }
-        #output {
-            column-count: 2;
-            column-gap: 20px;
-        }
-        .group {
-            background-color: #fff;
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            break-inside: avoid-column;
-            page-break-inside: avoid;
-        }
-        .group h2 {
-            color: #2c3e50;
-            margin: 0 0 10px 0;
-            font-size: 16px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 6px;
-            text-align: left;
-        }
-        th {
-            background-color: #34495e;
-            color: #fff;
-            font-weight: bold;
-        }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        #title-input {
-            width: calc(100% - 110px);
-            margin: 5px;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        #app-selector {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        #app-selector .btn {
-            margin: 0 10px;
-        }
-        @media print {
-            body {
-                margin: 0;
-                padding: 0;
-            }
-            #container {
-                padding: 0;
-                max-width: none;
-            }
-            .controls, #app-selector {
-                display: none;
-            }
-            h1 {
-                font-size: 18px;
-                margin-bottom: 10px;
-                page-break-after: avoid;
-            }
-            #output {
-                column-count: 2;
-                column-gap: 20px;
-            }
-            .group {
-                break-inside: avoid-column;
-                page-break-inside: avoid;
-            }
-            th, td {
-                padding: 4px;
-            }
-            tr:nth-child(even) {
-                background-color: #f2f2f2;
-            }
+        .button:hover {
+            background: #ff5722;
         }
     </style>
 </head>
 <body>
-    <div id="container">
-        <h1 id="main-title">Fiber Layout Applications</h1>
-        <div id="app-selector">
-            <button class="btn" onclick="selectApp('splitter')">Fiber Splitter Cabinet Layout</button>
-            <button class="btn" onclick="selectApp('distribution')">Distribution Fiber Layout</button>
+    <header>
+        <div class="container">
+            <h1>Fiber Network Tools</h1>
         </div>
-        <div id="app-container" style="display: none;">
-            <div class="controls">
-                <label for="file-upload" class="btn">Choose XLSX File</label>
-                <input type="file" id="file-upload" accept=".xlsx" />
-                <input type="text" id="title-input" placeholder="Enter title" required>
-                <button id="process-btn" class="btn">Process File</button>
-                <button id="print-btn" class="btn" style="display: none;">Print</button>
+    </header>
+
+    <div class="container">
+        <div class="app-grid">
+            <div class="app-card">
+                <h2>Splice Sheet</h2>
+                <p>Generate and manage fiber splice sheets for your network installations.</p>
+                <a href="vault_Splice_Sheet.html" class="button">Open App</a>
             </div>
-            <div id="output"></div>
+            <div class="app-card">
+                <h2>Splitter Cabinet Layout</h2>
+                <p>Design and visualize fiber splitter cabinet layouts for efficient network distribution.</p>
+                <a href="lcp_Splitter_Cabinet_Full_Customer.html" class="button">Open App</a>
+            </div>
+            <div class="app-card">
+                <h2>Distribution Fiber LCP Cabinet Layout</h2>
+                <p>Plan and optimize distribution fiber LCP cabinet layouts for your network infrastructure.</p>
+                <a href="lcp_Cabinet_Group_Layout.html" class="button">Open App</a>
+            </div>
         </div>
     </div>
-
-    <script>
-        let currentApp = '';
-
-        function selectApp(app) {
-            currentApp = app;
-            document.getElementById('app-container').style.display = 'block';
-            document.getElementById('main-title').textContent = app === 'splitter' ? 'Fiber Splitter Cabinet Layout' : 'Distribution Fiber LCP Cabinet Layout';
-            document.getElementById('title-input').placeholder = app === 'splitter' ? 'Enter splitter name' : 'Enter Splitter Name';
-            document.getElementById('output').innerHTML = '';
-            document.getElementById('print-btn').style.display = 'none';
-        }
-
-        document.getElementById('file-upload').addEventListener('change', updateFileName, false);
-        document.getElementById('process-btn').addEventListener('click', processFile);
-        document.getElementById('print-btn').addEventListener('click', () => window.print());
-
-        function updateFileName() {
-            const fileName = this.value.split("\\").pop();
-            this.previousElementSibling.textContent = fileName || "Choose XLSX File";
-        }
-
-        function processFile() {
-            const fileInput = document.getElementById('file-upload');
-            const titleInput = document.getElementById('title-input').value;
-            const output = document.getElementById('output');
-
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const sheetName = workbook.SheetNames[0];
-                const sheet = workbook.Sheets[sheetName];
-                let jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
-
-                if (currentApp === 'splitter') {
-                    processSplitterData(jsonData, titleInput);
-                } else {
-                    processDistributionData(jsonData, titleInput);
-                }
-
-                document.getElementById('print-btn').style.display = 'inline-block';
-                document.getElementById('main-title').textContent += ` For ${titleInput}`;
-                document.title = `${currentApp === 'splitter' ? 'Splitter' : 'Distribution'} Fiber Layout - ${titleInput}`;
-            };
-
-            reader.readAsArrayBuffer(file);
-        }
-
-        function processSplitterData(jsonData, splitterName) {
-            jsonData = jsonData.slice(2, -1);
-            const processedData = jsonData.map(row => ({
-                Vault: row[0],
-                Address: row[1].split(':::')[1].split('SEBF')[0].trim(),
-                Port: row[2]
-            })).filter(row => !row.Port.includes('-'));
-
-            processedData.sort((a, b) => {
-                const aMatch = a.Address.match(/(\d+)\s+(.+)/);
-                const bMatch = b.Address.match(/(\d+)\s+(.+)/);
-                if (aMatch && bMatch) {
-                    const [, aNum, aStreet] = aMatch;
-                    const [, bNum, bStreet] = bMatch;
-                    if (aStreet === bStreet) {
-                        return parseInt(aNum) - parseInt(bNum);
-                    }
-                    return aStreet.localeCompare(bStreet);
-                }
-                return 0;
-            });
-
-            const groupedData = processedData.reduce((acc, row) => {
-                const street = row.Address.replace(/^\d+\s+/, '');
-                if (!acc[street]) {
-                    acc[street] = [];
-                }
-                acc[street].push(row);
-                return acc;
-            }, {});
-
-            displaySplitterTable(groupedData, splitterName);
-        }
-
-        function processDistributionData(jsonData, splitterName) {
-            const processedData = jsonData.slice(1).map(row => {
-                const vaultInfo = row[0].split(':::')[1].split('BFO');
-                const vaultRaw = vaultInfo[0].trim();
-                const vaultLetter = vaultRaw.charAt(0);
-                let vaultDirection = '';
-                switch(vaultLetter) {
-                    case 'A': vaultDirection = '[North]'; break;
-                    case 'B': vaultDirection = '[East]'; break;
-                    case 'C': vaultDirection = '[South]'; break;
-                    case 'D': vaultDirection = '[West]'; break;
-                }
-                const vault = `${vaultRaw} ${vaultDirection}`;
-                
-                const fiberSizeMatch = vaultInfo[1].match(/(\d+)/);
-                const fiberSize = fiberSizeMatch ? `${fiberSizeMatch[1]} Fiber` : vaultInfo[1].trim();
-
-                return {
-                    Vault: vault,
-                    "Fiber Size": fiberSize,
-                    "Fibers Used": row[1],
-                    "Fiber Group": row[2],
-                    "LCP Fiber Count": row[3]
-                };
-            });
-
-            processedData.sort((a, b) => {
-                const groupA = parseInt(a["Fiber Group"].split(' ')[1]);
-                const groupB = parseInt(b["Fiber Group"].split(' ')[1]);
-                if (groupA !== groupB) {
-                    return groupA - groupB;
-                }
-                const countA = parseInt(a["LCP Fiber Count"].split('-')[0]);
-                const countB = parseInt(b["LCP Fiber Count"].split('-')[0]);
-                return countA - countB;
-            });
-
-            const groupedData = processedData.reduce((acc, row) => {
-                if (!acc[row['Fiber Group']]) {
-                    acc[row['Fiber Group']] = [];
-                }
-                acc[row['Fiber Group']].push(row);
-                return acc;
-            }, {});
-
-            displayDistributionTable(groupedData, splitterName);
-        }
-
-        function displaySplitterTable(data, splitterName) {
-            const output = document.getElementById('output');
-            let html = '';
-            for (const [street, rows] of Object.entries(data)) {
-                html += `
-                    <div class="group">
-                        <h2>${street}</h2>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Vault</th>
-                                    <th>Address</th>
-                                    <th>Port</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${rows.map(row => `
-                                    <tr>
-                                        <td>${row.Vault}</td>
-                                        <td>${row.Address}</td>
-                                        <td>${row.Port}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-            }
-            output.innerHTML = html;
-        }
-
-        function displayDistributionTable(data, splitterName) {
-            const output = document.getElementById('output');
-            let html = '';
-            for (const [group, rows] of Object.entries(data)) {
-                html += `
-                    <div class="group">
-                        <h2>${group}</h2>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Vault</th>
-                                    <th>Fiber Size</th>
-                                    <th>Fibers Used</th>
-                                    <th>LCP Fiber Count</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${rows.map(row => `
-                                    <tr>
-                                        <td>${row.Vault}</td>
-                                        <td>${row['Fiber Size']}</td>
-                                        <td>${row['Fibers Used']}</td>
-                                        <td>${row['LCP Fiber Count']}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-            }
-            output.innerHTML = html;
-        }
-    </script>
 </body>
 </html>
