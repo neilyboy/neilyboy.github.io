@@ -249,13 +249,19 @@
         }
 
         // Splitter app functions
-        function processSplitterData(jsonData, splitterName) {
+function processSplitterData(jsonData, splitterName) {
             jsonData = jsonData.slice(2, -1);
-            const processedData = jsonData.map(row => ({
-                Vault: row[0],
-                Address: row[1].split(':::')[1].split('SEBF')[0].trim(),
-                Port: row[2]
-            })).filter(row => !row.Port.includes('-'));
+            const processedData = jsonData.map(row => {
+                if (!Array.isArray(row) || row.length < 3) {
+                    console.warn("Invalid row data:", row);
+                    return null;
+                }
+                const vault = row[0] || '';
+                const addressInfo = (row[1] || '').split(':::');
+                const address = addressInfo.length > 1 ? addressInfo[1].split('SEBF')[0].trim() : '';
+                const port = row[2] || '';
+                return { Vault: vault, Address: address, Port: port };
+            }).filter(row => row !== null && !row.Port.includes('-'));
 
             processedData.sort((a, b) => {
                 const aMatch = a.Address.match(/(\d+)\s+(.+)/);
