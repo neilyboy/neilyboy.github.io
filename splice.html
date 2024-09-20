@@ -485,9 +485,13 @@ function processSplitterData(jsonData, splitterName) {
             displaySpliceReport(processedData, title, imageFile);
         }
 
-        function displaySpliceReport(data, title, imageFile) {
+function displaySpliceReport(data, title, imageFile) {
             const output = document.getElementById('output');
-            let html = `<h2>${title}</h2>`;
+            let html = `
+                <h2>${title}</h2>
+                <div class="splice-report">
+                    <div class="table-container">
+            `;
             
             if (data.length === 0) {
                 html += '<p class="error">No valid data found in the Excel file. Please check the file format and try again.</p>';
@@ -532,8 +536,13 @@ function processSplitterData(jsonData, splitterName) {
                 `;
             }
 
-            // Add image placeholder
-            html += '<img id="uploadedImage" alt="Uploaded Image" />';
+            html += `
+                    </div>
+                    <div class="image-container">
+                        <img id="uploadedImage" alt="Uploaded Image" />
+                    </div>
+                </div>
+            `;
 
             output.innerHTML = html;
 
