@@ -12,7 +12,7 @@
             font-family: 'Arial', sans-serif;
             line-height: 1.4;
             color: #333;
-            font-size: 18px;
+            font-size: 12px;
             background-color: #fff;
         }
         #container {
@@ -58,7 +58,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 18px;
+            font-size: 10px;
         }
         th, td {
             border: 1px solid #ddd;
@@ -214,8 +214,12 @@
                     const outFiberCountMatch = (row[5] || '').match(/(\d+)I/);
                     const outFiberCount = outFiberCountMatch ? outFiberCountMatch[1] + ' Fiber' : 'N/A';
                     const outFiber = row[6] || '';
-                    const outFiberNumber = parseInt(outFiber.split('-')[0]) || 0;
-                    const outFiberColor = getFiberColor(outFiberNumber);
+                    let outFiberColor = { name: '', hex: '' };
+                    
+                    if (!outFiber.includes('-')) {
+                        const outFiberNumber = parseInt(outFiber) || 0;
+                        outFiberColor = getFiberColor(outFiberNumber);
+                    }
 
                     processedData.push({
                         beginningVault,
