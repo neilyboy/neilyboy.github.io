@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Splice Sheet Generator</title>
+    <title>XLSX Processor</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         body, html {
@@ -58,7 +58,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
+            font-size: 10px;
         }
         th, td {
             border: 1px solid #ddd;
@@ -88,6 +88,7 @@
             margin: 20px auto;
         }
         .color-cell {
+            font-weight: bold;
             text-shadow: none;
         }
         @media print {
@@ -147,7 +148,7 @@
             { name: 'Slate', hex: '#999999a6' },
             { name: 'White', hex: '#FFFFFFFF' },
             { name: 'Red', hex: '#cc0000a6' },
-            { name: 'Black', hex: '#000000' },
+            { name: 'Black', hex: '#00000000' },
             { name: 'Yellow', hex: '#ffff33a1' },
             { name: 'Violet', hex: '#660066b0' },
             { name: 'Rose', hex: '#ff669999' },
@@ -196,9 +197,15 @@
                     const fiberCountMatch = (row[1] || '').match(/(\d+)I/);
                     const fiberCount = fiberCountMatch ? fiberCountMatch[1] + ' Fiber' : 'N/A';
                     const incomingFiber = row[2] || '';
-                    const fiberNumber = parseInt(incomingFiber.split('-')[0]) || 0;
-                    const tubeColor = getTubeColor(fiberNumber);
-                    const fiberColor = getFiberColor(fiberNumber);
+                    let tubeColor = { name: '', hex: '' };
+                    let fiberColor = { name: '', hex: '' };
+                    
+                    if (!incomingFiber.includes('-')) {
+                        const fiberNumber = parseInt(incomingFiber) || 0;
+                        tubeColor = getTubeColor(fiberNumber);
+                        fiberColor = getFiberColor(fiberNumber);
+                    }
+
                     const groupInfo = (row[3] || '').split('=');
                     const groupFiberCount = (groupInfo[1] || '').trim();
                     const originatingInfo = (row[5] || '').split(':::');
