@@ -149,7 +149,44 @@
                 object-fit: contain;
             }
         }
-    </style>
+.splice-report {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+.image-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+#uploadedImage {
+    max-width: 100%;
+    height: auto;
+}
+
+@media print {
+    .splice-report {
+        display: block;
+    }
+
+    .table-container {
+        overflow-x: visible;
+    }
+
+    #uploadedImage {
+        max-height: none;
+        object-fit: contain;
+        page-break-before: always;
+    }
+}
 </head>
 <body>
     <div id="container">
