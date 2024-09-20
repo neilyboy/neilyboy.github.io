@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XLSX Processor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            line-height: 1.4;
+            color: #333;
+            font-size: 12px;
+            background-color: #fff;
+        }
+        #container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            font-size: 24px;
+            margin: 0 0 20px 0;
+            padding: 0;
+        }
+        .controls {
+            background-color: #f4f4f4;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        #file-upload {
+            display: none;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 14px;
+            border: none;
+            margin: 5px;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        #output {
+            column-count: 2;
+            column-gap: 20px;
+        }
+        .street-group {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            break-inside: avoid-column;
+            page-break-inside: avoid;
+        }
+        .street-group h2 {
+            color: #2c3e50;
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: left;
+        }
+        th {
+            background-color: #34495e;
+            color: #fff;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        #title-input {
+            width: calc(100% - 110px);
+            margin: 5px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        #title-form {
+            display: none;
+        }
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            #container {
+                padding: 0;
+                max-width: none;
+            }
+            .controls {
+                display: none;
+            }
+            h1 {
+                font-size: 18px;
+                margin-bottom: 10px;
+                page-break-after: avoid;
+            }
+            #output {
+                column-count: 2;
+                column-gap: 20px;
+            }
+            .street-group {
+                break-inside: avoid-column;
+                page-break-inside: avoid;
+            }
+            th, td {
+                padding: 4px;
+            }
+            tr:nth-child(even) {
+                background-color: #f2f2f2;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1 id="main-title">Fiber Splitter Cabinet Layout</h1>
+        <div class="controls">
+            <label for="file-upload" class="btn">Choose XLSX File</label>
+            <input type="file" id="file-upload" accept=".xlsx" />
+            <button id="print-btn" class="btn" style="display: none;">Print</button>
+            <form id="title-form">
+                <input type="text" id="title-input" placeholder="Enter splitter name or title" required>
+                <button type="submit" class="btn">Set Title</button>
+            </form>
+        </div>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        document.getElementById('file-upload').addEventListener('change', handleFile, false);
+        document.getElementById('print-btn').addEventListener('click', () => window.print());
+        document.getElementById('title-form').addEventListener('submit', handleTitleChange);
+
+        function handleFile(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                let jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+
+                // Remove the first two rows and the last row
+                jsonData = jsonData.slice(2, -1);
+
+                // Process the data
+                const processedData = jsonData.map(row => ({
+                    Vault: row[0],
+                    Address: row[1].split(':::')[1].split('SEBF')[0].trim(),
+                    Port: row[2]
+                })).filter(row => !row.Port.includes('-'));
+
+                // Sort the data by street name and number
+                processedData.sort((a, b) => {
+                    const aMatch = a.Address.match(/(\d+)\s+(.+)/);
+                    const bMatch = b.Address.match(/(\d+)\s+(.+)/);
+                    if (aMatch && bMatch) {
+                        const [, aNum, aStreet] = aMatch;
+                        const [, bNum, bStreet] = bMatch;
+                        if (aStreet === bStreet) {
+                            return parseInt(aNum) - parseInt(bNum);
+                        }
+                        return aStreet.localeCompare(bStreet);
+                    }
+                    return 0;
+                });
+
+                // Group the data by street
+                const groupedData = processedData.reduce((acc, row) => {
+                    const street = row.Address.replace(/^\d+\s+/, '');
+                    if (!acc[street]) {
+                        acc[street] = [];
+                    }
+                    acc[street].push(row);
+                    return acc;
+                }, {});
+
+                // Generate HTML output
+                let output = '';
+                for (const [street, rows] of Object.entries(groupedData)) {
+                    output += `
+                        <div class="street-group">
+                            <h2>${street}</h2>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Vault</th>
+                                        <th>Address</th>
+                                        <th>Port</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${rows.map(row => `
+                                        <tr>
+                                            <td>${row.Vault}</td>
+                                            <td>${row.Address}</td>
+                                            <td>${row.Port}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+
+                document.getElementById('output').innerHTML = output;
+                document.getElementById('print-btn').style.display = 'inline-block';
+                document.getElementById('title-form').style.display = 'block';
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function handleTitleChange(e) {
+            e.preventDefault();
+            const newTitle = document.getElementById('title-input').value;
+            document.getElementById('main-title').textContent = newTitle;
+            document.title = newTitle;
+        }
+    </script>
+</body>
+</html>
