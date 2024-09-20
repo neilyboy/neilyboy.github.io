@@ -114,6 +114,9 @@
             text-shadow: none;
         }
         @media print {
+            @page {
+                size: landscape;
+            }
             body {
                 margin: 0;
                 padding: 0;
@@ -131,7 +134,7 @@
                 page-break-after: avoid;
             }
             #output {
-                column-count: 2;
+                column-count: 1;
                 column-gap: 20px;
             }
             .group {
