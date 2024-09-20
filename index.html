@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiber Layout and Splice Sheet Applications</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="container">
+        <h1 id="main-title">Fiber Layout and Splice Sheet Applications</h1>
+        <div id="app-selector">
+            <button class="btn" onclick="selectApp('splitter')">Fiber Splitter Cabinet Layout</button>
+            <button class="btn" onclick="selectApp('distribution')">Distribution Fiber Layout</button>
+            <button class="btn" onclick="selectApp('splice')">Splice Sheet Generator</button>
+        </div>
+        <div id="app-container" style="display: none;">
+            <div class="controls">
+                <label for="file-upload" class="btn">Choose XLSX File</label>
+                <input type="file" id="file-upload" accept=".xlsx" />
+                <input type="text" id="title-input" placeholder="Enter title" required>
+                <label for="imageFile" class="btn" style="display: none;">Upload Image</label>
+                <input type="file" id="imageFile" accept=".png,.jpg,.jpeg" style="display:none;">
+                <button id="process-btn" class="btn">Process File</button>
+                <button id="print-btn" class="btn" style="display: none;">Print</button>
+            </div>
+            <div id="output"></div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+    <script src="splitter.js"></script>
+    <script src="distribution.js"></script>
+    <script src="splice.js"></script>
+</body>
+</html>
