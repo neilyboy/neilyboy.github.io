@@ -20,14 +20,13 @@
             margin: 0 auto;
             padding: 20px;
         }
-        h1, h2 {
+        h1 {
             color: #2c3e50;
             text-align: center;
+            font-size: 24px;
             margin: 0 0 20px 0;
             padding: 0;
         }
-        h1 { font-size: 24px; }
-        h2 { font-size: 20px; }
         .controls {
             background-color: #f4f4f4;
             border-radius: 8px;
@@ -104,19 +103,7 @@
         #app-selector .btn {
             margin: 0 10px;
         }
-        #uploadedImage {
-            display: block;
-            max-width: 100%;
-            height: auto;
-            margin: 20px auto;
-        }
-        .color-cell {
-            text-shadow: none;
-        }
         @media print {
-            @page {
-                size: landscape;
-            }
             body {
                 margin: 0;
                 padding: 0;
@@ -134,7 +121,7 @@
                 page-break-after: avoid;
             }
             #output {
-                column-count: 1;
+                column-count: 2;
                 column-gap: 20px;
             }
             .group {
@@ -147,10 +134,6 @@
             tr:nth-child(even) {
                 background-color: #f2f2f2;
             }
-            #uploadedImage {
-                max-height: 300px;
-                object-fit: contain;
-            }
         }
     </style>
 </head>
@@ -160,15 +143,12 @@
         <div id="app-selector">
             <button class="btn" onclick="selectApp('splitter')">Fiber Splitter Cabinet Layout</button>
             <button class="btn" onclick="selectApp('distribution')">Distribution Fiber Layout</button>
-            <button class="btn" onclick="selectApp('splice')">Splice Sheet Generator</button>
         </div>
         <div id="app-container" style="display: none;">
             <div class="controls">
                 <label for="file-upload" class="btn">Choose XLSX File</label>
                 <input type="file" id="file-upload" accept=".xlsx" />
                 <input type="text" id="title-input" placeholder="Enter title" required>
-                <label for="imageFile" id="image-upload-label" class="btn" style="display: none;">Upload Image</label>
-                <input type="file" id="imageFile" accept=".png,.jpg,.jpeg" style="display:none;">
                 <button id="process-btn" class="btn">Process File</button>
                 <button id="print-btn" class="btn" style="display: none;">Print</button>
             </div>
@@ -182,17 +162,10 @@
         function selectApp(app) {
             currentApp = app;
             document.getElementById('app-container').style.display = 'block';
-            document.getElementById('main-title').textContent = 
-                app === 'splitter' ? 'Fiber Splitter Cabinet Layout' : 
-                app === 'distribution' ? 'Distribution Fiber LCP Cabinet Layout' : 
-                'Splice Sheet Generator';
-            document.getElementById('title-input').placeholder = 
-                app === 'splitter' ? 'Enter splitter name' : 
-                app === 'distribution' ? 'Enter Splitter Name' : 
-                'Enter title';
+            document.getElementById('main-title').textContent = app === 'splitter' ? 'Fiber Splitter Cabinet Layout' : 'Distribution Fiber LCP Cabinet Layout';
+            document.getElementById('title-input').placeholder = app === 'splitter' ? 'Enter splitter name' : 'Enter Splitter Name';
             document.getElementById('output').innerHTML = '';
             document.getElementById('print-btn').style.display = 'none';
-            document.getElementById('image-upload-label').style.display = app === 'splice' ? 'inline-block' : 'none';
         }
 
         document.getElementById('file-upload').addEventListener('change', updateFileName, false);
@@ -207,7 +180,6 @@
         function processFile() {
             const fileInput = document.getElementById('file-upload');
             const titleInput = document.getElementById('title-input').value;
-            const imageFile = document.getElementById('imageFile').files[0];
             const output = document.getElementById('output');
 
             const file = fileInput.files[0];
@@ -222,173 +194,163 @@
 
                 if (currentApp === 'splitter') {
                     processSplitterData(jsonData, titleInput);
-                } else if (currentApp === 'distribution') {
+                } else {
                     processDistributionData(jsonData, titleInput);
-                } else if (currentApp === 'splice') {
-                    processSpliceData(jsonData, titleInput, imageFile);
                 }
 
                 document.getElementById('print-btn').style.display = 'inline-block';
                 document.getElementById('main-title').textContent += ` For ${titleInput}`;
-                document.title = `${currentApp.charAt(0).toUpperCase() + currentApp.slice(1)} Fiber Layout - ${titleInput}`;
+                document.title = `${currentApp === 'splitter' ? 'Splitter' : 'Distribution'} Fiber Layout - ${titleInput}`;
             };
 
             reader.readAsArrayBuffer(file);
         }
 
-        // Existing functions (processSplitterData, processDistributionData, etc.) remain unchanged
+        function processSplitterData(jsonData, splitterName) {
+            jsonData = jsonData.slice(2, -1);
+            const processedData = jsonData.map(row => ({
+                Vault: row[0],
+                Address: row[1].split(':::')[1].split('SEBF')[0].trim(),
+                Port: row[2]
+            })).filter(row => !row.Port.includes('-'));
 
-        // New functions for Splice Sheet Generator
-        const fiberColors = [
-            { name: 'Blue', hex: '#3366ffa6' },
-            { name: 'Orange', hex: '#ff6600a6' },
-            { name: 'Green', hex: '#336633b5' },
-            { name: 'Brown', hex: '#9966339c' },
-            { name: 'Slate', hex: '#999999a6' },
-            { name: 'White', hex: '#FFFFFFFF' },
-            { name: 'Red', hex: '#cc0000a6' },
-            { name: 'Black', hex: '#000000' },
-            { name: 'Yellow', hex: '#ffff33a1' },
-            { name: 'Violet', hex: '#660066b0' },
-            { name: 'Rose', hex: '#ff669999' },
-            { name: 'Aqua', hex: '#00cccca6' }
-        ];
-
-        function getFiberColor(fiberNumber) {
-            return fiberColors[(fiberNumber - 1) % 12];
-        }
-
-        function getTubeColor(fiberNumber) {
-            return fiberColors[Math.floor((fiberNumber - 1) / 12) % 12];
-        }
-
-        function processSpliceData(data, title, imageFile) {
-            const processedData = [];
-            for (let i = 2; i < data.length; i++) {
-                const row = data[i];
-                if (!row || row.length < 7) continue;
-
-                try {
-                    const vaultInfo = (row[1] || '').split(':::');
-                    const beginningVault = (vaultInfo[0] || '').replace(/\([^)]*\)/g, '').trim();
-                    const endingVault = ((vaultInfo[1] || '').split('BFO')[0] || '').trim();
-                    const fiberCountMatch = (row[1] || '').match(/(\d+)I/);
-                    const fiberCount = fiberCountMatch ? fiberCountMatch[1] + ' Fiber' : 'N/A';
-                    const incomingFiber = row[2] || '';
-                    let tubeColor = { name: '', hex: '' };
-                    let fiberColor = { name: '', hex: '' };
-                    
-                    if (!incomingFiber.includes('-')) {
-                        const fiberNumber = parseInt(incomingFiber) || 0;
-                        tubeColor = getTubeColor(fiberNumber);
-                        fiberColor = getFiberColor(fiberNumber);
+            processedData.sort((a, b) => {
+                const aMatch = a.Address.match(/(\d+)\s+(.+)/);
+                const bMatch = b.Address.match(/(\d+)\s+(.+)/);
+                if (aMatch && bMatch) {
+                    const [, aNum, aStreet] = aMatch;
+                    const [, bNum, bStreet] = bMatch;
+                    if (aStreet === bStreet) {
+                        return parseInt(aNum) - parseInt(bNum);
                     }
-
-                    const groupInfo = (row[3] || '').split('=');
-                    const groupFiberCount = (groupInfo[1] || '').trim();
-                    const originatingInfo = (row[5] || '').split(':::');
-                    const originatingVault = (originatingInfo[0] || '').trim();
-                    const addressOrVault = ((originatingInfo[1] || '').split(/SEBF|BFO/)[0] || '').trim();
-                    const outFiberCountMatch = (row[5] || '').match(/(\d+)I/);
-                    const outFiberCount = outFiberCountMatch ? outFiberCountMatch[1] + ' Fiber' : 'N/A';
-                    const outFiber = row[6] || '';
-                    let outFiberColor = { name: '', hex: '' };
-                    
-                    if (!outFiber.includes('-')) {
-                        const outFiberNumber = parseInt(outFiber) || 0;
-                        outFiberColor = getFiberColor(outFiberNumber);
-                    }
-
-                    processedData.push({
-                        beginningVault,
-                        endingVault,
-                        fiberCount,
-                        incomingFiber,
-                        tubeColor,
-                        fiberColor,
-                        groupFiberCount,
-                        originatingVault,
-                        addressOrVault,
-                        outFiberCount,
-                        outFiber,
-                        outFiberColor
-                    });
-                } catch (error) {
-                    console.error(`Error processing row ${i + 1}:`, error);
+                    return aStreet.localeCompare(bStreet);
                 }
-            }
+                return 0;
+            });
 
-            displaySpliceReport(processedData, title, imageFile);
+            const groupedData = processedData.reduce((acc, row) => {
+                const street = row.Address.replace(/^\d+\s+/, '');
+                if (!acc[street]) {
+                    acc[street] = [];
+                }
+                acc[street].push(row);
+                return acc;
+            }, {});
+
+            displaySplitterTable(groupedData, splitterName);
         }
 
-        function displaySpliceReport(data, title, imageFile) {
+        function processDistributionData(jsonData, splitterName) {
+            const processedData = jsonData.slice(1).map(row => {
+                const vaultInfo = row[0].split(':::')[1].split('BFO');
+                const vaultRaw = vaultInfo[0].trim();
+                const vaultLetter = vaultRaw.charAt(0);
+                let vaultDirection = '';
+                switch(vaultLetter) {
+                    case 'A': vaultDirection = '[North]'; break;
+                    case 'B': vaultDirection = '[East]'; break;
+                    case 'C': vaultDirection = '[South]'; break;
+                    case 'D': vaultDirection = '[West]'; break;
+                }
+                const vault = `${vaultRaw} ${vaultDirection}`;
+                
+                const fiberSizeMatch = vaultInfo[1].match(/(\d+)/);
+                const fiberSize = fiberSizeMatch ? `${fiberSizeMatch[1]} Fiber` : vaultInfo[1].trim();
+
+                return {
+                    Vault: vault,
+                    "Fiber Size": fiberSize,
+                    "Fibers Used": row[1],
+                    "Fiber Group": row[2],
+                    "LCP Fiber Count": row[3]
+                };
+            });
+
+            processedData.sort((a, b) => {
+                const groupA = parseInt(a["Fiber Group"].split(' ')[1]);
+                const groupB = parseInt(b["Fiber Group"].split(' ')[1]);
+                if (groupA !== groupB) {
+                    return groupA - groupB;
+                }
+                const countA = parseInt(a["LCP Fiber Count"].split('-')[0]);
+                const countB = parseInt(b["LCP Fiber Count"].split('-')[0]);
+                return countA - countB;
+            });
+
+            const groupedData = processedData.reduce((acc, row) => {
+                if (!acc[row['Fiber Group']]) {
+                    acc[row['Fiber Group']] = [];
+                }
+                acc[row['Fiber Group']].push(row);
+                return acc;
+            }, {});
+
+            displayDistributionTable(groupedData, splitterName);
+        }
+
+        function displaySplitterTable(data, splitterName) {
             const output = document.getElementById('output');
-            let html = `<h2>${title}</h2>`;
-            
-            if (data.length === 0) {
-                html += '<p class="error">No valid data found in the Excel file. Please check the file format and try again.</p>';
-            } else {
+            let html = '';
+            for (const [street, rows] of Object.entries(data)) {
                 html += `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Beginning Vault</th>
-                                <th>Ending Vault</th>
-                                <th>Feed Fiber Size</th>
-                                <th>Incoming Fiber</th>
-                                <th>Tube Color</th>
-                                <th>Fiber Color</th>
-                                <th>Group Fiber Count</th>
-                                <th>Originating Vault</th>
-                                <th>Address or Vault</th>
-                                <th>Out Fiber Count</th>
-                                <th>Out Fiber</th>
-                                <th>Out Fiber Color</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${data.map(row => `
+                    <div class="group">
+                        <h2>${street}</h2>
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td>${row.beginningVault}</td>
-                                    <td>${row.endingVault}</td>
-                                    <td>${row.fiberCount}</td>
-                                    <td>${row.incomingFiber}</td>
-                                    <td class="color-cell" style="background-color: ${row.tubeColor.hex}; color: ${row.tubeColor.name === 'Black' ? 'white' : 'black'}">${row.tubeColor.name}</td>
-                                    <td class="color-cell" style="background-color: ${row.fiberColor.hex}; color: ${row.fiberColor.name === 'Black' ? 'white' : 'black'}">${row.fiberColor.name}</td>
-                                    <td>${row.groupFiberCount}</td>
-                                    <td>${row.originatingVault}</td>
-                                    <td>${row.addressOrVault}</td>
-                                    <td>${row.outFiberCount}</td>
-                                    <td>${row.outFiber}</td>
-                                    <td class="color-cell" style="background-color: ${row.outFiberColor.hex}; color: ${row.outFiberColor.name === 'Black' ? 'white' : 'black'}">${row.outFiberColor.name}</td>
+                                    <th>Vault</th>
+                                    <th>Address</th>
+                                    <th>Port</th>
                                 </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                ${rows.map(row => `
+                                    <tr>
+                                        <td>${row.Vault}</td>
+                                        <td>${row.Address}</td>
+                                        <td>${row.Port}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
                 `;
             }
-
-            // Add image placeholder
-            html += '<img id="uploadedImage" alt="Uploaded Image" />';
-
             output.innerHTML = html;
-
-            // Load and display the image
-            if (imageFile) {
-                const imageReader = new FileReader();
-                imageReader.onload = function(e) {
-                    document.getElementById('uploadedImage').src = e.target.result;
-                };
-                imageReader.readAsDataURL(imageFile);
-            }
-
-            document.getElementById('print-btn').style.display = 'inline-block';
         }
 
-        // Existing functions (processSplitterData, processDistributionData, displaySplitterTable, displayDistributionTable) remain unchanged
+        function displayDistributionTable(data, splitterName) {
+            const output = document.getElementById('output');
+            let html = '';
+            for (const [group, rows] of Object.entries(data)) {
+                html += `
+                    <div class="group">
+                        <h2>${group}</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Vault</th>
+                                    <th>Fiber Size</th>
+                                    <th>Fibers Used</th>
+                                    <th>LCP Fiber Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows.map(row => `
+                                    <tr>
+                                        <td>${row.Vault}</td>
+                                        <td>${row['Fiber Size']}</td>
+                                        <td>${row['Fibers Used']}</td>
+                                        <td>${row['LCP Fiber Count']}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+            output.innerHTML = html;
+        }
     </script>
 </body>
 </html>
-
-
-                                    
