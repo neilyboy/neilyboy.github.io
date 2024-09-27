@@ -17,14 +17,27 @@ const saveBookmarkBtn = document.getElementById('saveBookmarkBtn');
 const cancelFolderBtn = document.getElementById('cancelFolderBtn');
 const cancelBookmarkBtn = document.getElementById('cancelBookmarkBtn');
 const searchInput = document.getElementById('searchInput');
+const modalBackdrop = document.getElementById('modalBackdrop');
 
 // Event Listeners
-addFolderBtn.addEventListener('click', () => addFolderModal.classList.remove('hidden'));
-addBookmarkBtn.addEventListener('click', () => addBookmarkModal.classList.remove('hidden'));
+addFolderBtn.addEventListener('click', () => {
+    addFolderModal.classList.remove('hidden');
+    modalBackdrop.classList.remove('hidden');
+});
+addBookmarkBtn.addEventListener('click', () => {
+    addBookmarkModal.classList.remove('hidden');
+    modalBackdrop.classList.remove('hidden');
+});
 saveFolderBtn.addEventListener('click', saveFolder);
 saveBookmarkBtn.addEventListener('click', saveBookmark);
-cancelFolderBtn.addEventListener('click', () => addFolderModal.classList.add('hidden'));
-cancelBookmarkBtn.addEventListener('click', () => addBookmarkModal.classList.add('hidden'));
+cancelFolderBtn.addEventListener('click', () => {
+    addFolderModal.classList.add('hidden');
+    modalBackdrop.classList.add('hidden');
+});
+cancelBookmarkBtn.addEventListener('click', () => {
+    addBookmarkModal.classList.add('hidden');
+    modalBackdrop.classList.add('hidden');
+});
 searchInput.addEventListener('input', searchBookmarks);
 
 // Load data from localStorage
@@ -71,8 +84,10 @@ function renderBookmarks() {
                 <h3>${bookmark.title}</h3>
                 <a href="${bookmark.url}" target="_blank">${bookmark.url}</a>
                 <p>${bookmark.notes}</p>
-                <button onclick="editBookmark(${index})">Edit</button>
-                <button onclick="deleteBookmark(${index})">Delete</button>
+                <div class="bookmark-actions">
+                    <button onclick="editBookmark(${index})">Edit</button>
+                    <button onclick="deleteBookmark(${index})">Delete</button>
+                </div>
             `;
             bookmarkList.appendChild(bookmarkElement);
         });
@@ -88,6 +103,7 @@ function saveFolder() {
         renderFolders();
         newFolderName.value = '';
         addFolderModal.classList.add('hidden');
+        modalBackdrop.classList.add('hidden');
     }
 }
 
@@ -104,6 +120,7 @@ function saveBookmark() {
         newBookmarkUrl.value = '';
         newBookmarkNotes.value = '';
         addBookmarkModal.classList.add('hidden');
+        modalBackdrop.classList.add('hidden');
     }
 }
 
@@ -114,6 +131,7 @@ function editBookmark(index) {
     newBookmarkUrl.value = bookmark.url;
     newBookmarkNotes.value = bookmark.notes;
     addBookmarkModal.classList.remove('hidden');
+    modalBackdrop.classList.remove('hidden');
     saveBookmarkBtn.onclick = function() {
         bookmark.title = newBookmarkTitle.value.trim();
         bookmark.url = newBookmarkUrl.value.trim();
@@ -121,6 +139,7 @@ function editBookmark(index) {
         saveData();
         renderBookmarks();
         addBookmarkModal.classList.add('hidden');
+        modalBackdrop.classList.add('hidden');
     };
 }
 
