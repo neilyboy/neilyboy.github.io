@@ -9,21 +9,19 @@
         :root {
             --bg-color: #1a1a1a;
             --text-color: #e0e0e0;
-            --sidebar-bg: #2a2a2a;
-            --main-content-bg: #2a2a2a;
-            --folder-bg: #3a3a3a;
-            --folder-hover-bg: #4a4a4a;
-            --bookmark-bg: #3a3a3a;
+            --sidebar-bg: linear-gradient(145deg, #2a2a2a, #3a3a3a);
+            --main-content-bg: linear-gradient(145deg, #2a2a2a, #3a3a3a);
+            --folder-bg: linear-gradient(145deg, #3a3a3a, #4a4a4a);
+            --folder-hover-bg: linear-gradient(145deg, #4a4a4a, #5a5a5a);
+            --bookmark-bg: linear-gradient(145deg, #3a3a3a, #4a4a4a);
             --bookmark-border: #4a4a4a;
-            --button-bg: #4CAF50;
-            --button-hover-bg: #45a049;
+            --button-bg: linear-gradient(145deg, #4CAF50, #45a049);
+            --button-hover-bg: linear-gradient(145deg, #45a049, #3d8b3d);
             --input-border: #4a4a4a;
-            --modal-bg: #2a2a2a;
+            --modal-bg: linear-gradient(145deg, #2a2a2a, #3a3a3a);
             --modal-backdrop: rgba(0,0,0,0.7);
-            --edit-button-bg: #607d8b;
-            --edit-button-hover-bg: #546e7a;
-            --delete-button-bg: #f44336;
-            --delete-button-hover-bg: #d32f2f;
+            --action-button-bg: linear-gradient(145deg, #607d8b, #546e7a);
+            --action-button-hover-bg: linear-gradient(145deg, #546e7a, #455a64);
         }
 
         body {
@@ -43,26 +41,27 @@
         }
         .sidebar {
             width: 200px;
-            background-color: var(--sidebar-bg);
+            background: var(--sidebar-bg);
             padding: 15px;
-            border-radius: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08);
             margin-right: 15px;
         }
         .main-content {
             flex-grow: 1;
-            background-color: var(--main-content-bg);
+            background: var(--main-content-bg);
             padding: 15px;
-            border-radius: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08);
         }
         h2 {
             margin-top: 0;
             color: var(--text-color);
             font-size: 18px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
         button {
-            background-color: var(--button-bg);
+            background: var(--button-bg);
             border: none;
             color: white;
             padding: 8px 16px;
@@ -72,11 +71,14 @@
             font-size: 12px;
             margin: 3px 1px;
             cursor: pointer;
-            border-radius: 3px;
-            transition: background-color 0.3s;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         button:hover {
-            background-color: var(--button-hover-bg);
+            background: var(--button-hover-bg);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-1px);
         }
         input[type="text"], textarea {
             width: 100%;
@@ -84,29 +86,42 @@
             margin: 6px 0;
             box-sizing: border-box;
             border: 1px solid var(--input-border);
-            border-radius: 3px;
+            border-radius: 5px;
             font-size: 12px;
-            background-color: var(--bookmark-bg);
+            background-color: rgba(255,255,255,0.05);
             color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.5);
         }
         .folder {
             cursor: pointer;
             padding: 8px;
             margin: 4px 0;
-            background-color: var(--folder-bg);
-            border-radius: 3px;
-            transition: background-color 0.3s;
+            background: var(--folder-bg);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .folder:hover {
-            background-color: var(--folder-hover-bg);
+            background: var(--folder-hover-bg);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-1px);
         }
         .bookmark {
             border: 1px solid var(--bookmark-border);
             padding: 12px;
             margin: 8px 0;
-            border-radius: 3px;
-            background-color: var(--bookmark-bg);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            background: var(--bookmark-bg);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .bookmark:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-1px);
         }
         .bookmark h3 {
             margin-top: 0;
@@ -114,11 +129,13 @@
             font-size: 16px;
         }
         .bookmark a {
-            color: var(--button-bg);
+            color: #4CAF50;
             text-decoration: none;
             font-size: 12px;
+            transition: color 0.3s ease;
         }
         .bookmark a:hover {
+            color: #45a049;
             text-decoration: underline;
         }
         .hidden {
@@ -129,10 +146,10 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: var(--modal-bg);
-            padding: 15px;
-            border-radius: 6px;
-            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+            background: var(--modal-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08);
             z-index: 1000;
         }
         .modal-backdrop {
@@ -142,27 +159,20 @@
             width: 100%;
             height: 100%;
             background-color: var(--modal-backdrop);
+            backdrop-filter: blur(5px);
             z-index: 999;
         }
         .bookmark-actions {
             margin-top: 8px;
         }
         .bookmark-actions button {
+            background: var(--action-button-bg);
             margin-right: 4px;
             padding: 6px 12px;
             font-size: 11px;
         }
-        .bookmark-actions button:first-child {
-            background-color: var(--edit-button-bg);
-        }
-        .bookmark-actions button:first-child:hover {
-            background-color: var(--edit-button-hover-bg);
-        }
-        .bookmark-actions button:last-child {
-            background-color: var(--delete-button-bg);
-        }
-        .bookmark-actions button:last-child:hover {
-            background-color: var(--delete-button-hover-bg);
+        .bookmark-actions button:hover {
+            background: var(--action-button-hover-bg);
         }
         .search-container {
             display: flex;
