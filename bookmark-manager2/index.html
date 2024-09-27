@@ -4,14 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bookmark Manager</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        const supabaseUrl = 'https://rqcihwsidtqpwimaomck.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxY2lod3NpZHRxcHdpbWFvbWNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc0NjE4NzMsImV4cCI6MjA0MzAzNzg3M30.PxT-g78HXMZehgRfv5Hog-EevIPT1h3aEDwy5EVddxI';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-    </script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --bg-color: #1a1a1a;
@@ -267,6 +262,11 @@
 
     <div id="modalBackdrop" class="hidden modal-backdrop"></div>
 
+    <script>
+        const supabaseUrl = 'YOUR_SUPABASE_URL';
+        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
