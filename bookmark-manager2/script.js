@@ -1,3 +1,6 @@
+// Initialize Supabase client
+const supabase = supabase.createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_ANON_KEY');
+
 let folders = [];
 let selectedFolder = null;
 let isGridView = false;
@@ -47,18 +50,47 @@ filterSelect.addEventListener('change', searchAndFilterBookmarks);
 listViewBtn.addEventListener('click', () => setViewMode(false));
 gridViewBtn.addEventListener('click', () => setViewMode(true));
 
-// Load data from localStorage
-function loadData() {
-    const savedFolders = localStorage.getItem('bookmarkFolders');
-    if (savedFolders) {
-        folders = JSON.parse(savedFolders);
+// Load data from Supabase
+async function loadData() {
+    try {
+        const { data, error } = await supabase
+            .from('folders')
+            .select('*');
+        
+        if (error) throw error;
+        
+        folders = data || [];
         renderFolders();
+    } catch (error) {
+        console.error('Error loading data:', error);
     }
 }
 
-// Save data to localStorage
-function saveData() {
-    localStorage.setItem('bookmarkFolders', JSON.stringify(folders));
+// Save data to Supabase
+async function saveData() {
+    try {
+        for (const folder of folders) {
+            if (folder.id) {
+                const { error } = await supabase
+                    .from('folders')
+                    .update(folder)
+                    .eq('id', folder.id);
+                
+                if (error) throw error;
+            } else {
+                const { data, error } = await supabase
+                    .from('folders')
+                    .insert([folder])
+                    .select();
+                
+                if (error) throw error;
+                
+                folder.id = data[0].id;
+            }
+        }
+    } catch (error) {
+        console.error('Error saving data:', error);
+    }
 }
 
 // Render folders
@@ -116,14 +148,13 @@ function createBookmarkElement(bookmark, index) {
     bookmarkElement.innerHTML = `
         <h3>
             <span class="material-icons">${bookmark.icon || 'bookmark'}</span>
-            <a href="${bookmark.url}"
-<a href="${bookmark.url}" target="_blank">${bookmark.title}</a>
+            <a href="${bookmark.url}" target="_blank">${bookmark.title}</a>
         </h3>
         <p>${bookmark.notes}</p>
         <div class="tags">${renderTags(bookmark.tags)}</div>
         <div class="bookmark-actions">
-            <button onclick="editBookmark(${index})"><span class="material-icons">edit</span>Edit</button>
-            <button onclick="deleteBookmark(${index})"><span class="material-icons">delete</span>Delete</button>
+            <button onclick="editBookmark('${selectedFolder}', ${index})"><span class="material-icons">edit</span>Edit</button>
+            <button onclick="deleteBookmark('${selectedFolder}', ${index})"><span class="material-icons">delete</span>Delete</button>
         </div>
     `;
     return bookmarkElement;
@@ -159,20 +190,28 @@ function populateParentFolderSelect() {
 }
 
 // Save folder
-function saveFolder() {
+async function saveFolder() {
     const folderName = newFolderName.value.trim();
     const parentId = parentFolderSelect.value;
     const icon = folderIconSelect.value;
     if (folderName) {
         const newFolder = {
-            id: Date.now().toString(),
             name: folderName,
             parentId: parentId || null,
             icon: icon,
             bookmarks: []
         };
-        folders.push(newFolder);
-        saveData();
+        const { data, error } = await supabase
+            .from('folders')
+            .insert([newFolder])
+            .select();
+        
+        if (error) {
+            console.error('Error saving folder:', error);
+            return;
+        }
+        
+        folders.push(data[0]);
         renderFolders();
         newFolderName.value = '';
         closeAddFolderModal();
@@ -192,7 +231,7 @@ function closeAddBookmarkModal() {
 }
 
 // Save bookmark
-function saveBookmark() {
+async function saveBookmark() {
     const title = newBookmarkTitle.value.trim();
     const url = newBookmarkUrl.value.trim();
     const tags = newBookmarkTags.value.split(',').map(tag => tag.trim()).filter(tag => tag);
@@ -200,8 +239,19 @@ function saveBookmark() {
     const icon = bookmarkIconSelect.value;
     if (title && url && selectedFolder !== null) {
         const folder = folders.find(f => f.id === selectedFolder);
-        folder.bookmarks.push({ title, url, tags, notes, icon });
-        saveData();
+        const newBookmark = { title, url, tags, notes, icon };
+        folder.bookmarks.push(newBookmark);
+        
+        const { error } = await supabase
+            .from('folders')
+            .update({ bookmarks: folder.bookmarks })
+            .eq('id', folder.id);
+        
+        if (error) {
+            console.error('Error saving bookmark:', error);
+            return;
+        }
+        
         renderBookmarks();
         newBookmarkTitle.value = '';
         newBookmarkUrl.value = '';
@@ -212,8 +262,8 @@ function saveBookmark() {
 }
 
 // Edit bookmark
-function editBookmark(index) {
-    const folder = folders.find(f => f.id === selectedFolder);
+async function editBookmark(folderId, index) {
+    const folder = folders.find(f => f.id === folderId);
     const bookmark = folder.bookmarks[index];
     newBookmarkTitle.value = bookmark.title;
     newBookmarkUrl.value = bookmark.url;
@@ -221,24 +271,44 @@ function editBookmark(index) {
     newBookmarkNotes.value = bookmark.notes;
     bookmarkIconSelect.value = bookmark.icon || 'bookmark';
     openAddBookmarkModal();
-    saveBookmarkBtn.onclick = function() {
+    saveBookmarkBtn.onclick = async function() {
         bookmark.title = newBookmarkTitle.value.trim();
         bookmark.url = newBookmarkUrl.value.trim();
         bookmark.tags = newBookmarkTags.value.split(',').map(tag => tag.trim()).filter(tag => tag);
         bookmark.notes = newBookmarkNotes.value.trim();
         bookmark.icon = bookmarkIconSelect.value;
-        saveData();
+        
+        const { error } = await supabase
+            .from('folders')
+            .update({ bookmarks: folder.bookmarks })
+            .eq('id', folder.id);
+        
+        if (error) {
+            console.error('Error updating bookmark:', error);
+            return;
+        }
+        
         renderBookmarks();
         closeAddBookmarkModal();
     };
 }
 
 // Delete bookmark
-function deleteBookmark(index) {
+async function deleteBookmark(folderId, index) {
     if (confirm('Are you sure you want to delete this bookmark?')) {
-        const folder = folders.find(f => f.id === selectedFolder);
+        const folder = folders.find(f => f.id === folderId);
         folder.bookmarks.splice(index, 1);
-        saveData();
+        
+        const { error } = await supabase
+            .from('folders')
+            .update({ bookmarks: folder.bookmarks })
+            .eq('id', folder.id);
+        
+        if (error) {
+            console.error('Error deleting bookmark:', error);
+            return;
+        }
+        
         renderBookmarks();
     }
 }
@@ -308,8 +378,8 @@ function populateIconSelects() {
 }
 
 // Initialize
-function initialize() {
-    loadData();
+async function initialize() {
+    await loadData();
     populateIconSelects();
 }
 
