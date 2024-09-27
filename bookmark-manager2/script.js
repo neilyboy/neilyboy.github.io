@@ -62,6 +62,8 @@ async function loadData() {
         renderFolders();
     } catch (error) {
         console.error('Error loading data:', error);
+        folders = []; // Initialize with empty array if there's an error
+        renderFolders(); // Still render the UI, even if empty
     }
 }
 
@@ -196,24 +198,30 @@ async function saveFolder() {
     if (folderName) {
         const newFolder = {
             name: folderName,
-            parentId: parentId || null,
             icon: icon,
             bookmarks: []
         };
-        const { data, error } = await supabaseClient
-            .from('folders')
-            .insert([newFolder])
-            .select();
         
-        if (error) {
-            console.error('Error saving folder:', error);
-            return;
+        // Only add parentId if it's selected and your table has this column
+        if (parentId) {
+            newFolder.parentId = parentId;
         }
-        
-        folders.push(data[0]);
-        renderFolders();
-        newFolderName.value = '';
-        closeAddFolderModal();
+
+        try {
+            const { data, error } = await supabaseClient
+                .from('folders')
+                .insert([newFolder])
+                .select();
+            
+            if (error) throw error;
+            
+            folders.push(data[0]);
+            renderFolders();
+            newFolderName.value = '';
+            closeAddFolderModal();
+        } catch (error) {
+            console.error('Error saving folder:', error);
+        }
     }
 }
 
