@@ -1,5 +1,4 @@
-// Initialize Supabase client
-//const supabase = supabase.createClient('https://rqcihwsidtqpwimaomck.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxY2lod3NpZHRxcHdpbWFvbWNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc0NjE4NzMsImV4cCI6MjA0MzAzNzg3M30.PxT-g78HXMZehgRfv5Hog-EevIPT1h3aEDwy5EVddxI');
+// Supabase client is now available as 'supabaseClient'
 
 let folders = [];
 let selectedFolder = null;
@@ -53,7 +52,7 @@ gridViewBtn.addEventListener('click', () => setViewMode(true));
 // Load data from Supabase
 async function loadData() {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('folders')
             .select('*');
         
@@ -71,14 +70,14 @@ async function saveData() {
     try {
         for (const folder of folders) {
             if (folder.id) {
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('folders')
                     .update(folder)
                     .eq('id', folder.id);
                 
                 if (error) throw error;
             } else {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('folders')
                     .insert([folder])
                     .select();
@@ -201,7 +200,7 @@ async function saveFolder() {
             icon: icon,
             bookmarks: []
         };
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('folders')
             .insert([newFolder])
             .select();
@@ -242,7 +241,7 @@ async function saveBookmark() {
         const newBookmark = { title, url, tags, notes, icon };
         folder.bookmarks.push(newBookmark);
         
-        const { error } = await supabase
+        const { error } = await supabaseClient
             .from('folders')
             .update({ bookmarks: folder.bookmarks })
             .eq('id', folder.id);
@@ -278,7 +277,7 @@ async function editBookmark(folderId, index) {
         bookmark.notes = newBookmarkNotes.value.trim();
         bookmark.icon = bookmarkIconSelect.value;
         
-        const { error } = await supabase
+        const { error } = await supabaseClient
             .from('folders')
             .update({ bookmarks: folder.bookmarks })
             .eq('id', folder.id);
@@ -298,8 +297,7 @@ async function deleteBookmark(folderId, index) {
     if (confirm('Are you sure you want to delete this bookmark?')) {
         const folder = folders.find(f => f.id === folderId);
         folder.bookmarks.splice(index, 1);
-        
-        const { error } = await supabase
+        const { error } = await supabaseClient
             .from('folders')
             .update({ bookmarks: folder.bookmarks })
             .eq('id', folder.id);
@@ -320,13 +318,13 @@ function searchAndFilterBookmarks() {
     bookmarkList.innerHTML = '';
     
     folders.forEach(folder => {
-        folder.bookmarks.forEach(bookmark => {
+        folder.bookmarks.forEach((bookmark, index) => {
             if ((bookmark.title.toLowerCase().includes(searchTerm) ||
                  bookmark.url.toLowerCase().includes(searchTerm) ||
                  bookmark.notes.toLowerCase().includes(searchTerm) ||
                  bookmark.tags.some(tag => tag.toLowerCase().includes(searchTerm))) &&
                 (filterValue === 'all' || (filterValue === 'untagged' && bookmark.tags.length === 0))) {
-                const bookmarkElement = createBookmarkElement(bookmark);
+                const bookmarkElement = createBookmarkElement(bookmark, index);
                 bookmarkList.appendChild(bookmarkElement);
             }
         });
