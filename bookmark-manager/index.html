@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,35 +7,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f5f5f5;
-            --text-color: #333;
-            --sidebar-bg: white;
-            --main-content-bg: white;
-            --folder-bg: #ecf0f1;
-            --folder-hover-bg: #e0e6e8;
-            --bookmark-bg: white;
-            --bookmark-border: #ddd;
-            --button-bg: #3498db;
-            --button-hover-bg: #2980b9;
-            --input-border: #ddd;
-            --modal-bg: white;
-            --modal-backdrop: rgba(0,0,0,0.5);
-        }
-
-        .dark {
             --bg-color: #1a1a1a;
-            --text-color: #f0f0f0;
-            --sidebar-bg: #2c3e50;
-            --main-content-bg: #34495e;
-            --folder-bg: #2c3e50;
-            --folder-hover-bg: #34495e;
-            --bookmark-bg: #2c3e50;
-            --bookmark-border: #4a6278;
-            --button-bg: #2980b9;
-            --button-hover-bg: #3498db;
-            --input-border: #4a6278;
-            --modal-bg: #34495e;
+            --text-color: #e0e0e0;
+            --sidebar-bg: #2a2a2a;
+            --main-content-bg: #2a2a2a;
+            --folder-bg: #3a3a3a;
+            --folder-hover-bg: #4a4a4a;
+            --bookmark-bg: #3a3a3a;
+            --bookmark-border: #4a4a4a;
+            --button-bg: #4CAF50;
+            --button-hover-bg: #45a049;
+            --input-border: #4a4a4a;
+            --modal-bg: #2a2a2a;
             --modal-backdrop: rgba(0,0,0,0.7);
+            --edit-button-bg: #607d8b;
+            --edit-button-hover-bg: #546e7a;
+            --delete-button-bg: #f44336;
+            --delete-button-hover-bg: #d32f2f;
         }
 
         body {
@@ -44,7 +32,6 @@
             padding: 0;
             background-color: var(--bg-color);
             color: var(--text-color);
-            transition: background-color 0.3s, color 0.3s;
             font-size: 14px;
         }
         .container {
@@ -59,7 +46,7 @@
             background-color: var(--sidebar-bg);
             padding: 15px;
             border-radius: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
             margin-right: 15px;
         }
         .main-content {
@@ -67,7 +54,7 @@
             background-color: var(--main-content-bg);
             padding: 15px;
             border-radius: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
         h2 {
             margin-top: 0;
@@ -119,7 +106,7 @@
             margin: 8px 0;
             border-radius: 3px;
             background-color: var(--bookmark-bg);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         .bookmark h3 {
             margin-top: 0;
@@ -145,7 +132,7 @@
             background-color: var(--modal-bg);
             padding: 15px;
             border-radius: 6px;
-            box-shadow: 0 3px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
             z-index: 1000;
         }
         .modal-backdrop {
@@ -161,58 +148,21 @@
             margin-top: 8px;
         }
         .bookmark-actions button {
-            background-color: #e74c3c;
             margin-right: 4px;
             padding: 6px 12px;
             font-size: 11px;
         }
-        .bookmark-actions button:hover {
-            background-color: #c0392b;
+        .bookmark-actions button:first-child {
+            background-color: var(--edit-button-bg);
         }
-        .mode-toggle {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            z-index: 1001;
+        .bookmark-actions button:first-child:hover {
+            background-color: var(--edit-button-hover-bg);
         }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 20px;
+        .bookmark-actions button:last-child {
+            background-color: var(--delete-button-bg);
         }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 20px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 2px;
-            bottom: 2px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #2196F3;
-        }
-        input:checked + .slider:before {
-            transform: translateX(20px);
+        .bookmark-actions button:last-child:hover {
+            background-color: var(--delete-button-hover-bg);
         }
         .search-container {
             display: flex;
@@ -226,12 +176,6 @@
     </style>
 </head>
 <body>
-    <div class="mode-toggle">
-        <label class="switch">
-            <input type="checkbox" id="modeToggle" checked>
-            <span class="slider"></span>
-        </label>
-    </div>
     <div class="container">
         <div class="sidebar">
             <h2>Folders</h2>
