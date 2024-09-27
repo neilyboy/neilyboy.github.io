@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bookmark Manager</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
             --bg-color: #1a1a1a;
@@ -178,13 +179,37 @@
         .nested-folder {
             margin-left: 15px;
         }
+        .material-icons {
+            font-size: 18px;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+        .folder .material-icons,
+        .bookmark .material-icons {
+            margin-right: 10px;
+        }
+        .icon-select {
+            display: flex;
+            flex-wrap: wrap;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .icon-option {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .icon-option:hover {
+            background-color: var(--folder-hover-bg);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="sidebar">
-            <h2>Collections</h2>
-            <button id="addFolderBtn">New Collection</button>
+            <h2><span class="material-icons">collections_bookmark</span>Collections</h2>
+            <button id="addFolderBtn"><span class="material-icons">create_new_folder</span>New Collection</button>
             <div id="folderList"></div>
         </div>
         <div class="main-content">
@@ -194,33 +219,42 @@
                     <option value="all">All</option>
                     <option value="untagged">Untagged</option>
                 </select>
-                <button id="addBookmarkBtn" class="hidden">New Bookmark</button>
+                <button id="addBookmarkBtn" class="hidden"><span class="material-icons">add</span>New Bookmark</button>
             </div>
             <div class="view-toggle">
-                <button id="listViewBtn">List</button>
-                <button id="gridViewBtn">Grid</button>
+                <button id="listViewBtn"><span class="material-icons">view_list</span>List</button>
+                <button id="gridViewBtn"><span class="material-icons">grid_view</span>Grid</button>
             </div>
             <div id="bookmarkList" class="list-view"></div>
         </div>
     </div>
 
     <div id="addFolderModal" class="hidden modal">
-        <h3>New Collection</h3>
+        <h3><span class="material-icons">create_new_folder</span>New Collection</h3>
         <input type="text" id="newFolderName" placeholder="Enter collection name">
         <select id="parentFolderSelect">
             <option value="">Root</option>
-            <!-- Folder options will be populated dynamically -->
         </select>
+        <div>
+            <label for="folderIconSelect">Select Icon:</label>
+            <select id="folderIconSelect"></select>
+        </div>
+        <div class="icon-select" id="folderIconGrid"></div>
         <button id="saveFolderBtn">Save</button>
         <button id="cancelFolderBtn">Cancel</button>
     </div>
 
     <div id="addBookmarkModal" class="hidden modal">
-        <h3>New Bookmark</h3>
+        <h3><span class="material-icons">bookmark_add</span>New Bookmark</h3>
         <input type="text" id="newBookmarkTitle" placeholder="Enter title">
         <input type="text" id="newBookmarkUrl" placeholder="Enter URL">
         <input type="text" id="newBookmarkTags" placeholder="Enter tags (comma-separated)">
         <textarea id="newBookmarkNotes" placeholder="Enter notes (optional)"></textarea>
+        <div>
+            <label for="bookmarkIconSelect">Select Icon:</label>
+            <select id="bookmarkIconSelect"></select>
+        </div>
+        <div class="icon-select" id="bookmarkIconGrid"></div>
         <button id="saveBookmarkBtn">Save</button>
         <button id="cancelBookmarkBtn">Cancel</button>
     </div>
