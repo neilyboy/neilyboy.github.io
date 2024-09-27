@@ -24,6 +24,16 @@ const filterSelect = document.getElementById('filterSelect');
 const modalBackdrop = document.getElementById('modalBackdrop');
 const listViewBtn = document.getElementById('listViewBtn');
 const gridViewBtn = document.getElementById('gridViewBtn');
+const folderIconSelect = document.getElementById('folderIconSelect');
+const folderIconGrid = document.getElementById('folderIconGrid');
+const bookmarkIconSelect = document.getElementById('bookmarkIconSelect');
+const bookmarkIconGrid = document.getElementById('bookmarkIconGrid');
+
+const materialIcons = [
+    'folder', 'work', 'home', 'school', 'favorite', 'star', 'book', 'music_note', 'movie', 'games',
+    'bookmark', 'link', 'public', 'shopping_cart', 'flight', 'restaurant', 'sports_soccer', 'build',
+    'code', 'bug_report', 'emoji_events', 'local_library', 'museum', 'camera_alt', 'directions_car'
+];
 
 // Event Listeners
 addFolderBtn.addEventListener('click', openAddFolderModal);
@@ -61,7 +71,10 @@ function renderFolders(parentFolder = null, level = 0) {
         const folderElement = document.createElement('div');
         folderElement.classList.add('folder');
         folderElement.style.marginLeft = `${level * 15}px`;
-        folderElement.textContent = folder.name;
+        folderElement.innerHTML = `
+            <span class="material-icons">${folder.icon || 'folder'}</span>
+            ${folder.name}
+        `;
         folderElement.addEventListener('click', () => selectFolder(folder.id));
         folderContainer.appendChild(folderElement);
         
@@ -101,13 +114,16 @@ function createBookmarkElement(bookmark, index) {
     const bookmarkElement = document.createElement('div');
     bookmarkElement.classList.add('bookmark');
     bookmarkElement.innerHTML = `
-        <h3>${bookmark.title}</h3>
-        <a href="${bookmark.url}" target="_blank">${bookmark.url}</a>
+        <h3>
+            <span class="material-icons">${bookmark.icon || 'bookmark'}</span>
+            <a href="${bookmark.url}"
+<a href="${bookmark.url}" target="_blank">${bookmark.title}</a>
+        </h3>
         <p>${bookmark.notes}</p>
         <div class="tags">${renderTags(bookmark.tags)}</div>
         <div class="bookmark-actions">
-            <button onclick="editBookmark(${index})">Edit</button>
-            <button onclick="deleteBookmark(${index})">Delete</button>
+            <button onclick="editBookmark(${index})"><span class="material-icons">edit</span>Edit</button>
+            <button onclick="deleteBookmark(${index})"><span class="material-icons">delete</span>Delete</button>
         </div>
     `;
     return bookmarkElement;
@@ -146,11 +162,13 @@ function populateParentFolderSelect() {
 function saveFolder() {
     const folderName = newFolderName.value.trim();
     const parentId = parentFolderSelect.value;
+    const icon = folderIconSelect.value;
     if (folderName) {
         const newFolder = {
             id: Date.now().toString(),
             name: folderName,
             parentId: parentId || null,
+            icon: icon,
             bookmarks: []
         };
         folders.push(newFolder);
@@ -179,9 +197,10 @@ function saveBookmark() {
     const url = newBookmarkUrl.value.trim();
     const tags = newBookmarkTags.value.split(',').map(tag => tag.trim()).filter(tag => tag);
     const notes = newBookmarkNotes.value.trim();
+    const icon = bookmarkIconSelect.value;
     if (title && url && selectedFolder !== null) {
         const folder = folders.find(f => f.id === selectedFolder);
-        folder.bookmarks.push({ title, url, tags, notes });
+        folder.bookmarks.push({ title, url, tags, notes, icon });
         saveData();
         renderBookmarks();
         newBookmarkTitle.value = '';
@@ -200,12 +219,14 @@ function editBookmark(index) {
     newBookmarkUrl.value = bookmark.url;
     newBookmarkTags.value = bookmark.tags.join(', ');
     newBookmarkNotes.value = bookmark.notes;
+    bookmarkIconSelect.value = bookmark.icon || 'bookmark';
     openAddBookmarkModal();
     saveBookmarkBtn.onclick = function() {
         bookmark.title = newBookmarkTitle.value.trim();
         bookmark.url = newBookmarkUrl.value.trim();
         bookmark.tags = newBookmarkTags.value.split(',').map(tag => tag.trim()).filter(tag => tag);
         bookmark.notes = newBookmarkNotes.value.trim();
+        bookmark.icon = bookmarkIconSelect.value;
         saveData();
         renderBookmarks();
         closeAddBookmarkModal();
@@ -260,5 +281,37 @@ function updateViewMode() {
     }
 }
 
+// Populate icon selects and grids
+function populateIconSelects() {
+    const iconSelects = [folderIconSelect, bookmarkIconSelect];
+    const iconGrids = [folderIconGrid, bookmarkIconGrid];
+
+    iconSelects.forEach((select, index) => {
+        select.innerHTML = '';
+        iconGrids[index].innerHTML = '';
+
+        materialIcons.forEach(icon => {
+            const option = document.createElement('option');
+            option.value = icon;
+            option.textContent = icon.replace('_', ' ');
+            select.appendChild(option);
+
+            const iconElement = document.createElement('span');
+            iconElement.classList.add('material-icons', 'icon-option');
+            iconElement.textContent = icon;
+            iconElement.addEventListener('click', () => {
+                select.value = icon;
+            });
+            iconGrids[index].appendChild(iconElement);
+        });
+    });
+}
+
 // Initialize
-loadData();
+function initialize() {
+    loadData();
+    populateIconSelects();
+}
+
+// Call initialize to start the application
+initialize();
