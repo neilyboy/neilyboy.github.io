@@ -45,45 +45,47 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             transition: background-color 0.3s, color 0.3s;
+            font-size: 14px;
         }
         .container {
             display: flex;
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 15px;
             box-sizing: border-box;
         }
         .sidebar {
-            width: 250px;
+            width: 200px;
             background-color: var(--sidebar-bg);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-right: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-right: 15px;
         }
         .main-content {
             flex-grow: 1;
             background-color: var(--main-content-bg);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         h2 {
             margin-top: 0;
             color: var(--text-color);
+            font-size: 18px;
         }
         button {
             background-color: var(--button-bg);
             border: none;
             color: white;
-            padding: 10px 20px;
+            padding: 8px 16px;
             text-align: center;
             text-decoration: none;
             display: inline-block;
-            font-size: 14px;
-            margin: 4px 2px;
+            font-size: 12px;
+            margin: 3px 1px;
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: 3px;
             transition: background-color 0.3s;
         }
         button:hover {
@@ -91,21 +93,21 @@
         }
         input[type="text"], textarea {
             width: 100%;
-            padding: 10px;
-            margin: 8px 0;
+            padding: 8px;
+            margin: 6px 0;
             box-sizing: border-box;
             border: 1px solid var(--input-border);
-            border-radius: 4px;
-            font-size: 14px;
+            border-radius: 3px;
+            font-size: 12px;
             background-color: var(--bookmark-bg);
             color: var(--text-color);
         }
         .folder {
             cursor: pointer;
-            padding: 10px;
-            margin: 5px 0;
+            padding: 8px;
+            margin: 4px 0;
             background-color: var(--folder-bg);
-            border-radius: 4px;
+            border-radius: 3px;
             transition: background-color 0.3s;
         }
         .folder:hover {
@@ -113,19 +115,21 @@
         }
         .bookmark {
             border: 1px solid var(--bookmark-border);
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 4px;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 3px;
             background-color: var(--bookmark-bg);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
         .bookmark h3 {
             margin-top: 0;
             color: var(--text-color);
+            font-size: 16px;
         }
         .bookmark a {
             color: var(--button-bg);
             text-decoration: none;
+            font-size: 12px;
         }
         .bookmark a:hover {
             text-decoration: underline;
@@ -139,9 +143,9 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background-color: var(--modal-bg);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.1);
             z-index: 1000;
         }
         .modal-backdrop {
@@ -154,26 +158,28 @@
             z-index: 999;
         }
         .bookmark-actions {
-            margin-top: 10px;
+            margin-top: 8px;
         }
         .bookmark-actions button {
             background-color: #e74c3c;
-            margin-right: 5px;
+            margin-right: 4px;
+            padding: 6px 12px;
+            font-size: 11px;
         }
         .bookmark-actions button:hover {
             background-color: #c0392b;
         }
         .mode-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
+            position: absolute;
+            top: 15px;
+            right: 15px;
             z-index: 1001;
         }
         .switch {
             position: relative;
             display: inline-block;
-            width: 60px;
-            height: 34px;
+            width: 40px;
+            height: 20px;
         }
         .switch input {
             opacity: 0;
@@ -189,15 +195,15 @@
             bottom: 0;
             background-color: #ccc;
             transition: .4s;
-            border-radius: 34px;
+            border-radius: 20px;
         }
         .slider:before {
             position: absolute;
             content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
             background-color: white;
             transition: .4s;
             border-radius: 50%;
@@ -206,7 +212,16 @@
             background-color: #2196F3;
         }
         input:checked + .slider:before {
-            transform: translateX(26px);
+            transform: translateX(20px);
+        }
+        .search-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        #searchInput {
+            flex-grow: 1;
+            margin-right: 10px;
         }
     </style>
 </head>
@@ -225,8 +240,10 @@
         </div>
         <div class="main-content">
             <h2>Bookmarks</h2>
-            <input type="text" id="searchInput" placeholder="Search bookmarks...">
-            <button id="addBookmarkBtn" class="hidden">Add Bookmark</button>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search bookmarks...">
+                <button id="addBookmarkBtn" class="hidden">Add Bookmark</button>
+            </div>
             <div id="bookmarkList"></div>
         </div>
     </div>
