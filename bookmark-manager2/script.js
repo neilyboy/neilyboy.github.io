@@ -1,5 +1,5 @@
 // Initialize Supabase client
-const supabase = supabase.createClient('https://rqcihwsidtqpwimaomck.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxY2lod3NpZHRxcHdpbWFvbWNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc0NjE4NzMsImV4cCI6MjA0MzAzNzg3M30.PxT-g78HXMZehgRfv5Hog-EevIPT1h3aEDwy5EVddxI');
+//const supabase = supabase.createClient('https://rqcihwsidtqpwimaomck.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxY2lod3NpZHRxcHdpbWFvbWNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc0NjE4NzMsImV4cCI6MjA0MzAzNzg3M30.PxT-g78HXMZehgRfv5Hog-EevIPT1h3aEDwy5EVddxI');
 
 let folders = [];
 let selectedFolder = null;
