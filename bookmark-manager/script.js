@@ -18,8 +18,6 @@ const cancelFolderBtn = document.getElementById('cancelFolderBtn');
 const cancelBookmarkBtn = document.getElementById('cancelBookmarkBtn');
 const searchInput = document.getElementById('searchInput');
 const modalBackdrop = document.getElementById('modalBackdrop');
-const modeToggle = document.getElementById('modeToggle');
-const html = document.documentElement;
 
 // Event Listeners
 addFolderBtn.addEventListener('click', () => {
@@ -41,7 +39,6 @@ cancelBookmarkBtn.addEventListener('click', () => {
     modalBackdrop.classList.add('hidden');
 });
 searchInput.addEventListener('input', searchBookmarks);
-modeToggle.addEventListener('change', toggleDarkMode);
 
 // Load data from localStorage
 function loadData() {
@@ -177,31 +174,5 @@ function searchBookmarks() {
     });
 }
 
-// Toggle dark mode
-function toggleDarkMode() {
-    if (modeToggle.checked) {
-        html.classList.add('dark');
-        localStorage.setItem('darkMode', 'enabled');
-    } else {
-        html.classList.remove('dark');
-        localStorage.setItem('darkMode', 'disabled');
-    }
-}
-
-// Set initial mode
-function setInitialMode() {
-    const savedMode = localStorage.getItem('darkMode');
-    if (savedMode === 'disabled') {
-        modeToggle.checked = false;
-        html.classList.remove('dark');
-    }
-}
-
 // Initialize
-function initialize() {
-    loadData();
-    setInitialMode();
-}
-
-// Start the application
-initialize();
+loadData();
