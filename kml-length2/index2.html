@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Fiber Network Length Calculator Neil its updated</title>
+    <title>Fiber Network Length Calculator</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         h1 { color: #333; }
@@ -10,12 +10,23 @@
         input[type="file"] { margin-top: 10px; }
         .loading { color: blue; }
         .error { color: red; }
+        #layerSelectorContainer { margin-top: 20px; display: none; }
+        label { margin-right: 10px; }
     </style>
 </head>
 <body>
-    <h1>Fiber Network Length Calculator</h1>
+    <h1>Fiber Network Length Calculator Neil Its Updated</h1>
     <p>Select a KML, KMZ, or DWG file containing your fiber network data:</p>
     <input type="file" id="fileInput" accept=".kml,.kmz,.dwg" />
+    
+    <!-- Layer Selection Dropdown -->
+    <div id="layerSelectorContainer">
+        <label for="layerSelector">Select Layer to Process:</label>
+        <select id="layerSelector">
+            <option value="all">All Layers</option>
+        </select>
+    </div>
+    
     <div id="result"></div>
 
     <!-- Include JSZip for KMZ files -->
@@ -23,29 +34,47 @@
     <!-- Include @xeric/dwg for DWG files -->
     <script src="https://unpkg.com/@xeric/dwg/dist/dwg.min.js"></script>
     <script>
-        document.getElementById('fileInput').addEventListener('change', handleFile, false);
+        const fileInput = document.getElementById('fileInput');
+        const resultDiv = document.getElementById('result');
+        const layerSelectorContainer = document.getElementById('layerSelectorContainer');
+        const layerSelector = document.getElementById('layerSelector');
+        let dwgLayers = []; // To store layer names from DWG
+
+        fileInput.addEventListener('change', handleFile, false);
+        layerSelector.addEventListener('change', handleLayerSelection, false);
 
         async function handleFile(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            const resultDiv = document.getElementById('result');
+            // Reset previous results and layer selector
+            resultDiv.innerHTML = '';
+            layerSelectorContainer.style.display = 'none';
+            layerSelector.innerHTML = '<option value="all">All Layers</option>';
+            dwgLayers = [];
+
             resultDiv.textContent = 'Processing...';
             resultDiv.className = 'loading';
 
             try {
-                let totalFeet = 0;
-
                 if (file.name.toLowerCase().endsWith('.dwg')) {
                     // Process DWG file
-                    totalFeet = await processDwgFile(file);
+                    const layerData = await processDwgFile(file);
+                    dwgLayers = Object.keys(layerData);
+                    
+                    if (dwgLayers.length > 0) {
+                        populateLayerSelector(dwgLayers);
+                        layerSelectorContainer.style.display = 'block';
+                        // Automatically display all layers
+                        displayDwgResults(layerData);
+                    } else {
+                        throw new Error('No LINE entities found in DWG file.');
+                    }
                 } else {
                     // Process KML or KMZ file
-                    totalFeet = await processKmlOrKmzFile(file);
+                    const totalFeet = await processKmlOrKmzFile(file);
+                    displayKmlResult(totalFeet);
                 }
-
-                resultDiv.innerHTML = `Total Fiber Length: <strong>${totalFeet.toLocaleString(undefined, {maximumFractionDigits: 2})} feet</strong>`;
-                resultDiv.className = '';
             } catch (error) {
                 resultDiv.textContent = `Error: ${error.message}`;
                 resultDiv.className = 'error';
@@ -98,7 +127,7 @@
             return totalFeet;
         }
 
-        // Function to process DWG files
+        // Function to process DWG files and return layer-wise lengths
         async function processDwgFile(file) {
             // Ensure the DWG parser is available
             if (!window.DwgParser) {
@@ -116,22 +145,87 @@
                 throw new Error('No entities found in DWG file.');
             }
 
-            let totalFeet = 0;
+            const layerTotals = {}; // Object to store total lengths per layer
 
-            // Iterate through entities and calculate lengths
+            // Iterate through entities and calculate lengths per layer
             entities.forEach(entity => {
                 if (entity.type === 'LINE') {
+                    const layerName = entity.layer || 'Undefined Layer';
                     const start = entity.start;
                     const end = entity.end;
 
-                    // Assuming DWG uses a Cartesian coordinate system (units in meters)
+                    // Calculate Cartesian distance (assuming units are in meters)
                     const distanceMeters = cartesianDistance(start, end);
-                    totalFeet += metersToFeet(distanceMeters);
+                    const distanceFeet = metersToFeet(distanceMeters);
+
+                    if (layerTotals[layerName]) {
+                        layerTotals[layerName] += distanceFeet;
+                    } else {
+                        layerTotals[layerName] = distanceFeet;
+                    }
                 }
                 // Add more entity types if needed (e.g., LWPOLYLINE)
             });
 
-            return totalFeet;
+            return layerTotals;
+        }
+
+        // Function to populate the layer selector dropdown
+        function populateLayerSelector(layers) {
+            layers.sort(); // Sort layers alphabetically
+            layers.forEach(layer => {
+                const option = document.createElement('option');
+                option.value = layer;
+                option.textContent = layer;
+                layerSelector.appendChild(option);
+            });
+        }
+
+        // Function to handle layer selection change
+        async function handleLayerSelection(event) {
+            const selectedLayer = event.target.value;
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            try {
+                if (file.name.toLowerCase().endsWith('.dwg')) {
+                    const layerData = await processDwgFile(file);
+                    if (selectedLayer === 'all') {
+                        displayDwgResults(layerData);
+                    } else {
+                        const selectedTotal = layerData[selectedLayer] || 0;
+                        displayDwgSelectedLayer(selectedLayer, selectedTotal);
+                    }
+                }
+            } catch (error) {
+                resultDiv.textContent = `Error: ${error.message}`;
+                resultDiv.className = 'error';
+            }
+        }
+
+        // Function to display DWG results for all layers
+        function displayDwgResults(layerData) {
+            let html = `<strong>Total Fiber Length per Layer:</strong><br/><ul>`;
+            for (const [layer, total] of Object.entries(layerData)) {
+                html += `<li><strong>${layer}</strong>: ${total.toLocaleString(undefined, {maximumFractionDigits: 2})} feet</li>`;
+            }
+            html += `</ul>`;
+            resultDiv.innerHTML = html;
+            resultDiv.className = '';
+        }
+
+        // Function to display DWG result for a selected layer
+        function displayDwgSelectedLayer(layer, total) {
+            const html = `<strong>Total Fiber Length for Layer "${layer}":</strong> <strong>${total.toLocaleString(undefined, {maximumFractionDigits: 2})} feet</strong>`;
+            resultDiv.innerHTML = html;
+            resultDiv.className = '';
+        }
+
+        // Function to display KML/KMZ result
+        function displayKmlResult(totalFeet) {
+            const html = `Total Fiber Length: <strong>${totalFeet.toLocaleString(undefined, {maximumFractionDigits: 2})} feet</strong>`;
+            resultDiv.innerHTML = html;
+            resultDiv.className = '';
         }
 
         // Helper function to calculate Haversine distance between two lat/lng points in meters
