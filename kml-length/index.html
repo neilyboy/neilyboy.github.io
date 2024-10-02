@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KML/KMZ Length Calculator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/geodesy/2.2.1/geodesy.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,6 +25,22 @@
     <div id="result"></div>
 
     <script>
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            function toRad(x) {
+                return x * Math.PI / 180;
+            }
+
+            var R = 6371; // Earth's radius in km
+            var dLat = toRad(lat2 - lat1);
+            var dLon = toRad(lon2 - lon1);
+            var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            var d = R * c;
+            return d * 1000; // Convert to meters
+        }
+
         async function processFile() {
             const fileInput = document.getElementById('fileInput');
             const file = fileInput.files[0];
@@ -56,11 +71,9 @@
             for (let coord of coordinates) {
                 const points = coord.textContent.trim().split(' ');
                 for (let i = 1; i < points.length; i++) {
-                    const [lon1, lat1] = points[i-1].split(',');
-                    const [lon2, lat2] = points[i].split(',');
-                    const p1 = new geodesy.LatLonEllipsoidal(parseFloat(lat1), parseFloat(lon1));
-                    const p2 = new geodesy.LatLonEllipsoidal(parseFloat(lat2), parseFloat(lon2));
-                    totalLength += p1.distanceTo(p2);
+                    const [lon1, lat1] = points[i-1].split(',').map(parseFloat);
+                    const [lon2, lat2] = points[i].split(',').map(parseFloat);
+                    totalLength += haversineDistance(lat1, lon1, lat2, lon2);
                 }
             }
 
