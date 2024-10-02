@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fiber Network Length Calculator (DWG Support)</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        #result { margin-top: 20px; font-size: 1.2em; }
+        input[type="file"] { margin-top: 10px; }
+        .loading { color: blue; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Fiber Network Length Calculator (DWG Support)</h1>
+    <p>Select a KML, KMZ, or DWG file containing your fiber network data:</p>
+    <input type="file" id="fileInput" accept=".kml,.kmz,.dwg" />
+    <div id="result"></div>
+
+    <!-- Include JSZip for KMZ files, and Xeric DWG parser for DWG files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.0/jszip.min.js"></script>
+    <script src="https://unpkg.com/@xeric/dwg/dist/dwg.min.js"></script>
+    <script>
+        document.getElementById('fileInput').addEventListener('change', handleFile, false);
+
+        async function handleFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = 'Processing...';
+            resultDiv.className = 'loading';
+
+            try {
+                let totalFeet = 0;
+
+                if (file.name.toLowerCase().endsWith('.dwg')) {
+                    // Process DWG file
+                    const arrayBuffer = await file.arrayBuffer();
+                    const dwg = new window.DwgParser(arrayBuffer);
+                    const entities = dwg.getEntities();
+                    let totalMeters = 0;
+
+                    // Extract and calculate length of all line segments in DWG file
+                    for (let entity of entities) {
+                        if (entity.type === 'LINE') {
+                            const { start, end } = entity;
+                            totalMeters += haversineDistance(start.y, start.x, end.y, end.x);
+                        }
+                    }
+
+                    totalFeet = metersToFeet(totalMeters);
+
+                } else {
+                    // Existing KML or KMZ processing logic
+                    // Similar to what was done in the KML/KMZ example
+                    totalFeet = await processKmlOrKmzFile(file);
+                }
+
+                resultDiv.innerHTML = `Total Fiber Length: <strong>${totalFeet.toLocaleString(undefined, {maximumFractionDigits: 2})} feet</strong>`;
+                resultDiv.className = '';
+            } catch (error) {
+                resultDiv.textContent = `Error: ${error.message}`;
+                resultDiv.className = 'error';
+            }
+        }
+
+        // Helper function to process KML or KMZ files (as before)
+        async function processKmlOrKmzFile(file) {
+            // Your existing KML/KMZ logic to calculate total length
+            // ...
+        }
+
+        // Haversine formula to calculate distance between two lat/lng points in meters
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371000; // Radius of Earth in meters
+            const toRad = angle => angle * Math.PI / 180;
+
+            const φ1 = toRad(lat1);
+            const φ2 = toRad(lat2);
+            const Δφ = toRad(lat2 - lat1);
+            const Δλ = toRad(lon2 - lon1);
+
+            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            return R * c; // Distance in meters
+        }
+
+        function metersToFeet(meters) {
+            return meters * 3.28084;
+        }
+    </script>
+</body>
+</html>
