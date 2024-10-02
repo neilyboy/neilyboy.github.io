@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fiber Network Length Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        #result { margin-top: 20px; font-size: 1.2em; }
+        input[type="file"] { margin-top: 10px; }
+        .loading { color: blue; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Fiber Network Length Calculator</h1>
+    <p>Select a KML or KMZ file containing your fiber network data:</p>
+    <input type="file" id="fileInput" accept=".kml,.kmz" />
+    <div id="result"></div>
+
+    <!-- Include JSZip from CDN for handling KMZ files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.0/jszip.min.js" integrity="sha512-0VfXQXvSEbXcSDkxj4F4BjI6EldVHrTgXHWXpOqHe6YI5aw3qRk6sTRaGfpDwyMrdSLFJgK5Hc60jY4YXr3Ykg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        document.getElementById('fileInput').addEventListener('change', handleFile, false);
+
+        async function handleFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = 'Processing...';
+            resultDiv.className = 'loading';
+
+            try {
+                let kmlText;
+                if (file.name.toLowerCase().endsWith('.kmz')) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const zip = await JSZip.loadAsync(arrayBuffer);
+                    // KMZ usually contains doc.kml or similar; find the first KML file
+                    const kmlFile = Object.values(zip.files).find(f => f.name.toLowerCase().endsWith('.kml'));
+                    if (!kmlFile) throw new Error('No KML file found inside KMZ.');
+                    kmlText = await kmlFile.async('text');
+                } else if (file.name.toLowerCase().endsWith('.kml')) {
+                    kmlText = await file.text();
+                } else {
+                    throw new Error('Unsupported file format. Please upload a KML or KMZ file.');
+                }
+
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(kmlText, 'application/xml');
+                const parserError = xmlDoc.getElementsByTagName('parsererror');
+                if (parserError.length) throw new Error('Error parsing KML file.');
+
+                const lineStrings = xmlDoc.getElementsByTagName('LineString');
+                if (lineStrings.length === 0) throw new Error('No LineString elements found in the KML file.');
+
+                let totalMeters = 0;
+
+                for (let ls of lineStrings) {
+                    const coordinatesText = ls.getElementsByTagName('coordinates')[0]?.textContent;
+                    if (!coordinatesText) continue;
+
+                    const coordinates = coordinatesText.trim().split(/\s+/).map(coord => {
+                        const [lng, lat, alt] = coord.split(',').map(Number);
+                        return { lat, lng };
+                    });
+
+                    for (let i = 1; i < coordinates.length; i++) {
+                        const p1 = coordinates[i - 1];
+                        const p2 = coordinates[i];
+                        totalMeters += haversineDistance(p1.lat, p1.lng, p2.lat, p2.lng);
+                    }
+                }
+
+                const totalFeet = metersToFeet(totalMeters);
+                resultDiv.innerHTML = `Total Fiber Length: <strong>${totalFeet.toLocaleString(undefined, {maximumFractionDigits: 2})} feet</strong>`;
+                resultDiv.className = '';
+            } catch (error) {
+                resultDiv.textContent = `Error: ${error.message}`;
+                resultDiv.className = 'error';
+            }
+        }
+
+        // Haversine formula to calculate distance between two lat/lng points in meters
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371000; // Radius of Earth in meters
+            const toRad = angle => angle * Math.PI / 180;
+
+            const φ1 = toRad(lat1);
+            const φ2 = toRad(lat2);
+            const Δφ = toRad(lat2 - lat1);
+            const Δλ = toRad(lon2 - lon1);
+
+            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            return R * c; // Distance in meters
+        }
+
+        function metersToFeet(meters) {
+            return meters * 3.28084;
+        }
+    </script>
+</body>
+</html>
