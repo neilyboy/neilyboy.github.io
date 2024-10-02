@@ -2,330 +2,151 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Fiber Network Length Calculator</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1 { color: #333; }
-        #result { margin-top: 20px; font-size: 1.2em; }
-        input[type="file"] { margin-top: 10px; }
-        .loading { color: blue; }
-        .error { color: red; }
-        #layerSelectorContainer { margin-top: 20px; display: none; }
-        label { margin-right: 10px; }
-        ul { list-style-type: none; padding-left: 0; }
-        li { margin-bottom: 5px; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DXF/KML Length Calculator</title>
 </head>
 <body>
-    <h1>Luke is gay!!</h1>
-    <p>Select a KML, KMZ, or DXF file containing your fiber network data:</p>
-    <input type="file" id="fileInput" accept=".kml,.kmz,.dxf" />
-    
-    <!-- Layer Selection Dropdown -->
-    <div id="layerSelectorContainer">
-        <label for="layerSelector">Select Layer to Process:</label>
-        <select id="layerSelector">
-            <option value="all">All Layers</option>
-        </select>
-    </div>
-    
-    <div id="result"></div>
+    <h1>Upload DXF/KML/KMZ File</h1>
 
-    <!-- Include JSZip for KMZ files -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.0/jszip.min.js" integrity="sha512-0VfXQXvSEbXcSDkxj4F4BjI6EldVHrTgXHWXpOqHe6YI5aw3qRk6sTRaGfpDwyMrdSLFJgK5Hc60jY4YXr3Ykg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- Include dxf-parser for DXF files -->
-    <script src="https://cdn.jsdelivr.net/npm/dxf-parser@1.2.4/dist/dxf-parser.min.js"></script>
+    <!-- File input for DXF/KML/KMZ -->
+    <input type="file" id="fileInput" accept=".dxf,.kml,.kmz" />
+    <br><br>
+
+    <div id="output"></div>
+
+    <!-- dxf-parser library from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/dxf-parser@4.0.0/dist/dxf-parser.js"></script>
+    
     <script>
-        const fileInput = document.getElementById('fileInput');
-        const resultDiv = document.getElementById('result');
-        const layerSelectorContainer = document.getElementById('layerSelectorContainer');
-        const layerSelector = document.getElementById('layerSelector');
-        let dxfLayers = []; // To store layer names from DXF
-        let currentDxfLayerData = {}; // To store layer-wise lengths
+        document.getElementById('fileInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            const fileExtension = file.name.split('.').pop().toLowerCase();
 
-        fileInput.addEventListener('change', handleFile, false);
-        layerSelector.addEventListener('change', handleLayerSelection, false);
-
-        async function handleFile(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            // Reset previous results and layer selector
-            resultDiv.innerHTML = '';
-            layerSelectorContainer.style.display = 'none';
-            layerSelector.innerHTML = '<option value="all">All Layers</option>';
-            dxfLayers = [];
-            currentDxfLayerData = {};
-
-            resultDiv.textContent = 'Processing...';
-            resultDiv.className = 'loading';
-
-            try {
-                if (file.name.toLowerCase().endsWith('.dxf')) {
-                    // Process DXF file
-                    const layerData = await processDxfFile(file);
-                    dxfLayers = Object.keys(layerData);
-                    
-                    if (dxfLayers.length > 0) {
-                        populateLayerSelector(dxfLayers);
-                        layerSelectorContainer.style.display = 'block';
-                        // Automatically display all layers
-                        displayDxfResults(layerData);
-                        currentDxfLayerData = layerData;
-                    } else {
-                        throw new Error('No LINE, LWPOLYLINE, or SPLINE entities found in DXF file.');
-                    }
-                } else if (file.name.toLowerCase().endsWith('.dwg')) {
-                    throw new Error('Direct DWG file support is not available. Please convert your DWG file to DXF format and upload the DXF file.');
-                } else {
-                    // Process KML or KMZ file
-                    const totalFeet = await processKmlOrKmzFile(file);
-                    displayKmlResult(totalFeet);
-                }
-            } catch (error) {
-                resultDiv.textContent = `Error: ${error.message}`;
-                resultDiv.className = 'error';
-            }
-        }
-
-        // Function to process KML or KMZ files
-        async function processKmlOrKmzFile(file) {
-            let kmlText;
-            if (file.name.toLowerCase().endsWith('.kmz')) {
-                const arrayBuffer = await file.arrayBuffer();
-                const zip = await JSZip.loadAsync(arrayBuffer);
-                // KMZ usually contains doc.kml or similar; find the first KML file
-                const kmlFile = Object.values(zip.files).find(f => f.name.toLowerCase().endsWith('.kml'));
-                if (!kmlFile) throw new Error('No KML file found inside KMZ.');
-                kmlText = await kmlFile.async('text');
-            } else if (file.name.toLowerCase().endsWith('.kml')) {
-                kmlText = await file.text();
+            if (fileExtension === 'dxf') {
+                processDXF(file);
+            } else if (fileExtension === 'kml' || fileExtension === 'kmz') {
+                processKML(file);
             } else {
-                throw new Error('Unsupported file format. Please upload a KML, KMZ, or DXF file.');
+                document.getElementById('output').innerHTML = 'Unsupported file format. Please upload a DXF, KML, or KMZ file.';
             }
+        });
 
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(kmlText, 'application/xml');
-            const parserError = xmlDoc.getElementsByTagName('parsererror');
-            if (parserError.length) throw new Error('Error parsing KML file.');
+        // Function to process DXF files
+        function processDXF(file) {
+            const reader = new FileReader();
 
-            const lineStrings = xmlDoc.getElementsByTagName('LineString');
-            if (lineStrings.length === 0) throw new Error('No LineString elements found in the KML file.');
+            reader.onload = function (event) {
+                const dxfString = event.target.result;
+                const parser = new DxfParser();
 
-            let totalMeters = 0;
+                try {
+                    const dxfData = parser.parseSync(dxfString);
+                    const lengthsByLayer = {};
 
-            for (let ls of lineStrings) {
-                const coordinatesText = ls.getElementsByTagName('coordinates')[0]?.textContent;
-                if (!coordinatesText) continue;
+                    // Iterate over all entities
+                    dxfData.entities.forEach(entity => {
+                        if (entity.type === 'LINE' || entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE' || entity.type === 'SPLINE') {
+                            const layer = entity.layer || 'default';
+                            const length = calculateEntityLength(entity);
 
-                const coordinates = coordinatesText.trim().split(/\s+/).map(coord => {
-                    const [lng, lat, alt] = coord.split(',').map(Number);
-                    return { lat, lng };
-                });
+                            if (lengthsByLayer[layer]) {
+                                lengthsByLayer[layer] += length;
+                            } else {
+                                lengthsByLayer[layer] = length;
+                            }
+                        }
+                    });
 
-                for (let i = 1; i < coordinates.length; i++) {
-                    const p1 = coordinates[i - 1];
-                    const p2 = coordinates[i];
-                    totalMeters += haversineDistance(p1.lat, p1.lng, p2.lat, p2.lng);
+                    displayLayerLengths(lengthsByLayer);
+                } catch (err) {
+                    console.error('Error parsing DXF:', err.message);
+                    document.getElementById('output').innerHTML = 'Error parsing DXF file: ' + err.message;
                 }
-            }
+            };
 
-            const totalFeet = metersToFeet(totalMeters);
-            return totalFeet;
+            reader.readAsText(file);
         }
 
-        // Function to process DXF files and return layer-wise lengths
-        async function processDxfFile(file) {
-            const arrayBuffer = await file.arrayBuffer();
-            const parser = new window.DxfParser();
-            let dxf;
+        // Function to calculate the length of a DXF entity
+        function calculateEntityLength(entity) {
+            let length = 0;
 
-            try {
-                const text = new TextDecoder("utf-8").decode(arrayBuffer);
-                dxf = parser.parseSync(text);
-            } catch (err) {
-                throw new Error('Error parsing DXF file. Ensure the file is a valid DXF format.');
-            }
-
-            if (!dxf || !dxf.entities || dxf.entities.length === 0) {
-                throw new Error('No entities found in DXF file.');
-            }
-
-            const layerTotals = {}; // Object to store total lengths per layer
-
-            // Iterate through entities and calculate lengths per layer
-            dxf.entities.forEach(entity => {
-                switch (entity.type) {
-                    case 'LINE':
-                        handleLineEntity(entity, layerTotals);
-                        break;
-                    case 'LWPOLYLINE':
-                        handleLwPolylineEntity(entity, layerTotals);
-                        break;
-                    case 'SPLINE':
-                        handleSplineEntity(entity, layerTotals);
-                        break;
-                    // Add more entity types if needed
-                    default:
-                        // Ignore other entity types
-                        break;
+            if (entity.type === 'LINE') {
+                const dx = entity.vertices[1].x - entity.vertices[0].x;
+                const dy = entity.vertices[1].y - entity.vertices[0].y;
+                length = Math.sqrt(dx * dx + dy * dy);
+            } else if (entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE') {
+                for (let i = 0; i < entity.vertices.length - 1; i++) {
+                    const dx = entity.vertices[i + 1].x - entity.vertices[i].x;
+                    const dy = entity.vertices[i + 1].y - entity.vertices[i].y;
+                    length += Math.sqrt(dx * dx + dy * dy);
                 }
+            } else if (entity.type === 'SPLINE') {
+                // Approximate the spline length by summing distances between control points
+                const controlPoints = entity.controlPoints;
+                for (let i = 0; i < controlPoints.length - 1; i++) {
+                    const dx = controlPoints[i + 1].x - controlPoints[i].x;
+                    const dy = controlPoints[i + 1].y - controlPoints[i].y;
+                    length += Math.sqrt(dx * dx + dy * dy);
+                }
+            }
+
+            return length;
+        }
+
+        // Function to display the calculated lengths for each layer
+        function displayLayerLengths(lengthsByLayer) {
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = '<h2>Layer Lengths (in drawing units)</h2>';
+            const list = document.createElement('ul');
+
+            Object.keys(lengthsByLayer).forEach(layer => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `Layer: ${layer} - Total Length: ${lengthsByLayer[layer].toFixed(2)} units`;
+                list.appendChild(listItem);
             });
 
-            return layerTotals;
+            outputDiv.appendChild(list);
         }
 
-        // Function to handle LINE entities
-        function handleLineEntity(entity, layerTotals) {
-            const layerName = entity.layer || 'Undefined Layer';
-            const start = entity.start;
-            const end = entity.end;
+        // Function to process KML/KMZ files
+        function processKML(file) {
+            const reader = new FileReader();
 
-            // Calculate Cartesian distance (assuming units are in meters)
-            const distanceMeters = cartesianDistance(start, end);
-            const distanceFeet = metersToFeet(distanceMeters);
+            reader.onload = function (event) {
+                const kmlString = event.target.result;
+                const parser = new DOMParser();
+                const kmlDoc = parser.parseFromString(kmlString, 'application/vnd.google-earth.kml+xml');
+                const placemarks = kmlDoc.getElementsByTagName('Placemark');
+                let totalLength = 0;
 
-            if (layerTotals[layerName]) {
-                layerTotals[layerName] += distanceFeet;
-            } else {
-                layerTotals[layerName] = distanceFeet;
-            }
-        }
-
-        // Function to handle LWPOLYLINE entities
-        function handleLwPolylineEntity(entity, layerTotals) {
-            const layerName = entity.layer || 'Undefined Layer';
-            const vertices = entity.vertices;
-
-            if (!vertices || vertices.length < 2) return;
-
-            let distanceMeters = 0;
-
-            for (let i = 1; i < vertices.length; i++) {
-                const p1 = vertices[i - 1];
-                const p2 = vertices[i];
-                distanceMeters += cartesianDistance(p1, p2);
-            }
-
-            const distanceFeet = metersToFeet(distanceMeters);
-
-            if (layerTotals[layerName]) {
-                layerTotals[layerName] += distanceFeet;
-            } else {
-                layerTotals[layerName] = distanceFeet;
-            }
-        }
-
-        // Function to handle SPLINE entities
-        function handleSplineEntity(entity, layerTotals) {
-            const layerName = entity.layer || 'Undefined Layer';
-            const fitPoints = entity.fitPoints;
-
-            if (!fitPoints || fitPoints.length < 2) return;
-
-            let distanceMeters = 0;
-
-            for (let i = 1; i < fitPoints.length; i++) {
-                const p1 = fitPoints[i - 1];
-                const p2 = fitPoints[i];
-                distanceMeters += cartesianDistance(p1, p2);
-            }
-
-            const distanceFeet = metersToFeet(distanceMeters);
-
-            if (layerTotals[layerName]) {
-                layerTotals[layerName] += distanceFeet;
-            } else {
-                layerTotals[layerName] = distanceFeet;
-            }
-        }
-
-        // Function to populate the layer selector dropdown
-        function populateLayerSelector(layers) {
-            layers.sort(); // Sort layers alphabetically
-            layers.forEach(layer => {
-                const option = document.createElement('option');
-                option.value = layer;
-                option.textContent = layer;
-                layerSelector.appendChild(option);
-            });
-        }
-
-        // Function to handle layer selection change
-        async function handleLayerSelection(event) {
-            const selectedLayer = event.target.value;
-            const file = fileInput.files[0];
-            if (!file) return;
-
-            try {
-                if (file.name.toLowerCase().endsWith('.dxf')) {
-                    if (selectedLayer === 'all') {
-                        displayDxfResults(currentDxfLayerData);
-                    } else {
-                        const selectedTotal = currentDxfLayerData[selectedLayer] || 0;
-                        displayDxfSelectedLayer(selectedLayer, selectedTotal);
+                for (let i = 0; i < placemarks.length; i++) {
+                    const coordinates = placemarks[i].getElementsByTagName('coordinates')[0];
+                    if (coordinates) {
+                        const coordsArray = coordinates.textContent.trim().split(' ').map(coord => coord.split(',').map(Number));
+                        totalLength += calculateKMLLength(coordsArray);
                     }
                 }
-            } catch (error) {
-                resultDiv.textContent = `Error: ${error.message}`;
-                resultDiv.className = 'error';
+
+                document.getElementById('output').innerHTML = `Total length of all line segments: ${totalLength.toFixed(2)} units`;
+            };
+
+            reader.readAsText(file);
+        }
+
+        // Function to calculate the total length of a KML polyline
+        function calculateKMLLength(coordsArray) {
+            let length = 0;
+
+            for (let i = 0; i < coordsArray.length - 1; i++) {
+                const [x1, y1] = coordsArray[i];
+                const [x2, y2] = coordsArray[i + 1];
+                const dx = x2 - x1;
+                const dy = y2 - y1;
+                length += Math.sqrt(dx * dx + dy * dy);
             }
-        }
 
-        // Function to display DXF results for all layers
-        function displayDxfResults(layerData) {
-            let html = `<strong>Total Fiber Length per Layer:</strong><br/><ul>`;
-            for (const [layer, total] of Object.entries(layerData)) {
-                html += `<li><strong>${layer}</strong>: ${total.toLocaleString(undefined, {maximumFractionDigits: 2})} feet</li>`;
-            }
-            html += `</ul>`;
-            resultDiv.innerHTML = html;
-            resultDiv.className = '';
-        }
-
-        // Function to display DXF result for a selected layer
-        function displayDxfSelectedLayer(layer, total) {
-            const html = `<strong>Total Fiber Length for Layer "<em>${layer}</em>":</strong> <strong>${total.toLocaleString(undefined, {maximumFractionDigits: 2})} feet</strong>`;
-            resultDiv.innerHTML = html;
-            resultDiv.className = '';
-        }
-
-        // Function to display KML/KMZ result
-        function displayKmlResult(totalFeet) {
-            const html = `Total Fiber Length: <strong>${totalFeet.toLocaleString(undefined, {maximumFractionDigits: 2})} feet</strong>`;
-            resultDiv.innerHTML = html;
-            resultDiv.className = '';
-        }
-
-        // Helper function to calculate Haversine distance between two lat/lng points in meters
-        function haversineDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371000; // Radius of Earth in meters
-            const toRad = angle => angle * Math.PI / 180;
-
-            const φ1 = toRad(lat1);
-            const φ2 = toRad(lat2);
-            const Δφ = toRad(lat2 - lat1);
-            const Δλ = toRad(lon2 - lon1);
-
-            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-                      Math.cos(φ1) * Math.cos(φ2) *
-                      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-            return R * c; // Distance in meters
-        }
-
-        // Helper function to calculate Cartesian distance between two points in meters
-        function cartesianDistance(p1, p2) {
-            const dx = p2.x - p1.x;
-            const dy = p2.y - p1.y;
-            const dz = (p2.z || 0) - (p1.z || 0); // If z is undefined, assume 0
-            return Math.sqrt(dx * dx + dy * dy + dz * dz);
-        }
-
-        // Helper function to convert meters to feet
-        function metersToFeet(meters) {
-            return meters * 3.28084;
+            return length;
         }
     </script>
 </body>
