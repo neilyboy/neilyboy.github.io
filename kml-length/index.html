@@ -58,8 +58,8 @@
                 for (let i = 1; i < points.length; i++) {
                     const [lon1, lat1] = points[i-1].split(',');
                     const [lon2, lat2] = points[i].split(',');
-                    const p1 = new LatLon(parseFloat(lat1), parseFloat(lon1));
-                    const p2 = new LatLon(parseFloat(lat2), parseFloat(lon2));
+                    const p1 = new geodesy.LatLonEllipsoidal(parseFloat(lat1), parseFloat(lon1));
+                    const p2 = new geodesy.LatLonEllipsoidal(parseFloat(lat2), parseFloat(lon2));
                     totalLength += p1.distanceTo(p2);
                 }
             }
