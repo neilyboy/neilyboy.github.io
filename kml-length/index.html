@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KML/KMZ Length Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/geodesy/2.2.1/geodesy.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>KML/KMZ Length Calculator</h1>
+    <input type="file" id="fileInput" accept=".kml,.kmz">
+    <button onclick="processFile()">Calculate Length</button>
+    <div id="result"></div>
+
+    <script>
+        async function processFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a file');
+                return;
+            }
+
+            let kmlContent;
+            if (file.name.endsWith('.kmz')) {
+                const zip = new JSZip();
+                const zipContent = await zip.loadAsync(file);
+                const kmlFile = Object.values(zipContent.files).find(f => f.name.endsWith('.kml'));
+                if (!kmlFile) {
+                    alert('No KML file found in the KMZ archive');
+                    return;
+                }
+                kmlContent = await kmlFile.async('text');
+            } else {
+                kmlContent = await file.text();
+            }
+
+            const parser = new DOMParser();
+            const kmlDoc = parser.parseFromString(kmlContent, 'text/xml');
+            const coordinates = kmlDoc.getElementsByTagName('coordinates');
+
+            let totalLength = 0;
+            for (let coord of coordinates) {
+                const points = coord.textContent.trim().split(' ');
+                for (let i = 1; i < points.length; i++) {
+                    const [lon1, lat1] = points[i-1].split(',');
+                    const [lon2, lat2] = points[i].split(',');
+                    const p1 = new LatLon(parseFloat(lat1), parseFloat(lon1));
+                    const p2 = new LatLon(parseFloat(lat2), parseFloat(lon2));
+                    totalLength += p1.distanceTo(p2);
+                }
+            }
+
+            document.getElementById('result').textContent = `Total length: ${(totalLength * 3.28084).toFixed(2)} feet`;
+        }
+    </script>
+</body>
+</html>
