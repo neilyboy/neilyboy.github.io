@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>22DXF/KML Length Calculator</title>
+    <title>DXF/KML Length Calculator</title>
 </head>
 <body>
     <h1>Upload DXF/KML/KMZ File</h1>
@@ -15,7 +15,7 @@
     <div id="output"></div>
 
     <!-- dxf-parser library from CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/dxf-parser@4.0.0/dist/dxf-parser.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dxf-parser@4.0.0/dist/dxf-parser.min.js"></script>
     
     <script>
         document.getElementById('fileInput').addEventListener('change', function (e) {
@@ -37,7 +37,7 @@
 
             reader.onload = function (event) {
                 const dxfString = event.target.result;
-                const parser = new window.DxfParser(); // Make sure to access DxfParser via window
+                const parser = new DxfParser(); // Instantiate the parser
 
                 try {
                     const dxfData = parser.parseSync(dxfString);
