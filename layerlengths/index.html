@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DXF Length Calculator</title>
+</head>
+<body>
+    <h1>Upload DXF/KML/KMZ File</h1>
+
+    <!-- File input for DXF/KML/KMZ -->
+    <input type="file" id="fileInput" accept=".dxf,.kml,.kmz" />
+    <br><br>
+
+    <div id="output"></div>
+
+    <!-- dxf-parser library from CDN -->
+    <script src="dxf-parser-bundle.js"></script>
+    
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+
+            if (fileExtension === 'dxf') {
+                processDXF(file);
+            } else if (fileExtension === 'kml' || fileExtension === 'kmz') {
+                processKML(file);
+            } else {
+                document.getElementById('output').innerHTML = 'Unsupported file format. Please upload a DXF, KML, or KMZ file.';
+            }
+        });
+
+        // Function to process DXF files
+        function processDXF(file) {
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                const dxfString = event.target.result;
+                const parser = new DxfParser(); // Instantiate the parser
+
+                try {
+                    const dxfData = parser.parseSync(dxfString);
+                    const lengthsByLayer = {};
+
+                    // Iterate over all entities
+                    dxfData.entities.forEach(entity => {
+                        if (entity.type === 'LINE' || entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE' || entity.type === 'SPLINE') {
+                            const layer = entity.layer || 'default';
+                            const length = calculateEntityLength(entity);
+                            console.log(`Entity Type: ${entity.type}, Layer: ${layer}, Length: ${length}`);
+
+                            if (lengthsByLayer[layer]) {
+                                lengthsByLayer[layer] += length;
+                            } else {
+                                lengthsByLayer[layer] = length;
+                            }
+                        }
+                    });
+
+                    displayLayerLengths(lengthsByLayer);
+                } catch (err) {
+                    console.error('Error parsing DXF:', err.message);
+                    document.getElementById('output').innerHTML = 'Error parsing DXF file: ' + err.message;
+                }
+            };
+
+            reader.readAsText(file);
+        }
+
+        // Function to calculate the length of a DXF entity
+        function calculateEntityLength(entity) {
+            let length = 0;
+
+            if (entity.type === 'LINE') {
+                const dx = entity.vertices[1].x - entity.vertices[0].x;
+                const dy = entity.vertices[1].y - entity.vertices[0].y;
+                length = Math.sqrt(dx * dx + dy * dy);
+            } else if (entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE') {
+                for (let i = 0; i < entity.vertices.length - 1; i++) {
+                    const dx = entity.vertices[i + 1].x - entity.vertices[i].x;
+                    const dy = entity.vertices[i + 1].y - entity.vertices[i].y;
+                    length += Math.sqrt(dx * dx + dy * dy);
+                }
+            } else if (entity.type === 'SPLINE') {
+                length = calculateSplineLength(entity);
+            }
+
+            return length;
+        }
+
+        // Function to calculate spline length
+        function calculateSplineLength(spline) {
+            const controlPoints = spline.controlPoints;
+
+            if (!controlPoints || controlPoints.length < 2) {
+                console.warn(`Spline has insufficient control points: ${controlPoints}`);
+                return 0;
+            }
+
+            let totalLength = 0;
+            const numSegments = 100; // More segments = higher accuracy
+
+            for (let i = 0; i < numSegments; i++) {
+                const t1 = i / numSegments;
+                const t2 = (i + 1) / numSegments;
+
+                const point1 = getSplinePoint(controlPoints, t1);
+                const point2 = getSplinePoint(controlPoints, t2);
+
+                totalLength += Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
+            }
+
+            return totalLength;
+        }
+
+        // Function to compute a point on the spline using De Casteljau's algorithm
+        function getSplinePoint(controlPoints, t) {
+            const n = controlPoints.length - 1;
+            const point = { x: 0, y: 0 };
+
+            for (let i = 0; i <= n; i++) {
+                const binomialCoefficient = binomial(n, i) * Math.pow(t, i) * Math.pow(1 - t, n - i);
+                point.x += controlPoints[i].x * binomialCoefficient;
+                point.y += controlPoints[i].y * binomialCoefficient;
+            }
+
+            return point;
+        }
+
+        // Function to calculate binomial coefficient
+        function binomial(n, k) {
+            if (k < 0 || k > n) return 0;
+            let coeff = 1;
+            for (let i = 0; i < k; i++) {
+                coeff = coeff * (n - i) / (i + 1);
+            }
+            return coeff;
+        }
+
+        // Function to display the calculated lengths for each layer
+        function displayLayerLengths(lengthsByLayer) {
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = '<h2>Layer Lengths (in drawing units)</h2>';
+            const list = document.createElement('ul');
+
+            Object.keys(lengthsByLayer).forEach(layer => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `Layer: ${layer} - Total Length: ${lengthsByLayer[layer].toFixed(2)} units`;
+                list.appendChild(listItem);
+            });
+
+            outputDiv.appendChild(list);
+        }
+
+
+// Function to process KML/KMZ files
+function processKML(file) {
+    const reader = new FileReader();
+
+    reader.onload = function (event) {
+        const kmlString = event.target.result;
+        const parser = new DOMParser();
+        // Use 'application/xml' instead of 'application/vnd.google-earth.kml+xml'
+        const kmlDoc = parser.parseFromString(kmlString, 'application/xml');
+        
+        const placemarks = kmlDoc.getElementsByTagName('Placemark');
+        let totalLength = 0;
+
+        for (let i = 0; i < placemarks.length; i++) {
+            const coordinates = placemarks[i].getElementsByTagName('coordinates')[0];
+            if (coordinates) {
+                const coordsArray = coordinates.textContent.trim().split(' ').map(coord => coord.split(',').map(Number));
+                totalLength += calculateKMLLength(coordsArray);
+            }
+        }
+
+        document.getElementById('output').innerHTML = `Total length of all line segments: ${totalLength.toFixed(2)} units`;
+    };
+
+    reader.readAsText(file);
+}
+
+
+// Function to calculate the total length of a KML polyline
+function calculateKMLLength(coordsArray) {
+    let length = 0;
+
+    // Earth radius in feet (average)
+    const earthRadiusFeet = 20925646; // Earth's radius in feet
+
+    for (let i = 0; i < coordsArray.length - 1; i++) {
+        const [lon1, lat1] = coordsArray[i];
+        const [lon2, lat2] = coordsArray[i + 1];
+
+        // Convert degrees to radians
+        const lat1Rad = lat1 * (Math.PI / 180);
+        const lat2Rad = lat2 * (Math.PI / 180);
+        const dLon = (lon2 - lon1) * (Math.PI / 180);
+
+        // Calculate distance using the spherical law of cosines
+        const distance = Math.acos(Math.sin(lat1Rad) * Math.sin(lat2Rad) +
+                                    Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon)) * earthRadiusFeet;
+
+        length += distance;
+    }
+
+    return length;
+}
+
+
+
+    </script>
+</body>
+</html>
