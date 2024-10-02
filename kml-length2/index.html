@@ -182,20 +182,31 @@ function processKML(file) {
 }
 
 
-        // Function to calculate the total length of a KML polyline
-        function calculateKMLLength(coordsArray) {
-            let length = 0;
+// Function to calculate the total length of a KML polyline
+function calculateKMLLength(coordsArray) {
+    let length = 0;
 
-            for (let i = 0; i < coordsArray.length - 1; i++) {
-                const [x1, y1] = coordsArray[i];
-                const [x2, y2] = coordsArray[i + 1];
-                const dx = x2 - x1;
-                const dy = y2 - y1;
-                length += Math.sqrt(dx * dx + dy * dy);
-            }
+    // Assuming Earth's radius is approximately 3,959 miles
+    const earthRadiusFeet = 3.959 * 5280; // Convert miles to feet
 
-            return length;
-        }
+    for (let i = 0; i < coordsArray.length - 1; i++) {
+        const [lon1, lat1] = coordsArray[i];
+        const [lon2, lat2] = coordsArray[i + 1];
+
+        // Convert latitude and longitude to feet
+        const x1 = lon1 * (earthRadiusFeet * Math.cos(lat1 * (Math.PI / 180)));
+        const y1 = lat1 * earthRadiusFeet;
+        const x2 = lon2 * (earthRadiusFeet * Math.cos(lat2 * (Math.PI / 180)));
+        const y2 = lat2 * earthRadiusFeet;
+
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        length += Math.sqrt(dx * dx + dy * dy);
+    }
+
+    return length;
+}
+
     </script>
 </body>
 </html>
