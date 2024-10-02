@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DXF/KML Length Calculator</title>
+    <script src="dxf-parser-bundle.js"></script> <!-- Ensure this path is correct -->
+</head>
+<body>
+    <h1>Upload DXF/KML/KMZ File</h1>
+    <input type="file" id="fileInput" accept=".dxf,.kml,.kmz" />
+    <br><br>
+
+    <div id="layerSelection" style="display: none;">
+        <h2>Select Layers to Process</h2>
+        <div id="layerList"></div>
+        <button id="processButton">Process Selected Layers</button>
+    </div>
+
+    <div id="output"></div>
+
+    <script>
+        document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                parseDXF(content);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseDXF(content) {
+            const parser = new DxfParser();
+            let dxf;
+
+            try {
+                dxf = parser.parseSync(content);
+                const layers = extractLayers(dxf.entities);
+                showLayerSelection(layers);
+            } catch (err) {
+                console.error(err.stack);
+                document.getElementById('output').textContent = "Error parsing DXF file.";
+            }
+        }
+
+        function extractLayers(entities) {
+            const layers = {};
+            entities.forEach(entity => {
+                const layerName = entity.layer;
+                if (!layers[layerName]) {
+                    layers[layerName] = 0;
+                }
+                if (entity.type === 'LINE' || entity.type === 'POLYLINE' || entity.type === 'SPLINE') {
+                    const length = calculateLength(entity); // You need to implement this function
+                    layers[layerName] += length;
+                }
+            });
+            return layers;
+        }
+
+        function showLayerSelection(layers) {
+            const layerListDiv = document.getElementById('layerList');
+            layerListDiv.innerHTML = ""; // Clear previous content
+
+            // Create a checkbox for each layer
+            for (const layer in layers) {
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = layer;
+                checkbox.id = layer;
+
+                const label = document.createElement('label');
+                label.htmlFor = layer;
+                label.appendChild(document.createTextNode(layer));
+
+                layerListDiv.appendChild(checkbox);
+                layerListDiv.appendChild(label);
+                layerListDiv.appendChild(document.createElement('br'));
+            }
+
+            document.getElementById('layerSelection').style.display = 'block';
+
+            document.getElementById('processButton').onclick = function() {
+                processSelectedLayers(layers);
+            };
+        }
+
+        function processSelectedLayers(layers) {
+            const selectedLayers = [];
+            const checkboxes = document.querySelectorAll('#layerList input[type="checkbox"]:checked');
+
+            checkboxes.forEach(checkbox => {
+                selectedLayers.push(checkbox.value);
+            });
+
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = ""; // Clear previous output
+
+            selectedLayers.forEach(layer => {
+                const totalLength = layers[layer];
+                outputDiv.innerHTML += `Total length for layer "${layer}": ${totalLength} units<br>`;
+            });
+        }
+
+        function calculateLength(entity) {
+            // Implement the logic to calculate the length of the entity
+            // For LINE: length = distance between two points
+            // For POLYLINE: sum of lengths of segments
+            // For SPLINE: you might need to approximate the length
+            return 0; // Replace this with the actual length calculation
+        }
+    </script>
+</body>
+</html>
