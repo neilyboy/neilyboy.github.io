@@ -12,10 +12,12 @@
         .error { color: red; }
         #layerSelectorContainer { margin-top: 20px; display: none; }
         label { margin-right: 10px; }
+        ul { list-style-type: none; padding-left: 0; }
+        li { margin-bottom: 5px; }
     </style>
 </head>
 <body>
-    <h1>Fiber Network Length Calculator</h1>
+    <h1>Luke is gay!!</h1>
     <p>Select a KML, KMZ, or DXF file containing your fiber network data:</p>
     <input type="file" id="fileInput" accept=".kml,.kmz,.dxf" />
     
@@ -71,7 +73,7 @@
                         displayDxfResults(layerData);
                         currentDxfLayerData = layerData;
                     } else {
-                        throw new Error('No LINE entities found in DXF file.');
+                        throw new Error('No LINE, LWPOLYLINE, or SPLINE entities found in DXF file.');
                     }
                 } else if (file.name.toLowerCase().endsWith('.dwg')) {
                     throw new Error('Direct DWG file support is not available. Please convert your DWG file to DXF format and upload the DXF file.');
@@ -153,25 +155,89 @@
 
             // Iterate through entities and calculate lengths per layer
             dxf.entities.forEach(entity => {
-                if (entity.type === 'LINE') {
-                    const layerName = entity.layer || 'Undefined Layer';
-                    const start = entity.start;
-                    const end = entity.end;
-
-                    // Calculate Cartesian distance (assuming units are in meters)
-                    const distanceMeters = cartesianDistance(start, end);
-                    const distanceFeet = metersToFeet(distanceMeters);
-
-                    if (layerTotals[layerName]) {
-                        layerTotals[layerName] += distanceFeet;
-                    } else {
-                        layerTotals[layerName] = distanceFeet;
-                    }
+                switch (entity.type) {
+                    case 'LINE':
+                        handleLineEntity(entity, layerTotals);
+                        break;
+                    case 'LWPOLYLINE':
+                        handleLwPolylineEntity(entity, layerTotals);
+                        break;
+                    case 'SPLINE':
+                        handleSplineEntity(entity, layerTotals);
+                        break;
+                    // Add more entity types if needed
+                    default:
+                        // Ignore other entity types
+                        break;
                 }
-                // Add more entity types if needed (e.g., LWPOLYLINE)
             });
 
             return layerTotals;
+        }
+
+        // Function to handle LINE entities
+        function handleLineEntity(entity, layerTotals) {
+            const layerName = entity.layer || 'Undefined Layer';
+            const start = entity.start;
+            const end = entity.end;
+
+            // Calculate Cartesian distance (assuming units are in meters)
+            const distanceMeters = cartesianDistance(start, end);
+            const distanceFeet = metersToFeet(distanceMeters);
+
+            if (layerTotals[layerName]) {
+                layerTotals[layerName] += distanceFeet;
+            } else {
+                layerTotals[layerName] = distanceFeet;
+            }
+        }
+
+        // Function to handle LWPOLYLINE entities
+        function handleLwPolylineEntity(entity, layerTotals) {
+            const layerName = entity.layer || 'Undefined Layer';
+            const vertices = entity.vertices;
+
+            if (!vertices || vertices.length < 2) return;
+
+            let distanceMeters = 0;
+
+            for (let i = 1; i < vertices.length; i++) {
+                const p1 = vertices[i - 1];
+                const p2 = vertices[i];
+                distanceMeters += cartesianDistance(p1, p2);
+            }
+
+            const distanceFeet = metersToFeet(distanceMeters);
+
+            if (layerTotals[layerName]) {
+                layerTotals[layerName] += distanceFeet;
+            } else {
+                layerTotals[layerName] = distanceFeet;
+            }
+        }
+
+        // Function to handle SPLINE entities
+        function handleSplineEntity(entity, layerTotals) {
+            const layerName = entity.layer || 'Undefined Layer';
+            const fitPoints = entity.fitPoints;
+
+            if (!fitPoints || fitPoints.length < 2) return;
+
+            let distanceMeters = 0;
+
+            for (let i = 1; i < fitPoints.length; i++) {
+                const p1 = fitPoints[i - 1];
+                const p2 = fitPoints[i];
+                distanceMeters += cartesianDistance(p1, p2);
+            }
+
+            const distanceFeet = metersToFeet(distanceMeters);
+
+            if (layerTotals[layerName]) {
+                layerTotals[layerName] += distanceFeet;
+            } else {
+                layerTotals[layerName] = distanceFeet;
+            }
         }
 
         // Function to populate the layer selector dropdown
@@ -219,7 +285,7 @@
 
         // Function to display DXF result for a selected layer
         function displayDxfSelectedLayer(layer, total) {
-            const html = `<strong>Total Fiber Length for Layer "${layer}":</strong> <strong>${total.toLocaleString(undefined, {maximumFractionDigits: 2})} feet</strong>`;
+            const html = `<strong>Total Fiber Length for Layer "<em>${layer}</em>":</strong> <strong>${total.toLocaleString(undefined, {maximumFractionDigits: 2})} feet</strong>`;
             resultDiv.innerHTML = html;
             resultDiv.className = '';
         }
