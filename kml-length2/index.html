@@ -186,26 +186,37 @@ function processKML(file) {
 function calculateKMLLength(coordsArray) {
     let length = 0;
 
-    // Assuming Earth's radius is approximately 3,959 miles
-    const earthRadiusFeet = 3.959 * 5280; // Convert miles to feet
+    // Convert coordinates from degrees to radians for calculations
+    function degreesToRadians(degrees) {
+        return degrees * (Math.PI / 180);
+    }
 
     for (let i = 0; i < coordsArray.length - 1; i++) {
         const [lon1, lat1] = coordsArray[i];
         const [lon2, lat2] = coordsArray[i + 1];
 
-        // Convert latitude and longitude to feet
-        const x1 = lon1 * (earthRadiusFeet * Math.cos(lat1 * (Math.PI / 180)));
-        const y1 = lat1 * earthRadiusFeet;
-        const x2 = lon2 * (earthRadiusFeet * Math.cos(lat2 * (Math.PI / 180)));
-        const y2 = lat2 * earthRadiusFeet;
+        // Earth's radius in feet
+        const earthRadiusFeet = 20925646; // Earth radius in feet (using 3,959 miles)
 
-        const dx = x2 - x1;
-        const dy = y2 - y1;
-        length += Math.sqrt(dx * dx + dy * dy);
+        // Convert latitude and longitude to radians
+        const lat1Rad = degreesToRadians(lat1);
+        const lat2Rad = degreesToRadians(lat2);
+        const dLon = degreesToRadians(lon2 - lon1);
+
+        // Haversine formula to calculate distance
+        const a = Math.sin(dLon / 2) * Math.sin(dLon / 2) +
+                  Math.cos(lat1Rad) * Math.cos(lat2Rad) *
+                  Math.sin((lat2Rad - lat1Rad) / 2) *
+                  Math.sin((lat2Rad - lat1Rad) / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distance = earthRadiusFeet * c; // Distance in feet
+
+        length += distance;
     }
 
     return length;
 }
+
 
     </script>
 </body>
