@@ -15,9 +15,9 @@
     </style>
 </head>
 <body>
-    <h1>Fiber Network Length Calculator Neil Its Updated</h1>
-    <p>Select a KML, KMZ, or DWG file containing your fiber network data:</p>
-    <input type="file" id="fileInput" accept=".kml,.kmz,.dwg" />
+    <h1>Fiber Network Length Calculator</h1>
+    <p>Select a KML, KMZ, or DXF file containing your fiber network data:</p>
+    <input type="file" id="fileInput" accept=".kml,.kmz,.dxf" />
     
     <!-- Layer Selection Dropdown -->
     <div id="layerSelectorContainer">
@@ -31,14 +31,15 @@
 
     <!-- Include JSZip for KMZ files -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.0/jszip.min.js" integrity="sha512-0VfXQXvSEbXcSDkxj4F4BjI6EldVHrTgXHWXpOqHe6YI5aw3qRk6sTRaGfpDwyMrdSLFJgK5Hc60jY4YXr3Ykg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- Include @xeric/dwg for DWG files -->
-    <script src="https://unpkg.com/@xeric/dwg/dist/dwg.min.js"></script>
+    <!-- Include dxf-parser for DXF files -->
+    <script src="https://cdn.jsdelivr.net/npm/dxf-parser@1.2.4/dist/dxf-parser.min.js"></script>
     <script>
         const fileInput = document.getElementById('fileInput');
         const resultDiv = document.getElementById('result');
         const layerSelectorContainer = document.getElementById('layerSelectorContainer');
         const layerSelector = document.getElementById('layerSelector');
-        let dwgLayers = []; // To store layer names from DWG
+        let dxfLayers = []; // To store layer names from DXF
+        let currentDxfLayerData = {}; // To store layer-wise lengths
 
         fileInput.addEventListener('change', handleFile, false);
         layerSelector.addEventListener('change', handleLayerSelection, false);
@@ -51,25 +52,29 @@
             resultDiv.innerHTML = '';
             layerSelectorContainer.style.display = 'none';
             layerSelector.innerHTML = '<option value="all">All Layers</option>';
-            dwgLayers = [];
+            dxfLayers = [];
+            currentDxfLayerData = {};
 
             resultDiv.textContent = 'Processing...';
             resultDiv.className = 'loading';
 
             try {
-                if (file.name.toLowerCase().endsWith('.dwg')) {
-                    // Process DWG file
-                    const layerData = await processDwgFile(file);
-                    dwgLayers = Object.keys(layerData);
+                if (file.name.toLowerCase().endsWith('.dxf')) {
+                    // Process DXF file
+                    const layerData = await processDxfFile(file);
+                    dxfLayers = Object.keys(layerData);
                     
-                    if (dwgLayers.length > 0) {
-                        populateLayerSelector(dwgLayers);
+                    if (dxfLayers.length > 0) {
+                        populateLayerSelector(dxfLayers);
                         layerSelectorContainer.style.display = 'block';
                         // Automatically display all layers
-                        displayDwgResults(layerData);
+                        displayDxfResults(layerData);
+                        currentDxfLayerData = layerData;
                     } else {
-                        throw new Error('No LINE entities found in DWG file.');
+                        throw new Error('No LINE entities found in DXF file.');
                     }
+                } else if (file.name.toLowerCase().endsWith('.dwg')) {
+                    throw new Error('Direct DWG file support is not available. Please convert your DWG file to DXF format and upload the DXF file.');
                 } else {
                     // Process KML or KMZ file
                     const totalFeet = await processKmlOrKmzFile(file);
@@ -94,7 +99,7 @@
             } else if (file.name.toLowerCase().endsWith('.kml')) {
                 kmlText = await file.text();
             } else {
-                throw new Error('Unsupported file format. Please upload a KML, KMZ, or DWG file.');
+                throw new Error('Unsupported file format. Please upload a KML, KMZ, or DXF file.');
             }
 
             const parser = new DOMParser();
@@ -127,28 +132,27 @@
             return totalFeet;
         }
 
-        // Function to process DWG files and return layer-wise lengths
-        async function processDwgFile(file) {
-            // Ensure the DWG parser is available
-            if (!window.DwgParser) {
-                throw new Error('DWG parsing library not loaded.');
+        // Function to process DXF files and return layer-wise lengths
+        async function processDxfFile(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const parser = new window.DxfParser();
+            let dxf;
+
+            try {
+                const text = new TextDecoder("utf-8").decode(arrayBuffer);
+                dxf = parser.parseSync(text);
+            } catch (err) {
+                throw new Error('Error parsing DXF file. Ensure the file is a valid DXF format.');
             }
 
-            const arrayBuffer = await file.arrayBuffer();
-            const dwgParser = new window.DwgParser();
-
-            // Parse the DWG file
-            const dwg = await dwgParser.parse(arrayBuffer);
-            const entities = dwg.entities;
-
-            if (!entities || entities.length === 0) {
-                throw new Error('No entities found in DWG file.');
+            if (!dxf || !dxf.entities || dxf.entities.length === 0) {
+                throw new Error('No entities found in DXF file.');
             }
 
             const layerTotals = {}; // Object to store total lengths per layer
 
             // Iterate through entities and calculate lengths per layer
-            entities.forEach(entity => {
+            dxf.entities.forEach(entity => {
                 if (entity.type === 'LINE') {
                     const layerName = entity.layer || 'Undefined Layer';
                     const start = entity.start;
@@ -188,13 +192,12 @@
             if (!file) return;
 
             try {
-                if (file.name.toLowerCase().endsWith('.dwg')) {
-                    const layerData = await processDwgFile(file);
+                if (file.name.toLowerCase().endsWith('.dxf')) {
                     if (selectedLayer === 'all') {
-                        displayDwgResults(layerData);
+                        displayDxfResults(currentDxfLayerData);
                     } else {
-                        const selectedTotal = layerData[selectedLayer] || 0;
-                        displayDwgSelectedLayer(selectedLayer, selectedTotal);
+                        const selectedTotal = currentDxfLayerData[selectedLayer] || 0;
+                        displayDxfSelectedLayer(selectedLayer, selectedTotal);
                     }
                 }
             } catch (error) {
@@ -203,8 +206,8 @@
             }
         }
 
-        // Function to display DWG results for all layers
-        function displayDwgResults(layerData) {
+        // Function to display DXF results for all layers
+        function displayDxfResults(layerData) {
             let html = `<strong>Total Fiber Length per Layer:</strong><br/><ul>`;
             for (const [layer, total] of Object.entries(layerData)) {
                 html += `<li><strong>${layer}</strong>: ${total.toLocaleString(undefined, {maximumFractionDigits: 2})} feet</li>`;
@@ -214,8 +217,8 @@
             resultDiv.className = '';
         }
 
-        // Function to display DWG result for a selected layer
-        function displayDwgSelectedLayer(layer, total) {
+        // Function to display DXF result for a selected layer
+        function displayDxfSelectedLayer(layer, total) {
             const html = `<strong>Total Fiber Length for Layer "${layer}":</strong> <strong>${total.toLocaleString(undefined, {maximumFractionDigits: 2})} feet</strong>`;
             resultDiv.innerHTML = html;
             resultDiv.className = '';
@@ -250,7 +253,7 @@
         function cartesianDistance(p1, p2) {
             const dx = p2.x - p1.x;
             const dy = p2.y - p1.y;
-            const dz = p2.z - p1.z || 0; // If z is undefined, assume 0
+            const dz = (p2.z || 0) - (p1.z || 0); // If z is undefined, assume 0
             return Math.sqrt(dx * dx + dy * dy + dz * dz);
         }
 
