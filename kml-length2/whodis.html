@@ -153,30 +153,34 @@
             outputDiv.appendChild(list);
         }
 
-        // Function to process KML/KMZ files
-        function processKML(file) {
-            const reader = new FileReader();
 
-            reader.onload = function (event) {
-                const kmlString = event.target.result;
-                const parser = new DOMParser();
-                const kmlDoc = parser.parseFromString(kmlString, 'application/vnd.google-earth.kml+xml');
-                const placemarks = kmlDoc.getElementsByTagName('Placemark');
-                let totalLength = 0;
+// Function to process KML/KMZ files
+function processKML(file) {
+    const reader = new FileReader();
 
-                for (let i = 0; i < placemarks.length; i++) {
-                    const coordinates = placemarks[i].getElementsByTagName('coordinates')[0];
-                    if (coordinates) {
-                        const coordsArray = coordinates.textContent.trim().split(' ').map(coord => coord.split(',').map(Number));
-                        totalLength += calculateKMLLength(coordsArray);
-                    }
-                }
+    reader.onload = function (event) {
+        const kmlString = event.target.result;
+        const parser = new DOMParser();
+        // Use 'application/xml' instead of 'application/vnd.google-earth.kml+xml'
+        const kmlDoc = parser.parseFromString(kmlString, 'application/xml');
+        
+        const placemarks = kmlDoc.getElementsByTagName('Placemark');
+        let totalLength = 0;
 
-                document.getElementById('output').innerHTML = `Total length of all line segments: ${totalLength.toFixed(2)} units`;
-            };
-
-            reader.readAsText(file);
+        for (let i = 0; i < placemarks.length; i++) {
+            const coordinates = placemarks[i].getElementsByTagName('coordinates')[0];
+            if (coordinates) {
+                const coordsArray = coordinates.textContent.trim().split(' ').map(coord => coord.split(',').map(Number));
+                totalLength += calculateKMLLength(coordsArray);
+            }
         }
+
+        document.getElementById('output').innerHTML = `Total length of all line segments: ${totalLength.toFixed(2)} units`;
+    };
+
+    reader.readAsText(file);
+}
+
 
         // Function to calculate the total length of a KML polyline
         function calculateKMLLength(coordsArray) {
