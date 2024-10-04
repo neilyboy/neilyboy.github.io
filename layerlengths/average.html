@@ -1,146 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DXF Line Counter & Length Calculator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            background-color: #f9f9f9;
+function processDXF() {
+    const fileInput = document.getElementById('fileInput');
+    const output = document.getElementById('output');
+
+    if (!fileInput.files.length) {
+        alert("Please upload a DXF file.");
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(event) {
+        const dxfContent = event.target.result;
+        const parser = new DxfParser();
+        let dxfData;
+
+        try {
+            dxfData = parser.parseSync(dxfContent);
+        } catch (error) {
+            output.innerHTML = "Error parsing DXF file: " + error.message;
+            return;
         }
-        input {
-            margin-bottom: 15px;
-        }
-        button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        #output {
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body>
-    <h1>DXF Line Counter & Length Calculator</h1>
-    <input type="file" id="fileInput" accept=".dxf" />
-    <button onclick="processDXF()">Process DXF</button>
 
-    <div id="output"></div>
+        let totalLines = 0;
+        let totalLength = 0;
 
-    <script src="dxf-parser-bundle.js"></script> <!-- Using your hosted file -->
+        // Filter entities for line-based types: LINE, LWPOLYLINE, POLYLINE, ARC, SPLINE
+        const lineEntities = dxfData.entities.filter(entity =>
+            ['LINE', 'LWPOLYLINE', 'POLYLINE', 'ARC', 'SPLINE'].includes(entity.type)
+        );
 
-    <script>
-        function processDXF() {
-            const fileInput = document.getElementById('fileInput');
-            const output = document.getElementById('output');
-
-            if (!fileInput.files.length) {
-                alert("Please upload a DXF file.");
-                return;
-            }
-
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            
-            reader.onload = function(event) {
-                const dxfContent = event.target.result;
-                const parser = new DxfParser();
-                let dxfData;
-
-                try {
-                    dxfData = parser.parseSync(dxfContent);
-                } catch (error) {
-                    output.innerHTML = "Error parsing DXF file: " + error.message;
-                    return;
+        // Process entities asynchronously
+        const processEntity = (index) => {
+            if (index < lineEntities.length) {
+                const entity = lineEntities[index];
+                if (entity.type === 'LINE') {
+                    totalLines++;
+                    totalLength += calculateLineLength(entity);
+                } else if (entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE') {
+                    totalLines++;
+                    totalLength += calculatePolylineLength(entity);
+                } else if (entity.type === 'ARC') {
+                    totalLines++;
+                    totalLength += calculateArcLength(entity);
+                } else if (entity.type === 'SPLINE') {
+                    totalLines++;
+                    totalLength += calculateSplineLength(entity);
                 }
-
-                let totalLines = 0;
-                let totalLength = 0;
-
-                // Filter entities for line-based types: LINE, LWPOLYLINE, POLYLINE, ARC, SPLINE
-                const lineEntities = dxfData.entities.filter(entity =>
-                    ['LINE', 'LWPOLYLINE', 'POLYLINE', 'ARC', 'SPLINE'].includes(entity.type)
-                );
-
-                lineEntities.forEach(entity => {
-                    if (entity.type === 'LINE') {
-                        totalLines++;
-                        totalLength += calculateLineLength(entity);
-                    } else if (entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE') {
-                        totalLines++;
-                        totalLength += calculatePolylineLength(entity);
-                    } else if (entity.type === 'ARC') {
-                        totalLines++;
-                        totalLength += calculateArcLength(entity);
-                    } else if (entity.type === 'SPLINE') {
-                        totalLines++;
-                        totalLength += calculateSplineLength(entity);
-                    }
-                });
-
+                // Continue processing the next entity
+                setTimeout(() => processEntity(index + 1), 0);
+            } else {
+                // Update the output when all entities are processed
                 output.innerHTML = `
                     <p>Total Number of Lines/Polylines/Arcs/Splines: <strong>${totalLines}</strong></p>
                     <p>Total Length: <strong>${totalLength.toFixed(2)} units</strong></p>
                 `;
-            };
-
-            reader.readAsText(file);
-        }
-
-        // Calculate length of a line
-        function calculateLineLength(entity) {
-            const x1 = entity.vertices[0].x;
-            const y1 = entity.vertices[0].y;
-            const x2 = entity.vertices[1].x;
-            const y2 = entity.vertices[1].y;
-            return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-        }
-
-        // Calculate length of a polyline
-        function calculatePolylineLength(entity) {
-            let length = 0;
-            for (let i = 0; i < entity.vertices.length - 1; i++) {
-                const x1 = entity.vertices[i].x;
-                const y1 = entity.vertices[i].y;
-                const x2 = entity.vertices[i + 1].x;
-                const y2 = entity.vertices[i + 1].y;
-                length += Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
             }
-            return length;
-        }
+        };
 
-        // Calculate length of an arc
-        function calculateArcLength(entity) {
-            const radius = entity.radius;
-            const angle = Math.abs(entity.endAngle - entity.startAngle);
-            return radius * angle;  // Arc length formula
-        }
+        // Start processing the entities
+        processEntity(0);
+    };
 
-        // Simplified spline length calculation (approximate by vertices)
-        function calculateSplineLength(entity) {
-            let length = 0;
-            for (let i = 0; i < entity.controlPoints.length - 1; i++) {
-                const x1 = entity.controlPoints[i].x;
-                const y1 = entity.controlPoints[i].y;
-                const x2 = entity.controlPoints[i + 1].x;
-                const y2 = entity.controlPoints[i + 1].y;
-                length += Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-            }
-            return length;
-        }
-    </script>
-</body>
-</html>
+    reader.readAsText(file);
+}
