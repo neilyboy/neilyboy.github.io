@@ -1,4 +1,49 @@
-function processDXF() {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DXF Line Counter & Length Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        input {
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #output {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>DXF Line Counter & Length Calculator</h1>
+    <input type="file" id="fileInput" accept=".dxf" />
+    <button onclick="processDXF()">Process DXF</button>
+
+    <div id="output"></div>
+
+    <script src="dxf-parser-bundle.js"></script> <!-- Using your hosted file -->
+
+    <script>
+        function processDXF() {
     const fileInput = document.getElementById('fileInput');
     const output = document.getElementById('output');
 
@@ -64,3 +109,48 @@ function processDXF() {
 
     reader.readAsText(file);
 }
+
+        // Calculate length of a line
+        function calculateLineLength(entity) {
+            const x1 = entity.vertices[0].x;
+            const y1 = entity.vertices[0].y;
+            const x2 = entity.vertices[1].x;
+            const y2 = entity.vertices[1].y;
+            return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        }
+
+        // Calculate length of a polyline
+        function calculatePolylineLength(entity) {
+            let length = 0;
+            for (let i = 0; i < entity.vertices.length - 1; i++) {
+                const x1 = entity.vertices[i].x;
+                const y1 = entity.vertices[i].y;
+                const x2 = entity.vertices[i + 1].x;
+                const y2 = entity.vertices[i + 1].y;
+                length += Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            }
+            return length;
+        }
+
+        // Calculate length of an arc
+        function calculateArcLength(entity) {
+            const radius = entity.radius;
+            const angle = Math.abs(entity.endAngle - entity.startAngle);
+            return radius * angle;  // Arc length formula
+        }
+
+        // Simplified spline length calculation (approximate by vertices)
+        function calculateSplineLength(entity) {
+            let length = 0;
+            for (let i = 0; i < entity.controlPoints.length - 1; i++) {
+                const x1 = entity.controlPoints[i].x;
+                const y1 = entity.controlPoints[i].y;
+                const x2 = entity.controlPoints[i + 1].x;
+                const y2 = entity.controlPoints[i + 1].y;
+                length += Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            }
+            return length;
+        }
+    </script>
+</body>
+</html>
