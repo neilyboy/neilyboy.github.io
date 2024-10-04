@@ -3,101 +3,274 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced KML/KMZ Length Calculator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        #result {
-            margin-top: 20px;
-        }
-        .data-item {
-            margin-bottom: 10px;
-        }
-    </style>
+    <title>DXF Length Calculator</title>
 </head>
 <body>
-    <h1>Enhanced KML/KMZ Length Calculator</h1>
-    <input type="file" id="fileInput" accept=".kml,.kmz">
-    <button onclick="processFile()">Calculate</button>
-    <div id="result"></div>
+    <h1>Upload DXF/KML/KMZ File</h1>
 
+    <!-- File input for DXF/KML/KMZ -->
+    <input type="file" id="fileInput" accept=".dxf,.kml,.kmz" />
+    <br><br>
+
+    <div id="output"></div>
+
+    <!-- dxf-parser library from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/dxf-parser@1.2.1/dist/dxf-parser.bundle.js"></script>
+    <!-- JSZip library for KMZ handling -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
     <script>
-        function haversineDistance(lat1, lon1, lat2, lon2) {
-            function toRad(x) {
-                return x * Math.PI / 180;
-            }
+        document.getElementById('fileInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
 
-            var R = 6371; // Earth's radius in km
-            var dLat = toRad(lat2 - lat1);
-            var dLon = toRad(lon2 - lon1);
-            var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            var d = R * c;
-            return d * 1000; // Convert to meters
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+
+            if (fileExtension === 'dxf') {
+                processDXF(file);
+            } else if (fileExtension === 'kml' || fileExtension === 'kmz') {
+                processKML(file);
+            } else {
+                document.getElementById('output').innerHTML = 'Unsupported file format. Please upload a DXF, KML, or KMZ file.';
+            }
+        });
+
+        // Function to process DXF files
+        function processDXF(file) {
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                const dxfString = event.target.result;
+                const parser = new DxfParser(); // Instantiate the parser
+
+                try {
+                    const dxfData = parser.parseSync(dxfString);
+                    const lengthsByLayer = {};
+                    const countsByLayer = {};
+
+                    // Iterate over all entities
+                    dxfData.entities.forEach(entity => {
+                        if (entity.type === 'LINE' || entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE' || entity.type === 'SPLINE') {
+                            const layer = entity.layer || 'default';
+                            const length = calculateEntityLength(entity);
+                            console.log(`Entity Type: ${entity.type}, Layer: ${layer}, Length: ${length}`);
+
+                            if (lengthsByLayer[layer]) {
+                                lengthsByLayer[layer] += length;
+                                countsByLayer[layer] += 1;
+                            } else {
+                                lengthsByLayer[layer] = length;
+                                countsByLayer[layer] = 1;
+                            }
+                        }
+                    });
+
+                    displayLayerLengths(lengthsByLayer, countsByLayer);
+                } catch (err) {
+                    console.error('Error parsing DXF:', err.message);
+                    document.getElementById('output').innerHTML = 'Error parsing DXF file: ' + err.message;
+                }
+            };
+
+            reader.readAsText(file);
         }
 
-        async function processFile() {
-            const fileInput = document.getElementById('fileInput');
-            const file = fileInput.files[0];
-            if (!file) {
-                alert('Please select a file');
-                return;
-            }
+        // Function to calculate the length of a DXF entity
+        function calculateEntityLength(entity) {
+            let length = 0;
 
-            let kmlContent;
-            if (file.name.endsWith('.kmz')) {
-                const zip = new JSZip();
-                const zipContent = await zip.loadAsync(file);
-                const kmlFile = Object.values(zipContent.files).find(f => f.name.endsWith('.kml'));
-                if (!kmlFile) {
-                    alert('No KML file found in the KMZ archive');
-                    return;
+            if (entity.type === 'LINE') {
+                const dx = entity.end.x - entity.start.x;
+                const dy = entity.end.y - entity.start.y;
+                length = Math.sqrt(dx * dx + dy * dy);
+            } else if (entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE') {
+                for (let i = 0; i < entity.vertices.length - 1; i++) {
+                    const dx = entity.vertices[i + 1].x - entity.vertices[i].x;
+                    const dy = entity.vertices[i + 1].y - entity.vertices[i].y;
+                    length += Math.sqrt(dx * dx + dy * dy);
                 }
-                kmlContent = await kmlFile.async('text');
-            } else {
-                kmlContent = await file.text();
+            } else if (entity.type === 'SPLINE') {
+                if (entity.fitPoints && entity.fitPoints.length > 1) {
+                    length = calculateSplineLength(entity.fitPoints);
+                } else {
+                    console.warn(`Spline has insufficient fit points.`);
+                    length = 0;
+                }
             }
 
-            const parser = new DOMParser();
-            const kmlDoc = parser.parseFromString(kmlContent, 'text/xml');
-            const coordinates = kmlDoc.getElementsByTagName('coordinates');
+            return length;
+        }
 
+        // Function to calculate spline length (using fitPoints)
+        function calculateSplineLength(fitPoints) {
             let totalLength = 0;
-            let lineCount = 0;
-            let lineLengths = [];
+            const numSegments = 100; // More segments = higher accuracy
 
-            for (let coord of coordinates) {
-                const points = coord.textContent.trim().split(' ');
-                let lineLength = 0;
-                for (let i = 1; i < points.length; i++) {
-                    const [lon1, lat1] = points[i-1].split(',').map(parseFloat);
-                    const [lon2, lat2] = points[i].split(',').map(parseFloat);
-                    const segmentLength = haversineDistance(lat1, lon1, lat2, lon2);
-                    lineLength += segmentLength;
-                    totalLength += segmentLength;
+            for (let i = 0; i < numSegments; i++) {
+                const t1 = i / numSegments;
+                const t2 = (i + 1) / numSegments;
+
+                const point1 = getSplinePoint(fitPoints, t1);
+                const point2 = getSplinePoint(fitPoints, t2);
+
+                totalLength += Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
+            }
+
+            return totalLength;
+        }
+
+        // Function to compute a point on the spline using De Casteljau's algorithm
+        function getSplinePoint(controlPoints, t) {
+            const n = controlPoints.length - 1;
+            const point = { x: 0, y: 0 };
+
+            for (let i = 0; i <= n; i++) {
+                const binomialCoefficient = binomial(n, i) * Math.pow(t, i) * Math.pow(1 - t, n - i);
+                point.x += controlPoints[i].x * binomialCoefficient;
+                point.y += controlPoints[i].y * binomialCoefficient;
+            }
+
+            return point;
+        }
+
+        // Function to calculate binomial coefficient
+        function binomial(n, k) {
+            if (k < 0 || k > n) return 0;
+            let coeff = 1;
+            for (let i = 0; i < k; i++) {
+                coeff = coeff * (n - i) / (i + 1);
+            }
+            return coeff;
+        }
+
+        // Function to display the calculated lengths and counts for each layer
+        function displayLayerLengths(lengthsByLayer, countsByLayer) {
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = '<h2>Layer Lengths and Counts (in drawing units)</h2>';
+            const table = document.createElement('table');
+            table.style.width = '100%';
+            table.border = '1';
+            const headerRow = document.createElement('tr');
+
+            const headers = ['Layer', 'Total Length (units)', 'Number of Entities', 'Average Length (units)'];
+            headers.forEach(headerText => {
+                const th = document.createElement('th');
+                th.textContent = headerText;
+                headerRow.appendChild(th);
+            });
+            table.appendChild(headerRow);
+
+            Object.keys(lengthsByLayer).forEach(layer => {
+                const row = document.createElement('tr');
+
+                const layerCell = document.createElement('td');
+                layerCell.textContent = layer;
+                row.appendChild(layerCell);
+
+                const lengthCell = document.createElement('td');
+                lengthCell.textContent = lengthsByLayer[layer].toFixed(2);
+                row.appendChild(lengthCell);
+
+                const countCell = document.createElement('td');
+                countCell.textContent = countsByLayer[layer];
+                row.appendChild(countCell);
+
+                const averageLength = lengthsByLayer[layer] / countsByLayer[layer];
+                const averageCell = document.createElement('td');
+                averageCell.textContent = averageLength.toFixed(2);
+                row.appendChild(averageCell);
+
+                table.appendChild(row);
+            });
+
+            outputDiv.appendChild(table);
+        }
+
+        // Function to process KML/KMZ files
+        async function processKML(file) {
+            if (file.name.toLowerCase().endsWith('.kmz')) {
+                try {
+                    const zip = await JSZip.loadAsync(file);
+                    const kmlFile = Object.keys(zip.files).find(name => name.toLowerCase().endsWith('.kml'));
+                    if (!kmlFile) {
+                        document.getElementById('output').innerHTML = 'No KML file found inside KMZ.';
+                        return;
+                    }
+                    const kmlContent = await zip.files[kmlFile].async('string');
+                    parseKML(kmlContent);
+                } catch (error) {
+                    console.error('Error processing KMZ file:', error);
+                    document.getElementById('output').innerHTML = 'Error processing KMZ file: ' + error.message;
                 }
-                if (lineLength > 0) {
-                    lineCount++;
-                    lineLengths.push(lineLength);
+            } else {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const kmlString = event.target.result;
+                    parseKML(kmlString);
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // Function to parse and calculate KML lengths
+        function parseKML(kmlString) {
+            const parser = new DOMParser();
+            const kmlDoc = parser.parseFromString(kmlString, 'application/xml');
+
+            const placemarks = kmlDoc.getElementsByTagName('Placemark');
+            let totalLength = 0;
+            let totalSegments = 0;
+
+            for (let i = 0; i < placemarks.length; i++) {
+                const coordinates = placemarks[i].getElementsByTagName('coordinates')[0];
+                if (coordinates) {
+                    const coordsArray = coordinates.textContent.trim().split(/\s+/).map(coord => coord.split(',').map(Number));
+                    const { length, segments } = calculateKMLLength(coordsArray);
+                    totalLength += length;
+                    totalSegments += segments;
                 }
             }
 
-            const averageLength = lineCount > 0 ? totalLength / lineCount : 0;
-            const totalLengthFeet = totalLength * 3.28084;
-            const averageLengthFeet = averageLength * 3.28084;
+            displayKMLResults(totalLength, totalSegments);
+        }
 
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = `
-                <div class="data-item"><strong>Total Length:</strong> ${totalLengthFeet.toFixed(2)} feet (${totalLength.toFixed(2)} meters)</div>
-                <div class="data-item"><strong>Number of Lines:</strong> ${lineCount}</div>
-                <div class="data-item"><strong>Average Line Length:</strong> ${averageLengthFeet.toFixed(2)} feet (${averageLength.toFixed(2)} meters)</div>
+        // Function to calculate the total length of a KML polyline
+        function calculateKMLLength(coordsArray) {
+            let length = 0;
+            let segments = 0;
+
+            // Earth radius in feet (average)
+            const earthRadiusFeet = 20925646; // Earth's radius in feet
+
+            for (let i = 0; i < coordsArray.length - 1; i++) {
+                const [lon1, lat1] = coordsArray[i];
+                const [lon2, lat2] = coordsArray[i + 1];
+
+                // Convert degrees to radians
+                const lat1Rad = lat1 * (Math.PI / 180);
+                const lat2Rad = lat2 * (Math.PI / 180);
+                const dLon = (lon2 - lon1) * (Math.PI / 180);
+
+                // Calculate distance using the spherical law of cosines
+                const distance = Math.acos(Math.sin(lat1Rad) * Math.sin(lat2Rad) +
+                                            Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon)) * earthRadiusFeet;
+
+                length += distance;
+                segments += 1;
+            }
+
+            return { length, segments };
+        }
+
+        // Function to display KML results
+        function displayKMLResults(totalLength, totalSegments) {
+            const outputDiv = document.getElementById('output');
+            const averageLength = totalSegments > 0 ? (totalLength / totalSegments) : 0;
+            outputDiv.innerHTML = `
+                <h2>KML/KMZ Line Statistics</h2>
+                <p>Total Length of All Line Segments: <strong>${totalLength.toFixed(2)} units</strong></p>
+                <p>Number of Line Segments: <strong>${totalSegments}</strong></p>
+                <p>Average Length per Line Segment: <strong>${averageLength.toFixed(2)} units</strong></p>
             `;
         }
     </script>
