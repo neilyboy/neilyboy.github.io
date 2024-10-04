@@ -76,30 +76,38 @@
         }
 
         // Function to calculate the length of a DXF entity
-        function calculateEntityLength(entity) {
-            let length = 0;
+function calculateEntityLength(entity) {
+    let length = 0;
 
-            if (entity.type === 'LINE') {
-                const dx = entity.end.x - entity.start.x;
-                const dy = entity.end.y - entity.start.y;
-                length = Math.sqrt(dx * dx + dy * dy);
-            } else if (entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE') {
-                for (let i = 0; i < entity.vertices.length - 1; i++) {
+    if (entity.type === 'LINE') {
+        if (entity.vertices && entity.vertices.length >= 2) {
+            const dx = entity.vertices[1].x - entity.vertices[0].x;
+            const dy = entity.vertices[1].y - entity.vertices[0].y;
+            length = Math.sqrt(dx * dx + dy * dy);
+        } else {
+            console.warn('LINE entity has invalid or missing vertices:', entity);
+        }
+    } else if (entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE') {
+        if (entity.vertices && entity.vertices.length > 1) {
+            for (let i = 0; i < entity.vertices.length - 1; i++) {
+                if (entity.vertices[i] && entity.vertices[i + 1]) {
                     const dx = entity.vertices[i + 1].x - entity.vertices[i].x;
                     const dy = entity.vertices[i + 1].y - entity.vertices[i].y;
                     length += Math.sqrt(dx * dx + dy * dy);
-                }
-            } else if (entity.type === 'SPLINE') {
-                if (entity.fitPoints && entity.fitPoints.length > 1) {
-                    length = calculateSplineLength(entity.fitPoints);
                 } else {
-                    console.warn(`Spline has insufficient fit points.`);
-                    length = 0;
+                    console.warn('Polyline has undefined vertices at index:', i, entity);
                 }
             }
-
-            return length;
+        } else {
+            console.warn('Polyline entity has invalid or missing vertices:', entity);
         }
+    } else if (entity.type === 'SPLINE') {
+        length = calculateSplineLength(entity);
+    }
+
+    return length;
+}
+
 
         // Function to calculate spline length (using fitPoints)
         function calculateSplineLength(fitPoints) {
