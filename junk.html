@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KML File Processor with Preview</title>
+    <title>Enhanced KML File Processor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -22,7 +22,7 @@
             background-color: #f0f0f0;
             padding: 10px;
             border-radius: 5px;
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
         }
         button {
@@ -32,10 +32,22 @@
         .hidden {
             display: none;
         }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
-    <h1>KML File Processor with Preview</h1>
+    <h1>Enhanced KML File Processor</h1>
     <input type="file" id="fileInput" accept=".kml">
     <button onclick="processFile()">Process File</button>
     
@@ -66,6 +78,7 @@
     <script>
         let kmlData = null;
         let dataSets = new Set();
+        let allFields = new Set();
 
         function processFile() {
             const fileInput = document.getElementById('fileInput');
@@ -92,31 +105,20 @@
 
         function extractDataSets() {
             dataSets.clear();
+            allFields.clear();
             const placemarks = kmlData.getElementsByTagName('Placemark');
             console.log(`Found ${placemarks.length} Placemarks`);
             
             for (let i = 0; i < placemarks.length; i++) {
-                // Try ExtendedData first
-                const extendedData = placemarks[i].getElementsByTagName('ExtendedData')[0];
-                if (extendedData) {
-                    const dataElements = extendedData.getElementsByTagName('Data');
-                    for (let j = 0; j < dataElements.length; j++) {
-                        dataSets.add(dataElements[j].getAttribute('name'));
-                    }
-                }
-                
-                // If no ExtendedData, try SimpleData
-                const simpleData = placemarks[i].getElementsByTagName('SimpleData');
-                for (let j = 0; j < simpleData.length; j++) {
-                    dataSets.add(simpleData[j].getAttribute('name'));
-                }
-
-                // If still no data, check for direct child elements
-                if (dataSets.size === 0) {
-                    for (let child of placemarks[i].children) {
-                        if (child.textContent.trim() !== '') {
-                            dataSets.add(child.tagName);
-                        }
+                const description = placemarks[i].getElementsByTagName('description')[0];
+                if (description) {
+                    const parser = new DOMParser();
+                    const descDoc = parser.parseFromString(description.textContent, 'text/html');
+                    const listItems = descDoc.getElementsByTagName('li');
+                    for (let j = 0; j < listItems.length; j++) {
+                        const field = listItems[j].getElementsByTagName('b')[0].textContent.replace(':', '');
+                        allFields.add(field);
+                        dataSets.add(field);
                     }
                 }
             }
@@ -143,19 +145,43 @@
         function previewKMLContent() {
             const previewElement = document.getElementById('preview');
             const placemarks = kmlData.getElementsByTagName('Placemark');
-            let previewContent = '';
+            let previewContent = '<table><tr><th>Field</th>';
 
             for (let i = 0; i < Math.min(placemarks.length, 3); i++) {
-                previewContent += `Placemark ${i + 1}:\n`;
-                previewContent += placemarks[i].outerHTML;
-                previewContent += '\n\n';
+                previewContent += `<th>Placemark ${i + 1}</th>`;
             }
+            previewContent += '</tr>';
+
+            allFields.forEach(field => {
+                previewContent += `<tr><td>${field}</td>`;
+                for (let i = 0; i < Math.min(placemarks.length, 3); i++) {
+                    const description = placemarks[i].getElementsByTagName('description')[0];
+                    if (description) {
+                        const parser = new DOMParser();
+                        const descDoc = parser.parseFromString(description.textContent, 'text/html');
+                        const listItems = descDoc.getElementsByTagName('li');
+                        let fieldValue = '';
+                        for (let j = 0; j < listItems.length; j++) {
+                            if (listItems[j].getElementsByTagName('b')[0].textContent.replace(':', '') === field) {
+                                fieldValue = listItems[j].textContent.split(':')[1].trim();
+                                break;
+                            }
+                        }
+                        previewContent += `<td>${fieldValue}</td>`;
+                    } else {
+                        previewContent += '<td></td>';
+                    }
+                }
+                previewContent += '</tr>';
+            });
+
+            previewContent += '</table>';
 
             if (placemarks.length > 3) {
-                previewContent += `... (${placemarks.length - 3} more Placemarks)`;
+                previewContent += `<p>... (${placemarks.length - 3} more Placemarks)</p>`;
             }
 
-            previewElement.textContent = previewContent;
+            previewElement.innerHTML = previewContent;
         }
 
         function performOperation() {
@@ -171,43 +197,20 @@
             let values = [];
 
             for (let i = 0; i < placemarks.length; i++) {
-                let value = null;
-
-                // Try ExtendedData
-                const extendedData = placemarks[i].getElementsByTagName('ExtendedData')[0];
-                if (extendedData) {
-                    const dataElements = extendedData.getElementsByTagName('Data');
-                    for (let j = 0; j < dataElements.length; j++) {
-                        if (dataElements[j].getAttribute('name') === dataSetName) {
-                            value = dataElements[j].getElementsByTagName('value')[0]?.textContent;
+                const description = placemarks[i].getElementsByTagName('description')[0];
+                if (description) {
+                    const parser = new DOMParser();
+                    const descDoc = parser.parseFromString(description.textContent, 'text/html');
+                    const listItems = descDoc.getElementsByTagName('li');
+                    for (let j = 0; j < listItems.length; j++) {
+                        if (listItems[j].getElementsByTagName('b')[0].textContent.replace(':', '') === dataSetName) {
+                            const value = listItems[j].textContent.split(':')[1].trim();
+                            const numValue = parseFloat(value);
+                            if (!isNaN(numValue)) {
+                                values.push(numValue);
+                            }
                             break;
                         }
-                    }
-                }
-
-                // Try SimpleData if not found in ExtendedData
-                if (value === null) {
-                    const simpleData = placemarks[i].getElementsByTagName('SimpleData');
-                    for (let j = 0; j < simpleData.length; j++) {
-                        if (simpleData[j].getAttribute('name') === dataSetName) {
-                            value = simpleData[j].textContent;
-                            break;
-                        }
-                    }
-                }
-
-                // Try direct child elements if still not found
-                if (value === null) {
-                    const element = placemarks[i].getElementsByTagName(dataSetName)[0];
-                    if (element) {
-                        value = element.textContent;
-                    }
-                }
-
-                if (value !== null) {
-                    const numValue = parseFloat(value);
-                    if (!isNaN(numValue)) {
-                        values.push(numValue);
                     }
                 }
             }
