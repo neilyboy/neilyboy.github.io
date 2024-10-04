@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced KML/KMZ Length Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #result {
+            margin-top: 20px;
+        }
+        .data-item {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Enhanced KML/KMZ Length Calculator</h1>
+    <input type="file" id="fileInput" accept=".kml,.kmz">
+    <button onclick="processFile()">Calculate</button>
+    <div id="result"></div>
+
+    <script>
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            function toRad(x) {
+                return x * Math.PI / 180;
+            }
+
+            var R = 6371; // Earth's radius in km
+            var dLat = toRad(lat2 - lat1);
+            var dLon = toRad(lon2 - lon1);
+            var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            var d = R * c;
+            return d * 1000; // Convert to meters
+        }
+
+        async function processFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a file');
+                return;
+            }
+
+            let kmlContent;
+            if (file.name.endsWith('.kmz')) {
+                const zip = new JSZip();
+                const zipContent = await zip.loadAsync(file);
+                const kmlFile = Object.values(zipContent.files).find(f => f.name.endsWith('.kml'));
+                if (!kmlFile) {
+                    alert('No KML file found in the KMZ archive');
+                    return;
+                }
+                kmlContent = await kmlFile.async('text');
+            } else {
+                kmlContent = await file.text();
+            }
+
+            const parser = new DOMParser();
+            const kmlDoc = parser.parseFromString(kmlContent, 'text/xml');
+            const coordinates = kmlDoc.getElementsByTagName('coordinates');
+
+            let totalLength = 0;
+            let lineCount = 0;
+            let lineLengths = [];
+
+            for (let coord of coordinates) {
+                const points = coord.textContent.trim().split(' ');
+                let lineLength = 0;
+                for (let i = 1; i < points.length; i++) {
+                    const [lon1, lat1] = points[i-1].split(',').map(parseFloat);
+                    const [lon2, lat2] = points[i].split(',').map(parseFloat);
+                    const segmentLength = haversineDistance(lat1, lon1, lat2, lon2);
+                    lineLength += segmentLength;
+                    totalLength += segmentLength;
+                }
+                if (lineLength > 0) {
+                    lineCount++;
+                    lineLengths.push(lineLength);
+                }
+            }
+
+            const averageLength = lineCount > 0 ? totalLength / lineCount : 0;
+            const totalLengthFeet = totalLength * 3.28084;
+            const averageLengthFeet = averageLength * 3.28084;
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <div class="data-item"><strong>Total Length:</strong> ${totalLengthFeet.toFixed(2)} feet (${totalLength.toFixed(2)} meters)</div>
+                <div class="data-item"><strong>Number of Lines:</strong> ${lineCount}</div>
+                <div class="data-item"><strong>Average Line Length:</strong> ${averageLengthFeet.toFixed(2)} feet (${averageLength.toFixed(2)} meters)</div>
+            `;
+        }
+    </script>
+</body>
+</html>
