@@ -53,7 +53,6 @@
     <h2>Output</h2>
     <div id="output"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xmldom/0.1.31/xmldom.min.js"></script>
     <script>
         let kmlData = null;
         let dataSets = new Set();
@@ -82,7 +81,10 @@
         function extractDataSets() {
             dataSets.clear();
             const placemarks = kmlData.getElementsByTagName('Placemark');
+            console.log(`Found ${placemarks.length} Placemarks`);
+            
             for (let i = 0; i < placemarks.length; i++) {
+                // Try ExtendedData first
                 const extendedData = placemarks[i].getElementsByTagName('ExtendedData')[0];
                 if (extendedData) {
                     const dataElements = extendedData.getElementsByTagName('Data');
@@ -90,18 +92,40 @@
                         dataSets.add(dataElements[j].getAttribute('name'));
                     }
                 }
+                
+                // If no ExtendedData, try SimpleData
+                const simpleData = placemarks[i].getElementsByTagName('SimpleData');
+                for (let j = 0; j < simpleData.length; j++) {
+                    dataSets.add(simpleData[j].getAttribute('name'));
+                }
+
+                // If still no data, check for direct child elements
+                if (dataSets.size === 0) {
+                    for (let child of placemarks[i].children) {
+                        if (child.textContent.trim() !== '') {
+                            dataSets.add(child.tagName);
+                        }
+                    }
+                }
             }
+            
+            console.log(`Extracted data sets: ${Array.from(dataSets).join(', ')}`);
         }
 
         function populateDataSetSelect() {
             const select = document.getElementById('dataSetSelect');
             select.innerHTML = '';
-            dataSets.forEach(set => {
-                const option = document.createElement('option');
-                option.value = set;
-                option.textContent = set;
-                select.appendChild(option);
-            });
+            if (dataSets.size === 0) {
+                select.innerHTML = '<option value="">No data sets found</option>';
+                document.getElementById('output').textContent = 'No data sets found in the KML file. Please check the file structure.';
+            } else {
+                dataSets.forEach(set => {
+                    const option = document.createElement('option');
+                    option.value = set;
+                    option.textContent = set;
+                    select.appendChild(option);
+                });
+            }
         }
 
         function performOperation() {
@@ -117,16 +141,43 @@
             let values = [];
 
             for (let i = 0; i < placemarks.length; i++) {
+                let value = null;
+
+                // Try ExtendedData
                 const extendedData = placemarks[i].getElementsByTagName('ExtendedData')[0];
                 if (extendedData) {
                     const dataElements = extendedData.getElementsByTagName('Data');
                     for (let j = 0; j < dataElements.length; j++) {
                         if (dataElements[j].getAttribute('name') === dataSetName) {
-                            const value = parseFloat(dataElements[j].getElementsByTagName('value')[0].textContent);
-                            if (!isNaN(value)) {
-                                values.push(value);
-                            }
+                            value = dataElements[j].getElementsByTagName('value')[0]?.textContent;
+                            break;
                         }
+                    }
+                }
+
+                // Try SimpleData if not found in ExtendedData
+                if (value === null) {
+                    const simpleData = placemarks[i].getElementsByTagName('SimpleData');
+                    for (let j = 0; j < simpleData.length; j++) {
+                        if (simpleData[j].getAttribute('name') === dataSetName) {
+                            value = simpleData[j].textContent;
+                            break;
+                        }
+                    }
+                }
+
+                // Try direct child elements if still not found
+                if (value === null) {
+                    const element = placemarks[i].getElementsByTagName(dataSetName)[0];
+                    if (element) {
+                        value = element.textContent;
+                    }
+                }
+
+                if (value !== null) {
+                    const numValue = parseFloat(value);
+                    if (!isNaN(numValue)) {
+                        values.push(numValue);
                     }
                 }
             }
@@ -137,13 +188,13 @@
                     result = values.reduce((a, b) => a + b, 0);
                     break;
                 case 'average':
-                    result = values.reduce((a, b) => a + b, 0) / values.length;
+                    result = values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0;
                     break;
                 case 'max':
-                    result = Math.max(...values);
+                    result = values.length > 0 ? Math.max(...values) : 'N/A';
                     break;
                 case 'min':
-                    result = Math.min(...values);
+                    result = values.length > 0 ? Math.min(...values) : 'N/A';
                     break;
             }
 
