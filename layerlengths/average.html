@@ -44,71 +44,73 @@
 
     <script>
         function processDXF() {
-    const fileInput = document.getElementById('fileInput');
-    const output = document.getElementById('output');
+            const fileInput = document.getElementById('fileInput');
+            const output = document.getElementById('output');
 
-    if (!fileInput.files.length) {
-        alert("Please upload a DXF file.");
-        return;
-    }
-
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-    
-    reader.onload = function(event) {
-        const dxfContent = event.target.result;
-        const parser = new DxfParser();
-        let dxfData;
-
-        try {
-            dxfData = parser.parseSync(dxfContent);
-        } catch (error) {
-            output.innerHTML = "Error parsing DXF file: " + error.message;
-            return;
-        }
-
-        let totalLines = 0;
-        let totalLength = 0;
-
-        // Filter entities for line-based types: LINE, LWPOLYLINE, POLYLINE, ARC, SPLINE
-        const lineEntities = dxfData.entities.filter(entity =>
-            ['LINE', 'LWPOLYLINE', 'POLYLINE', 'ARC', 'SPLINE'].includes(entity.type)
-        );
-
-        // Process entities asynchronously
-        const processEntity = (index) => {
-            if (index < lineEntities.length) {
-                const entity = lineEntities[index];
-                if (entity.type === 'LINE') {
-                    totalLines++;
-                    totalLength += calculateLineLength(entity);
-                } else if (entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE') {
-                    totalLines++;
-                    totalLength += calculatePolylineLength(entity);
-                } else if (entity.type === 'ARC') {
-                    totalLines++;
-                    totalLength += calculateArcLength(entity);
-                } else if (entity.type === 'SPLINE') {
-                    totalLines++;
-                    totalLength += calculateSplineLength(entity);
-                }
-                // Continue processing the next entity
-                setTimeout(() => processEntity(index + 1), 0);
-            } else {
-                // Update the output when all entities are processed
-                output.innerHTML = `
-                    <p>Total Number of Lines/Polylines/Arcs/Splines: <strong>${totalLines}</strong></p>
-                    <p>Total Length: <strong>${totalLength.toFixed(2)} units</strong></p>
-                `;
+            if (!fileInput.files.length) {
+                alert("Please upload a DXF file.");
+                return;
             }
-        };
 
-        // Start processing the entities
-        processEntity(0);
-    };
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {
+                const dxfContent = event.target.result;
+                const parser = new DxfParser();
+                let dxfData;
 
-    reader.readAsText(file);
-}
+                try {
+                    dxfData = parser.parseSync(dxfContent);
+                } catch (error) {
+                    output.innerHTML = "Error parsing DXF file: " + error.message;
+                    return;
+                }
+
+                let totalLines = 0;
+                let totalLength = 0;
+
+                // Filter entities for line-based types: LINE, LWPOLYLINE, POLYLINE, ARC, SPLINE
+                const lineEntities = dxfData.entities.filter(entity =>
+                    ['LINE', 'LWPOLYLINE', 'POLYLINE', 'ARC', 'SPLINE'].includes(entity.type)
+                );
+
+                // Process entities asynchronously
+                const processEntity = (index) => {
+                    if (index < lineEntities.length) {
+                        const entity = lineEntities[index];
+                        console.log(`Processing entity ${index + 1} of ${lineEntities.length}: Type = ${entity.type}`); // Debugging output
+                        
+                        if (entity.type === 'LINE') {
+                            totalLines++;
+                            totalLength += calculateLineLength(entity);
+                        } else if (entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE') {
+                            totalLines++;
+                            totalLength += calculatePolylineLength(entity);
+                        } else if (entity.type === 'ARC') {
+                            totalLines++;
+                            totalLength += calculateArcLength(entity);
+                        } else if (entity.type === 'SPLINE') {
+                            totalLines++;
+                            totalLength += calculateSplineLength(entity);
+                        }
+                        // Continue processing the next entity
+                        setTimeout(() => processEntity(index + 1), 0);
+                    } else {
+                        // Update the output when all entities are processed
+                        output.innerHTML = `
+                            <p>Total Number of Lines/Polylines/Arcs/Splines: <strong>${totalLines}</strong></p>
+                            <p>Total Length: <strong>${totalLength.toFixed(2)} units</strong></p>
+                        `;
+                    }
+                };
+
+                // Start processing the entities
+                processEntity(0);
+            };
+
+            reader.readAsText(file);
+        }
 
         // Calculate length of a line
         function calculateLineLength(entity) {
