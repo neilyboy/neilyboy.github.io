@@ -44,55 +44,73 @@
     <script src="dxf-parser-bundle.js"></script>
 
     <script>
-        function processDXF() {
-            const fileInput = document.getElementById('fileInput');
-            const output = document.getElementById('output');
+function processDXF() {
+    const fileInput = document.getElementById('fileInput');
+    const output = document.getElementById('output');
 
-            if (!fileInput.files.length) {
-                alert("Please upload a DXF file.");
-                return;
+    if (!fileInput.files.length) {
+        alert("Please upload a DXF file.");
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(event) {
+        const dxfContent = event.target.result;
+        const parser = new DxfParser();
+        let dxfData;
+
+        try {
+            dxfData = parser.parseSync(dxfContent);
+        } catch (error) {
+            output.innerHTML = "Error parsing DXF file: " + error.message;
+            return;
+        }
+
+        let totalLines = 0;
+        let totalLength = 0;
+
+        const entities = dxfData.entities.filter(entity => 
+            entity.type === 'LINE' || entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE'
+        );
+
+        // Process in chunks
+        const chunkSize = 100;  // Process 100 entities at a time
+        let index = 0;
+
+        function processChunk() {
+            const endIndex = Math.min(index + chunkSize, entities.length);
+
+            for (let i = index; i < endIndex; i++) {
+                const entity = entities[i];
+                if (entity.type === 'LINE') {
+                    totalLines++;
+                    totalLength += calculateLineLength(entity);
+                } else if (entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE') {
+                    totalLines++;
+                    totalLength += calculatePolylineLength(entity);
+                }
             }
 
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            
-            reader.onload = function(event) {
-                const dxfContent = event.target.result;
-                const parser = new DxfParser();
-                let dxfData;
-
-                try {
-                    dxfData = parser.parseSync(dxfContent);
-                } catch (error) {
-                    output.innerHTML = "Error parsing DXF file: " + error.message;
-                    return;
-                }
-
-                let totalLines = 0;
-                let totalLength = 0;
-
-                if (dxfData && dxfData.entities) {
-                    dxfData.entities.forEach(entity => {
-                        if (entity.type === 'LINE') {
-                            totalLines++;
-                            const length = calculateLineLength(entity);
-                            totalLength += length;
-                        } else if (entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE') {
-                            totalLines++;
-                            const length = calculatePolylineLength(entity);
-                            totalLength += length;
-                        }
-                    });
-                }
-
+            index = endIndex;
+            if (index < entities.length) {
+                setTimeout(processChunk, 0);  // Continue processing the next chunk
+            } else {
+                // Update the output when all entities are processed
                 output.innerHTML = `
                     <p>Total Number of Lines/Polylines: <strong>${totalLines}</strong></p>
                     <p>Total Length: <strong>${totalLength.toFixed(2)} units</strong></p>
                 `;
-            };
-            
-            reader.readAsText(file);
+            }
         }
+
+        processChunk();
+    };
+
+    reader.readAsText(file);
+}
+
 
         function calculateLineLength(entity) {
             const x1 = entity.vertices[0].x;
