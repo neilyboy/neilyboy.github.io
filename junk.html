@@ -3,77 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced KML File Processor</title>
+    <title>Modern KML File Processor</title>
     <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --background-color: #ecf0f1;
+            --text-color: #34495e;
+            --border-radius: 8px;
+        }
         body {
-            font-family: Arial, sans-serif;
-            max-width: 1000px;
-            margin: 0 auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            margin: 0;
             padding: 20px;
         }
-        #fileInput, #dataSetSelect, #operationSelect {
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: var(--secondary-color);
             margin-bottom: 20px;
+        }
+        input[type="file"], select, button {
             width: 100%;
             padding: 10px;
-            box-sizing: border-box;
-        }
-        #output, #preview {
-            white-space: pre-wrap;
-            background-color: #f0f0f0;
-            padding: 10px;
-            border-radius: 5px;
-            max-height: 400px;
-            overflow-y: auto;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
         }
         button {
-            padding: 10px;
-            margin-right: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #preview, #output {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
         }
         .hidden {
             display: none;
         }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
     </style>
 </head>
 <body>
-    <h1>Enhanced KML File Processor</h1>
-    <input type="file" id="fileInput" accept=".kml">
-    <button onclick="processFile()">Process File</button>
-    
-    <div id="previewContainer" class="hidden">
-        <h2>KML Content Preview</h2>
-        <div id="preview"></div>
-    </div>
+    <div class="container">
+        <h1>Modern KML File Processor</h1>
+        <input type="file" id="fileInput" accept=".kml">
+        <button onclick="processFile()">Process File</button>
+        
+        <div id="previewContainer" class="hidden">
+            <h2>KML Content Preview</h2>
+            <div id="preview"></div>
+        </div>
 
-    <div id="dataSetContainer" class="hidden">
-        <h2>Select Data Set</h2>
-        <select id="dataSetSelect"></select>
-    </div>
-    
-    <div id="operationContainer" class="hidden">
-        <h2>Select Operation</h2>
-        <select id="operationSelect">
-            <option value="sum">Sum</option>
-            <option value="average">Average</option>
-            <option value="max">Maximum</option>
-            <option value="min">Minimum</option>
-        </select>
-        <button onclick="performOperation()">Perform Operation</button>
-    </div>
+        <div id="dataSetContainer" class="hidden">
+            <h2>Select Data Set</h2>
+            <select id="dataSetSelect"></select>
+        </div>
+        
+        <div id="operationContainer" class="hidden">
+            <h2>Select Operation</h2>
+            <select id="operationSelect">
+                <option value="sum">Sum</option>
+                <option value="average">Average</option>
+                <option value="max">Maximum</option>
+                <option value="min">Minimum</option>
+            </select>
+            <button onclick="performOperation()">Perform Operation</button>
+        </div>
 
-    <h2>Output</h2>
-    <div id="output"></div>
+        <h2>Output</h2>
+        <div id="output"></div>
+    </div>
 
     <script>
         let kmlData = null;
@@ -145,16 +184,16 @@
         function previewKMLContent() {
             const previewElement = document.getElementById('preview');
             const placemarks = kmlData.getElementsByTagName('Placemark');
-            let previewContent = '<table><tr><th>Field</th>';
+            let previewContent = '<table><thead><tr><th>Field</th>';
 
-            for (let i = 0; i < Math.min(placemarks.length, 3); i++) {
+            for (let i = 0; i < placemarks.length; i++) {
                 previewContent += `<th>Placemark ${i + 1}</th>`;
             }
-            previewContent += '</tr>';
+            previewContent += '</tr></thead><tbody>';
 
             allFields.forEach(field => {
                 previewContent += `<tr><td>${field}</td>`;
-                for (let i = 0; i < Math.min(placemarks.length, 3); i++) {
+                for (let i = 0; i < placemarks.length; i++) {
                     const description = placemarks[i].getElementsByTagName('description')[0];
                     if (description) {
                         const parser = new DOMParser();
@@ -175,11 +214,7 @@
                 previewContent += '</tr>';
             });
 
-            previewContent += '</table>';
-
-            if (placemarks.length > 3) {
-                previewContent += `<p>... (${placemarks.length - 3} more Placemarks)</p>`;
-            }
+            previewContent += '</tbody></table>';
 
             previewElement.innerHTML = previewContent;
         }
@@ -235,5 +270,6 @@
             document.getElementById('output').textContent = output;
         }
     </script>
+</div>
 </body>
 </html>
