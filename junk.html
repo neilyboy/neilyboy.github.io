@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KML File Processor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #fileInput, #dataSetSelect, #operationSelect {
+            margin-bottom: 20px;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        #output {
+            white-space: pre-wrap;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>KML File Processor</h1>
+    <input type="file" id="fileInput" accept=".kml">
+    <button onclick="processFile()">Process File</button>
+    
+    <div id="dataSetContainer" style="display:none;">
+        <h2>Select Data Set</h2>
+        <select id="dataSetSelect"></select>
+    </div>
+    
+    <div id="operationContainer" style="display:none;">
+        <h2>Select Operation</h2>
+        <select id="operationSelect">
+            <option value="sum">Sum</option>
+            <option value="average">Average</option>
+            <option value="max">Maximum</option>
+            <option value="min">Minimum</option>
+        </select>
+        <button onclick="performOperation()">Perform Operation</button>
+    </div>
+
+    <h2>Output</h2>
+    <div id="output"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xmldom/0.1.31/xmldom.min.js"></script>
+    <script>
+        let kmlData = null;
+        let dataSets = new Set();
+
+        function processFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a KML file');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const parser = new DOMParser();
+                kmlData = parser.parseFromString(e.target.result, 'text/xml');
+                extractDataSets();
+                populateDataSetSelect();
+                document.getElementById('dataSetContainer').style.display = 'block';
+                document.getElementById('operationContainer').style.display = 'block';
+                document.getElementById('output').textContent = 'KML file processed. Select a data set and operation to perform.';
+            };
+            reader.readAsText(file);
+        }
+
+        function extractDataSets() {
+            dataSets.clear();
+            const placemarks = kmlData.getElementsByTagName('Placemark');
+            for (let i = 0; i < placemarks.length; i++) {
+                const extendedData = placemarks[i].getElementsByTagName('ExtendedData')[0];
+                if (extendedData) {
+                    const dataElements = extendedData.getElementsByTagName('Data');
+                    for (let j = 0; j < dataElements.length; j++) {
+                        dataSets.add(dataElements[j].getAttribute('name'));
+                    }
+                }
+            }
+        }
+
+        function populateDataSetSelect() {
+            const select = document.getElementById('dataSetSelect');
+            select.innerHTML = '';
+            dataSets.forEach(set => {
+                const option = document.createElement('option');
+                option.value = set;
+                option.textContent = set;
+                select.appendChild(option);
+            });
+        }
+
+        function performOperation() {
+            const dataSetName = document.getElementById('dataSetSelect').value;
+            const operation = document.getElementById('operationSelect').value;
+            
+            if (!kmlData || !dataSetName) {
+                alert('Please process a KML file and select a data set first');
+                return;
+            }
+
+            const placemarks = kmlData.getElementsByTagName('Placemark');
+            let values = [];
+
+            for (let i = 0; i < placemarks.length; i++) {
+                const extendedData = placemarks[i].getElementsByTagName('ExtendedData')[0];
+                if (extendedData) {
+                    const dataElements = extendedData.getElementsByTagName('Data');
+                    for (let j = 0; j < dataElements.length; j++) {
+                        if (dataElements[j].getAttribute('name') === dataSetName) {
+                            const value = parseFloat(dataElements[j].getElementsByTagName('value')[0].textContent);
+                            if (!isNaN(value)) {
+                                values.push(value);
+                            }
+                        }
+                    }
+                }
+            }
+
+            let result;
+            switch (operation) {
+                case 'sum':
+                    result = values.reduce((a, b) => a + b, 0);
+                    break;
+                case 'average':
+                    result = values.reduce((a, b) => a + b, 0) / values.length;
+                    break;
+                case 'max':
+                    result = Math.max(...values);
+                    break;
+                case 'min':
+                    result = Math.min(...values);
+                    break;
+            }
+
+            const output = `${operation.charAt(0).toUpperCase() + operation.slice(1)} of "${dataSetName}": ${result}\nNumber of values: ${values.length}`;
+            document.getElementById('output').textContent = output;
+        }
+    </script>
+</body>
+</html>
