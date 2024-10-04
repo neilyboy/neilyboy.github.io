@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KML File Processor</title>
+    <title>KML File Processor with Preview</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,29 +17,39 @@
             padding: 10px;
             box-sizing: border-box;
         }
-        #output {
+        #output, #preview {
             white-space: pre-wrap;
             background-color: #f0f0f0;
             padding: 10px;
             border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
         }
         button {
             padding: 10px;
             margin-right: 10px;
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <h1>KML File Processor</h1>
+    <h1>KML File Processor with Preview</h1>
     <input type="file" id="fileInput" accept=".kml">
     <button onclick="processFile()">Process File</button>
     
-    <div id="dataSetContainer" style="display:none;">
+    <div id="previewContainer" class="hidden">
+        <h2>KML Content Preview</h2>
+        <div id="preview"></div>
+    </div>
+
+    <div id="dataSetContainer" class="hidden">
         <h2>Select Data Set</h2>
         <select id="dataSetSelect"></select>
     </div>
     
-    <div id="operationContainer" style="display:none;">
+    <div id="operationContainer" class="hidden">
         <h2>Select Operation</h2>
         <select id="operationSelect">
             <option value="sum">Sum</option>
@@ -71,8 +81,10 @@
                 kmlData = parser.parseFromString(e.target.result, 'text/xml');
                 extractDataSets();
                 populateDataSetSelect();
-                document.getElementById('dataSetContainer').style.display = 'block';
-                document.getElementById('operationContainer').style.display = 'block';
+                previewKMLContent();
+                document.getElementById('previewContainer').classList.remove('hidden');
+                document.getElementById('dataSetContainer').classList.remove('hidden');
+                document.getElementById('operationContainer').classList.remove('hidden');
                 document.getElementById('output').textContent = 'KML file processed. Select a data set and operation to perform.';
             };
             reader.readAsText(file);
@@ -126,6 +138,24 @@
                     select.appendChild(option);
                 });
             }
+        }
+
+        function previewKMLContent() {
+            const previewElement = document.getElementById('preview');
+            const placemarks = kmlData.getElementsByTagName('Placemark');
+            let previewContent = '';
+
+            for (let i = 0; i < Math.min(placemarks.length, 3); i++) {
+                previewContent += `Placemark ${i + 1}:\n`;
+                previewContent += placemarks[i].outerHTML;
+                previewContent += '\n\n';
+            }
+
+            if (placemarks.length > 3) {
+                previewContent += `... (${placemarks.length - 3} more Placemarks)`;
+            }
+
+            previewElement.textContent = previewContent;
         }
 
         function performOperation() {
