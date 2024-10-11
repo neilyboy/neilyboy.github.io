@@ -49,19 +49,11 @@ button:hover {
 }
 
 #downloadButtons {
-    display: table;
-    width: 100%;
+    display: none; /* Initially hide the download buttons */
     margin-top: 20px;
+    text-align: center;
 }
 
 #downloadButtons button {
-    display: table-cell;
-    padding: 10px;
-    text-align: center;
-    vertical-align: middle;
-    border: 1px solid #ccc;
-}
-
-#downloadButtons button:hover {
-    background-color: #f2f2f2;
+    margin: 0 10px;
 }
