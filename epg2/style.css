@@ -70,18 +70,18 @@ button:hover {
 }
 
 .container {
-  max-width: 800px;
+  max-width: 600px; /* Adjust the width as needed */
   margin: 0 auto;
   padding: 20px;
+  border: 1px solid #ccc; /* Add a border for a container look */
+  border-radius: 5px; /* Add rounded corners */
+  background-color: #f0f0f0; /* Add a light background color */
 }
 
 .form-container {
-  border: 1px solid #ccc;
-  padding: 20px;
+  padding: 10px; /* Reduce padding for a more compact look */
 }
 
 .download-buttons {
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
+  justify-content: space-between; /* Space buttons evenly */
 }
