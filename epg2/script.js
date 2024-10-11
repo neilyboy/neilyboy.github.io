@@ -1,7 +1,6 @@
 const urlForm = document.getElementById('urlForm');
 const downloadButtons = document.getElementById('downloadButtons');
 const submitBtn = document.getElementById('submitBtn');
-const skipBtn = document.getElementById('skipBtn');
 const downloadEPGBtn = document.getElementById('downloadEPGBtn');
 const downloadM3UBtn = document.getElementById('downloadM3UBtn');
 
@@ -11,6 +10,7 @@ submitBtn.addEventListener('click', () => {
     const password = document.getElementById('password').value;
 
     if (xtremeUrl && username && password) {
+        // Show the download buttons
         downloadButtons.style.display = 'block';
 
         downloadEPGBtn.addEventListener('click', () => {
@@ -23,8 +23,4 @@ submitBtn.addEventListener('click', () => {
             window.open(m3uUrl);
         });
     }
-});
-
-skipBtn.addEventListener('click', () => {
-    // Implement logic to skip URL input or load saved data
 });
