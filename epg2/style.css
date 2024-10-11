@@ -68,3 +68,13 @@ button:hover {
 #downloadButtons button:hover {
     background-color: #3e8e41;
 }
+
+#step1 form table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#step1 form table td {
+    padding: 10px;
+    border: 1px solid #ccc;
+}
