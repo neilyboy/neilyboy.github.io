@@ -48,27 +48,6 @@ button:hover {
     background-color: #3e8e41;
 }
 
-#downloadButtons {
-    display: none; /* Initially hide the download buttons */
-    margin-top: 10px;
-    text-align: center;
-}
-
-#downloadButtons button {
-    display: inline-block;
-    padding: 10px;
-    margin: 5px;
-    background-color: #4CAF50;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-}
-
-#downloadButtons button:hover {
-    background-color: #3e8e41;
-}
-
 #step1 form table {
     width: 100%;
     border-collapse: collapse;
