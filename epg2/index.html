@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Xtreme URL Web Application</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Xtreme URL Web Application</h1>
+    <form id="urlForm">
+        <label for="xtremeUrl">Xtreme URL:</label>
+        <input type="text" id="xtremeUrl" name="xtremeUrl"><br><br>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username"><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br><br>
+        <button type="button" id="submitBtn">Submit</button>
+        <button type="button" id="skipBtn">Skip</button>
+    </form>
+
+    <div id="downloadButtons" style="display: none;">
+        <button type="button" id="downloadEPGBtn">Download EPG XML</button>
+        <button type="button" id="downloadM3UBtn">Download M3U</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
