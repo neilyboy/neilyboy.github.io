@@ -1,87 +1,50 @@
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f2f2f2;
-    padding: 20px;
-}
-
-h1 {
-    text-align: center;
-    color: #333;
-}
-
-form {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    color: #666;
-}
-
-input[type="text"],
-input[type="password"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    box-sizing: border-box;
-}
-
-button {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background-color: #4CAF50;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #3e8e41;
-}
-
-#downloadButtons {
-    display: none; /* Initially hide the download buttons */
-    margin-top: 10px; /* Adjust margin as needed */
-    text-align: center;
-}
-
-#downloadButtons button {
-    display: inline-block; /* Use inline-block for better layout */
-    padding: 10px;
-    margin: 5px;
-    background-color: #4CAF50;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-}
-
-#downloadButtons button:hover {
-    background-color: #3e8e41;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
 }
 
 .container {
-  max-width: 600px; /* Adjust the width as needed */
+  max-width: 600px;
   margin: 0 auto;
   padding: 20px;
-  border: 1px solid #ccc; /* Add a border for a container look */
-  border-radius: 5px; /* Add rounded corners */
-  background-color: #f0f0f0; /* Add a light background color */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f0f0f0;
 }
 
 .form-container {
-  padding: 10px; /* Reduce padding for a more compact look */
+  padding: 10px;
 }
 
 .download-buttons {
-  justify-content: space-between; /* Space buttons evenly */
+  display: flex;
+  justify-content: space-between;
+}
+
+#download-buttons-container {
+  display: none;
+}
+
+#download-buttons-container.visible {
+  display: flex;
+}
+
+#search-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+#results {
+  margin-top: 20px;
+}
+
+.result {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.result h3 {
+  margin: 0;
 }
