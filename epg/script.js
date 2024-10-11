@@ -6,7 +6,7 @@ const searchButton = document.getElementById('search-button');
 const resultsDiv = document.getElementById('results');
 
 let epgData; // Stores downloaded EPG data
-let channelMap; // Stores channel ID to name mapping
+let channelMap; // Stores channel ID to channel information mapping
 
 getDataButton.addEventListener('click', async () => {
   if (!epgFileInput.files[0] || !channelFileInput.files[0]) {
@@ -58,13 +58,16 @@ searchButton.addEventListener('click', () => {
     const channelId = programme.getAttribute('channel');
 
     if (title.includes(searchTerm) || desc.includes(searchTerm)) {
-      const channelName = channelMap[channelId];
-      results.push({
-        title,
-        desc,
-        channelId,
-        channelName
-      });
+      const channelInfo = channelMap[channelId];
+      if (channelInfo) {
+        results.push({
+          title,
+          desc,
+          channelId,
+          channelName: channelInfo.name, // Assuming name exists in channelMap
+          channelUrl: channelInfo.url // New property for channel URL
+        });
+      }
     }
   });
 
@@ -84,22 +87,28 @@ function displayResults(results) {
       <h3>${result.title}</h3>
       <p>Channel: ${result.channelName}</p>
       <p>Description: ${result.desc}</p>
+      <p>Channel URL: ${result.channelUrl}</p>
     `;
     resultsDiv.appendChild(resultDiv);
   });
 }
 
 function parseM3u(m3uData) {
-  // Replace this with your actual M3U parsing logic
-  // Example using regular expressions:
   const channelMap = {};
   const lines = m3uData.split('\n');
   lines.forEach(line => {
-    const match = line.match(/#EXTINF:-1 tvg-id="([^"]+)" tvg-name="([^"]+)"/);
+    const match = line.match(/#EXTINF:-1 tvg-id="([^"]+)" tvg-name="([^"]+)" tvg-logo="([^"]+)" group-title="([^"]+)",([^"]+)/);
     if (match) {
       const channelId = match[1];
       const channelName = match[2];
-      channelMap[channelId] = channelName;
+      const logoUrl = match[3];
+      const lastUrlPart = match[5];
+
+      channelMap[channelId] = {
+        name: channelName,
+        logoUrl,
+        url: lastUrlPart // New property to store the last URL
+      };
     }
   });
   return channelMap;
