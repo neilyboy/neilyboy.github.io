@@ -15,6 +15,7 @@ const searchBox = document.getElementById('searchBox');
 const searchTerm = document.getElementById('searchTerm');
 const searchBtn = document.getElementById('searchBtn');
 const searchResults = document.getElementById('searchResults');
+const urlForm = document.getElementById('urlForm');
 
 // Function to parse XML data
 function parseXML(xmlString) {
@@ -93,16 +94,45 @@ backButton.addEventListener('click', () => {
     uploadConfirmation.style.display = 'none';
 });
 
+function parseM3U(m3uData) {
+  const channels = [];
+  const lines = m3uData.split(/\r?\n/); // Split by line breaks (CR or LF)
+
+  for (const line of lines) {
+    if (line.startsWith('#EXTINF:')) {
+      // Extract channel information (assuming format is consistent)
+      const info = line.split(',');
+      const tvgId = info.find(item => item.startsWith('tvg-id='));
+      const tvgName = info.find(item => item.startsWith('tvg-name='));
+      const tvgLogo = info.find(item => item.startsWith('tvg-logo='));
+      const groupTitle = info.find(item => item.startsWith('group-title='));
+
+      if (tvgId && tvgName) {
+        channels.push({
+          tvgId: tvgId.split('=')[1],
+          tvgName: tvgName.split('=')[1],
+          tvgLogo: tvgLogo ? tvgLogo.split('=')[1] : '',
+          groupTitle: groupTitle ? groupTitle.split('=')[1].split(',')[0] : '',
+          url: groupTitle ? groupTitle.split('=')[1].split(',').pop() : '', // Get the last URL
+        });
+      }
+    }
+  }
+
+  return channels;
+}
+
+
 searchBtn.addEventListener('click', () => {
     const searchQuery = searchTerm.value.toLowerCase();
 
-    if (window.parsedXMLData) {
+    if (window.parsedXMLData && window.parsedM3UData) { // Check for both parsed data
         const filteredPrograms = Array.from(window.parsedXMLData.getElementsByTagName('programme'))
             .filter(program => program.getElementsByTagName('title')[0].textContent.toLowerCase().includes(searchQuery));
 
         if (filteredPrograms.length > 0) {
             // Build search results table
-            let resultsHtml = '<table><tr><th>Channel</th><th>Title</th><th>Description</th><th>Start Time</th><th>End Time</th></tr>';
+            let resultsHtml = '<table><tr><th>Logo</th><th>Channel</th><th>Title</th><th>Description</th><th>Start Time</th><th>End Time</th></tr>';
             for (const program of filteredPrograms) {
                 const channel = program.getAttribute('channel');
                 const title = program.getElementsByTagName('title')[0].textContent;
@@ -113,7 +143,16 @@ searchBtn.addEventListener('click', () => {
                 const humanReadableStartTime = new Date(startTime * 1000).toLocaleString();
                 const humanReadableEndTime = new Date(endTime * 1000).toLocaleString();
 
-                resultsHtml += `<tr><td>${channel}</td><td>${title}</td><td>${desc}</td><td>${humanReadableStartTime}</td><td>${humanReadableEndTime}</td></tr>`;
+                const matchingChannel = window.parsedM3UData.find(m3uChannel => m3uChannel.tvgId === channel);
+
+                let logoUrl = '';
+                let url = '';
+                if (matchingChannel) {
+                    logoUrl = matchingChannel.tvgLogo;
+                    url = matchingChannel.url;
+                }
+
+                resultsHtml += `<tr><td><img src="${logoUrl}" width="30" height="30"></td><td>${channel}</td><td>${title}</td><td>${desc}</td><td>${humanReadableStartTime}</td><td>${humanReadableEndTime}</td><td><a href="${url}" target="_blank">Link</a></td></tr>`;
             }
             resultsHtml += '</table>';
 
@@ -124,6 +163,6 @@ searchBtn.addEventListener('click', () => {
             searchResults.style.display = 'block';
         }
     } else {
-        console.error('Error parsing XML data.');
+        console.error('Error parsing XML or M3U data.');
     }
 });
