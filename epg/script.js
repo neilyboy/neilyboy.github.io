@@ -109,7 +109,7 @@ function parseM3u(m3uData) {
   lines.forEach(line => {
     const match = line.match(/#EXTINF:-1 tvg-id="([^"]+)" tvg-name="([^"]+)" tvg-logo="([^"]+)" group-title="([^"]+)",([^"]+)/);
     if (match) {
-      const channelId = match[1];
+      const channelId = match[1]; // Corrected capture group for channel ID
       const channelName = match[2];
       const logoUrl = match[3];
       const lastUrlPart = match[5];
