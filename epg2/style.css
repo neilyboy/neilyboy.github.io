@@ -78,3 +78,7 @@ button:hover {
     padding: 10px;
     border: 1px solid #ccc;
 }
+
+#step2 {
+    display: none;
+}
