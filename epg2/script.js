@@ -6,8 +6,10 @@ const downloadEPGBtn = document.getElementById('downloadEPGBtn');
 const downloadM3UBtn = document.getElementById('downloadM3UBtn');
 const uploadForm = document.getElementById('uploadForm');
 const uploadBtn = document.getElementById('uploadBtn');
+const backButton = document.getElementById('backButton');
 const step1 = document.getElementById('step1');
 const step2 = document.getElementById('step2');
+const uploadConfirmation = document.getElementById('uploadConfirmation');
 
 submitBtn.addEventListener('click', () => {
     const xtremeUrl = document.getElementById('xtremeUrl').value;
@@ -40,5 +42,14 @@ uploadBtn.addEventListener('click', () => {
         // Process the uploaded files (e.g., send to server, store locally)
         console.log('XML File:', xmlFile);
         console.log('M3U File:', m3uFile);
+
+        // Show confirmation message
+        uploadConfirmation.style.display = 'block';
     }
+});
+
+backButton.addEventListener('click', () => {
+    // Show Step 1 and hide Step 2
+    step1.style.display = 'block';
+    step2.style.display = 'none';
 });
