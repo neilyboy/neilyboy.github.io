@@ -97,7 +97,7 @@ searchBtn.addEventListener('click', () => {
     const searchQuery = searchTerm.value.toLowerCase();
 
     if (window.parsedXMLData) {
-        const filteredPrograms = window.parsedXMLData.getElementsByTagName('programme')
+        const filteredPrograms = Array.from(window.parsedXMLData.getElementsByTagName('programme'))
             .filter(program => program.getElementsByTagName('title')[0].textContent.toLowerCase().includes(searchQuery));
 
         if (filteredPrograms.length > 0) {
