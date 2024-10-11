@@ -61,3 +61,15 @@ button:hover {
 #step2 {
     display: none;
 }
+
+#step2 .backButton {
+    margin-top: 10px;
+    display: block;
+    text-align: center;
+}
+
+#uploadConfirmation {
+    margin-top: 20px;
+    text-align: center;
+    color: green;
+}
