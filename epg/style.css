@@ -53,3 +53,15 @@ button:hover {
 .result h3 {
   margin: 0;
 }
+
+#progress-bar {
+  margin-top: 10px;
+}
+
+#progress {
+  width: 100%;
+}
+
+#progress-text {
+  margin-left: 5px;
+}
