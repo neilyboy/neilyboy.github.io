@@ -1,28 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EPG Search App</title>
-  <link rel="stylesheet" href="style.css">
+    <title>Xtreme URL Web Application</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Step 1: Enter Xtreme URL Information</h1>
-    <div class="form-container">
-      <label for="xtreme-url">Xtreme URL:</label>
-      <input type="text" id="xtreme-url" placeholder="blah.com">
-      <label for="username">Username:</label>
-      <input type="text" id="username" placeholder="dildo">
-      <label for="password">Password:</label>
-      <input type="password" id="password" placeholder="*****">
-      <button id="submit-button">Submit</button>
-      <div class="download-buttons" id="download-buttons-container">
-        <button id="download-epg-xml">Download EPG XML</button>
-        <button id="download-m3u">Download M3U</button>
-      </div>
+    <div id="step1">
+        <h2>Step 1: Enter Xtreme URL Information</h2>
+        <form id="urlForm">
+            <label for="xtremeUrl">Xtreme URL:</label>
+            <input type="text" id="xtremeUrl" name="xtremeUrl"><br><br>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username"><br><br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password"><br><br>
+            <button type="button" id="submitBtn">Submit</button>
+        </form>
+        <div id="downloadButtons" style="display: none;">
+            <button type="button" id="downloadEPGBtn">Download EPG XML</button>
+            <button type="button" id="downloadM3UBtn">Download M3U</button>
+        </div>
     </div>
-  </div>
-  <script src="script.js"></script>
+
+    <div id="step2" style="display: none;">
+        <h2>Step 2: Additional Options (Coming Soon)</h2>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
