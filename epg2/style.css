@@ -1,50 +1,70 @@
 body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 20px;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f2f2f2;
+    padding: 20px;
 }
 
-.container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #f0f0f0;
+h1 {
+    text-align: center;
+    color: #333;
 }
 
-.form-container {
-  padding: 10px;
+form {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.download-buttons {
-  display: flex;
-  justify-content: space-between;
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #666;
 }
 
-#download-buttons-container {
-  display: none;
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-sizing: border-box;
 }
 
-#download-buttons-container.visible {
-  display: flex;
+button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
 }
 
-#search-container {
-  margin-top: 20px;
-  text-align: center;
+button:hover {
+    background-color: #3e8e41;
 }
 
-#results {
-  margin-top: 20px;
+#downloadButtons {
+    display: none; /* Initially hide the download buttons */
+    margin-top: 10px;
+    text-align: center;
 }
 
-.result {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin-bottom: 10px;
+#downloadButtons button {
+    display: inline-block;
+    padding: 10px;
+    margin: 5px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
 }
 
-.result h3 {
-  margin: 0;
+#downloadButtons button:hover {
+    background-color: #3e8e41;
 }
