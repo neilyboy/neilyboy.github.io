@@ -7,19 +7,40 @@
 <body>
     <div id="step1">
         <h2>Step 1: Enter Xtreme URL Information</h2>
-        <form id="urlForm" autocomplete="off">
-            <label for="xtremeUrl">Xtreme URL:</label>
-            <input type="text" id="xtremeUrl" name="xtremeUrl"><br><br>
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username"><br><br>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password"><br><br>
-            <button type="button" id="submitBtn">Submit</button>
+        <form id="urlForm">
+            <table style="width: 100%;">
+                <tr>
+                    <td colspan="2">
+                        <h3 style="text-align: center;">Xtreme URL Information</h3>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Xtreme URL:</td>
+                    <td><input type="text" id="xtremeUrl" name="xtremeUrl"></td>
+                </tr>
+                <tr>
+                    <td>Username:</td>
+                    <td><input type="text" id="username" name="username"></td>
+                </tr>
+                <tr>
+                    <td>Password:</td>
+                    <td><input type="password" id="password" name="password"></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align: center;">
+                        <button type="button" id="submitBtn">Submit</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align: center;">
+                        <div id="downloadButtons" style="display: none;">
+                            <button type="button" id="downloadEPGBtn">Download EPG XML</button>
+                            <button type="button" id="downloadM3UBtn">Download M3U</button>
+                        </div>
+                    </td>
+                </tr>
+            </table>
         </form>
-        <div id="downloadButtons" style="display: none;">
-            <button type="button" id="downloadEPGBtn">Download EPG XML</button>
-            <button type="button" id="downloadM3UBtn">Download M3U</button>
-        </div>
     </div>
 
     <div id="step2" style="display: none;">
