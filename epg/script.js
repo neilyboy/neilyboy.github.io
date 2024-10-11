@@ -60,12 +60,14 @@ searchButton.addEventListener('click', () => {
     if (title.includes(searchTerm) || desc.includes(searchTerm)) {
       const channelInfo = channelMap[channelId];
       if (channelInfo) {
+        // Search for channel URL based on name
+        const channelUrl = findChannelUrlByName(channelInfo.name, channelMap);
         results.push({
           title,
           desc,
           channelId,
-          channelName: channelInfo.name, // Assuming name exists in channelMap
-          channelUrl: channelInfo.url // New property for channel URL
+          channelName: channelInfo.name,
+          channelUrl
         });
       }
     }
@@ -83,8 +85,7 @@ function displayResults(results) {
 
   results.forEach(result => {
     const resultDiv = document.createElement('div');
-    resultDiv.innerHTML   
- = `
+    resultDiv.innerHTML = `
       <h3>${result.title}</h3>
       <p>Channel: ${result.channelName}</p>
       <p>Description: ${result.desc}</p>
