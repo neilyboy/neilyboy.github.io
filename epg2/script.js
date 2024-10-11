@@ -58,4 +58,7 @@ backButton.addEventListener('click', () => {
     // Show Step 1 and hide Step 2
     step1.style.display = 'block';
     step2.style.display = 'none';
+
+    // Reset upload confirmation
+    uploadConfirmation.style.display = 'none';
 });
