@@ -75,7 +75,8 @@ uploadBtn.addEventListener('click', () => {
             // Parse XML data
             const xmlDoc = parseXML(xmlData);
 
-            // ... (rest of the search logic) ...
+            // Store parsed XML data for later use
+            window.parsedXMLData = xmlDoc;
         };
         reader.readAsText(xmlFile);
     } else {
@@ -95,8 +96,8 @@ backButton.addEventListener('click', () => {
 searchBtn.addEventListener('click', () => {
     const searchQuery = searchTerm.value.toLowerCase();
 
-    if (xmlData) { // Assuming you have the XML data stored in a variable named xmlData
-        const filteredPrograms = xmlDoc.getElementsByTagName('programme')
+    if (window.parsedXMLData) {
+        const filteredPrograms = window.parsedXMLData.getElementsByTagName('programme')
             .filter(program => program.getElementsByTagName('title')[0].textContent.toLowerCase().includes(searchQuery));
 
         if (filteredPrograms.length > 0) {
