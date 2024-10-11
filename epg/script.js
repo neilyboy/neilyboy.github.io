@@ -95,6 +95,16 @@ function displayResults(results) {
   });
 }
 
+function findChannelUrlByName(channelName, channelMap) {
+  for (const channelId in channelMap) {
+    if (channelMap[channelId].name === channelName) {
+      return channelMap[channelId].url;
+    }
+  }
+  // Return undefined if not found
+  return undefined;
+}
+
 function parseM3u(m3uData) {
   const channelMap = {};
   const lines = m3uData.split('\n');
