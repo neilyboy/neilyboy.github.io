@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EPG Search</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>EPG Search</h1>
+  <div id="inputs">
+    <label for="epg-file">Upload EPG XML:</label>
+    <input type="file" id="epg-file" accept=".xml">
+    <label for="channel-file">Upload Channel M3U:</label>
+    <input type="file" id="channel-file" accept=".m3u">
+    <button id="get-data-button">Get Data</button>
+  </div>
+  <div id="search">
+    <label for="search-term">Search:</label>
+    <input type="text" id="search-term" placeholder="Search EPG data">
+    <button id="search-button">Search</button>
+  </div>
+  <div id="results"></div>
+  <script src="script.js"></script>
+</body>
+</html>
