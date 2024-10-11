@@ -56,6 +56,10 @@ uploadBtn.addEventListener('click', () => {
 
         // Show search box
         searchBox.style.display = 'block';
+
+        // Enable submit and skip buttons
+        submitBtn.disabled = false;
+        skipBtn.disabled = false;
     } else {
         alert('Please select both XML and M3U files.');
     }
@@ -67,3 +71,9 @@ backButton.addEventListener('click', () => {
     step2.style.display = 'none';
 
     // Reset upload confirmation
+    uploadConfirmation.style.display = 'none';
+});
+
+// Initial button state
+submitBtn.disabled = false;
+skipBtn.disabled = false;
