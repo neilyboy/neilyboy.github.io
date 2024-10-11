@@ -80,10 +80,12 @@ function displayResults(results) {
 
   results.forEach(result => {
     const resultDiv = document.createElement('div');
+    const { name, logoUrl, lastUrlPart } = result; // Destructure object
     resultDiv.innerHTML = `
-      <h3>${result.title}</h3>
-      <p>Channel: ${result.channelName}</p>
+      <h3>${name}</h3>
+      <p>Channel: ${lastUrlPart}</p>
       <p>Description: ${result.desc}</p>
+      <img src="${logoUrl}" alt="${name} Logo">
     `;
     resultsDiv.appendChild(resultDiv);
   });
