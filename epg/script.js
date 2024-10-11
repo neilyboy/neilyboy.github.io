@@ -91,8 +91,16 @@ function displayResults(results) {
 
 function parseM3u(m3uData) {
   // Replace this with your actual M3U parsing logic
-  // For example, you might use a regular expression to extract channel information
+  // Example using regular expressions:
   const channelMap = {};
-  // ... parsing logic ...
+  const lines = m3uData.split('\n');
+  lines.forEach(line => {
+    const match = line.match(/#EXTINF:-1 tvg-id="([^"]+)" tvg-name="([^"]+)"/);
+    if (match) {
+      const channelId = match[1];
+      const channelName = match[2];
+      channelMap[channelId] = channelName;
+    }
+  });
   return channelMap;
 }
