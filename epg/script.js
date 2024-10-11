@@ -4,8 +4,6 @@ const getDataButton = document.getElementById('get-data-button');
 const searchTermInput = document.getElementById('search-term');
 const searchButton = document.getElementById('search-button');
 const resultsDiv = document.getElementById('results');
-const progressBar = document.getElementById('progress');
-const progressText = document.getElementById('progress-text');
 
 let epgData; // Stores downloaded EPG data
 let channelMap; // Stores channel ID to name mapping
@@ -20,11 +18,6 @@ getDataButton.addEventListener('click', async () => {
     // Read EPG data
     const epgFile = epgFileInput.files[0];
     const epgReader = new FileReader();
-    epgReader.addEventListener('progress', (event) => {
-      const progress = (event.loaded / event.total) * 100;
-      progressBar.value = progress;
-      progressText.textContent = `${progress}%`;
-    });
     epgReader.onload = () => {
       epgData = epgReader.result;
       console.log('EPG data uploaded');
@@ -34,11 +27,6 @@ getDataButton.addEventListener('click', async () => {
     // Read channel data
     const channelFile = channelFileInput.files[0];
     const channelReader = new FileReader();
-    channelReader.addEventListener('progress', (event) => {
-      const progress = (event.loaded / event.total) * 100;
-      progressBar.value = progress;
-      progressText.textContent = `${progress}%`;
-    });
     channelReader.onload = () => {
       channelMap = parseM3u(channelReader.result);
       console.log('Channel map created');
@@ -109,7 +97,7 @@ function parseM3u(m3uData) {
   lines.forEach(line => {
     const match = line.match(/#EXTINF:-1 tvg-id="([^"]+)" tvg-name="([^"]+)" tvg-logo="([^"]+)" group-title="([^"]+)",([^"]+)/);
     if (match) {
-      const channelId = match[1]; // Corrected capture group for channel ID
+      const channelId = match[1];
       const channelName = match[2];
       const logoUrl = match[3];
       const lastUrlPart = match[5];
