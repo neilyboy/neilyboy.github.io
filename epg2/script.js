@@ -10,6 +10,7 @@ const backButton = document.getElementById('backButton');
 const step1 = document.getElementById('step1');
 const step2 = document.getElementById('step2');
 const uploadConfirmation = document.getElementById('uploadConfirmation');
+const uploadConfirmationMessage = document.getElementById('uploadConfirmationMessage');
 
 submitBtn.addEventListener('click', () => {
     const xtremeUrl = document.getElementById('xtremeUrl').value;
@@ -45,6 +46,11 @@ uploadBtn.addEventListener('click', () => {
 
         // Show confirmation message
         uploadConfirmation.style.display = 'block';
+
+        // Add file names to confirmation message
+        uploadConfirmationMessage.textContent = `Upload Successful! XML: ${xmlFile.name}, M3U: ${m3uFile.name}`;
+    } else {
+        alert('Please select both XML and M3U files.');
     }
 });
 
