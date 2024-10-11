@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Xtreme URL Web Application</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="step1">
+        <h2>Step 1: Enter Xtreme URL Information</h2>
+        <form id="urlForm">
+            </form>
+    </div>
+
+    <div id="step2" style="display: none;">
+        <h2>Step 2: Upload XML and M3U Files</h2>
+        <form id="uploadForm">
+            </form>
+        <div id="uploadConfirmation" style="display: none;">
+            <h3>Upload Successful!</h3>
+            <p id="uploadConfirmationMessage"></p>
+        </div>
+        <div id="searchBox" style="display: none;">
+            <h2>Search EPG Data</h2>
+            <input type="text" id="searchTerm" placeholder="Search EPG data">
+            <button type="button" id="searchBtn">Search</button>
+            <div id="searchResults" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
