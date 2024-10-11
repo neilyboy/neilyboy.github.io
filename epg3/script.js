@@ -16,6 +16,12 @@ const searchTerm = document.getElementById('searchTerm');
 const searchBtn = document.getElementById('searchBtn');
 const searchResults = document.getElementById('searchResults');
 
+// Function to parse XML data
+function parseXML(xmlString) {
+    const parser = new DOMParser();
+    return parser.parseFromString(xmlString, "text/xml");
+}
+
 submitBtn.addEventListener('click', () => {
     const xtremeUrl = document.getElementById('xtremeUrl').value;
     const username = document.getElementById('username').value;
@@ -60,6 +66,18 @@ uploadBtn.addEventListener('click', () => {
         // Enable submit and skip buttons
         submitBtn.disabled = false;
         skipBtn.disabled = false;
+
+        // Read the XML file content
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const xmlData = e.target.result;
+
+            // Parse XML data
+            const xmlDoc = parseXML(xmlData);
+
+            // ... (rest of the search logic) ...
+        };
+        reader.readAsText(xmlFile);
     } else {
         alert('Please select both XML and M3U files.');
     }
@@ -74,6 +92,37 @@ backButton.addEventListener('click', () => {
     uploadConfirmation.style.display = 'none';
 });
 
-// Initial button state
-submitBtn.disabled = false;
-skipBtn.disabled = false;
+searchBtn.addEventListener('click', () => {
+    const searchQuery = searchTerm.value.toLowerCase();
+
+    if (xmlData) { // Assuming you have the XML data stored in a variable named xmlData
+        const filteredPrograms = xmlDoc.getElementsByTagName('programme')
+            .filter(program => program.getElementsByTagName('title')[0].textContent.toLowerCase().includes(searchQuery));
+
+        if (filteredPrograms.length > 0) {
+            // Build search results table
+            let resultsHtml = '<table><tr><th>Channel</th><th>Title</th><th>Description</th><th>Start Time</th><th>End Time</th></tr>';
+            for (const program of filteredPrograms) {
+                const channel = program.getAttribute('channel');
+                const title = program.getElementsByTagName('title')[0].textContent;
+                const desc = program.getElementsByTagName('desc')[0].textContent;
+                const startTime = program.getAttribute('start_timestamp');
+                const endTime = program.getAttribute('stop_timestamp');
+
+                const humanReadableStartTime = new Date(startTime * 1000).toLocaleString();
+                const humanReadableEndTime = new Date(endTime * 1000).toLocaleString();
+
+                resultsHtml += `<tr><td>${channel}</td><td>${title}</td><td>${desc}</td><td>${humanReadableStartTime}</td><td>${humanReadableEndTime}</td></tr>`;
+            }
+            resultsHtml += '</table>';
+
+            searchResults.innerHTML = resultsHtml;
+            searchResults.style.display = 'block';
+        } else {
+            searchResults.textContent = 'No programs found matching your search.';
+            searchResults.style.display = 'block';
+        }
+    } else {
+        console.error('Error parsing XML data.');
+    }
+});
