@@ -18,20 +18,16 @@ submitBtn.addEventListener('click', () => {
         // Show the download buttons
         downloadButtons.style.display = 'block';
 
-        downloadEPGBtn.addEventListener('click', () => {
-            const epgUrl = `${xtremeUrl}/xmltv.php?username=${username}&password=${password}`;
-            window.open(epgUrl);
-        });
-
-        downloadM3UBtn.addEventListener('click', () => {
-            const m3uUrl = `${xtremeUrl}/get.php?username=${username}&password=${password}&type=m3u_plus&output=ts`;
-            window.open(m3uUrl);
-        });
+        // Show Step 2 after a delay (adjust as needed)
+        setTimeout(() => {
+            step1.style.display = 'none';
+            step2.style.display = 'block';
+        }, 1000); // 1 second delay
     }
 });
 
 skipBtn.addEventListener('click', () => {
-    // Show Step 2 and hide Step 1
+    // Show Step 2 immediately
     step1.style.display = 'none';
     step2.style.display = 'block';
 });
