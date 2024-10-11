@@ -68,3 +68,20 @@ button:hover {
 #downloadButtons button:hover {
     background-color: #3e8e41;
 }
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.form-container {
+  border: 1px solid #ccc;
+  padding: 20px;
+}
+
+.download-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
