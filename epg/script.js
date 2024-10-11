@@ -15,23 +15,38 @@ getDataButton.addEventListener('click', async () => {
   }
 
   try {
-    // Read EPG data
+    // Read EPG data asynchronously with progress updates
     const epgFile = epgFileInput.files[0];
     const epgReader = new FileReader();
-    epgReader.onload = () => {
-      epgData = epgReader.result;
-      console.log('EPG data uploaded');
-    };
-    epgReader.readAsText(epgFile);
+    epgReader.addEventListener('progress', (event) => {
+      const progress = (event.loaded / event.total) * 100;
+      progressBar.value = progress;
+      progressText.textContent = `${progress}%`;
+    });
+    const epgDataPromise = new Promise(resolve => {
+      epgReader.onload = () => {
+        resolve(epgReader.result);
+      };
+    });
+    epgData = await epgDataPromise;
+    console.log('EPG data uploaded');
 
-    // Read channel data
+    // Read channel data asynchronously with progress updates
     const channelFile = channelFileInput.files[0];
     const channelReader = new FileReader();
-    channelReader.onload = () => {
-      channelMap = parseM3u(channelReader.result);
-      console.log('Channel map created');
-    };
-    channelReader.readAsText(channelFile);
+    channelReader.addEventListener('progress', (event) => {
+      const progress = (event.loaded / event.total) * 100;
+      progressBar.value = progress;
+      progressText.textContent = `${progress}%`;
+    });
+    const channelDataPromise = new Promise(resolve => {
+      channelReader.onload = () => {
+        resolve(channelReader.result);
+      };
+    });
+    const channelData = await channelDataPromise;
+    channelMap = parseM3u(channelData);
+    console.log('Channel map created');
   } catch (error) {
     console.error('Error reading files:', error);
     alert('Error reading files. Please ensure they are valid.');
