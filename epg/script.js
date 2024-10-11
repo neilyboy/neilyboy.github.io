@@ -83,7 +83,8 @@ function displayResults(results) {
 
   results.forEach(result => {
     const resultDiv = document.createElement('div');
-    resultDiv.innerHTML = `
+    resultDiv.innerHTML   
+ = `
       <h3>${result.title}</h3>
       <p>Channel: ${result.channelName}</p>
       <p>Description: ${result.desc}</p>
