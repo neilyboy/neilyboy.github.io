@@ -50,10 +50,21 @@ button:hover {
 
 #downloadButtons {
     display: none; /* Initially hide the download buttons */
-    margin-top: 20px;
+    margin-top: 10px; /* Adjust margin as needed */
     text-align: center;
 }
 
 #downloadButtons button {
-    margin: 0 10px;
+    display: inline-block; /* Use inline-block for better layout */
+    padding: 10px;
+    margin: 5px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#downloadButtons button:hover {
+    background-color: #3e8e41;
 }
