@@ -1,7 +1,7 @@
 const urlForm = document.getElementById('urlForm');
 const downloadButtons = document.getElementById('downloadButtons');
 const submitBtn = document.getElementById('submitBtn');
-const nextBtn = document.getElementById('nextBtn');
+const skipBtn = document.getElementById('skipBtn');
 const downloadEPGBtn = document.getElementById('downloadEPGBtn');
 const downloadM3UBtn = document.getElementById('downloadM3UBtn');
 const uploadForm = document.getElementById('uploadForm');
@@ -38,24 +38,17 @@ submitBtn.addEventListener('click', () => {
         downloadButtons.style.display = 'block';
 
         // Construct download URLs based on user input
-        const epgDownloadUrl = `https://<span class="math-inline">\{xtremeUrl\}/epg\.xml?username\=</span>{username}&password=${password}`;
-        const m3uDownloadUrl = `https://<span class="math-inline">\{xtremeUrl\}/m3u\.m3u?username\=</span>{username}&password=${password}`;
+        const epgDownloadUrl = `https://${xtremeUrl}/xmltv.php?username=${username}&password=${password}`;
+        const m3uDownloadUrl = `https://${xtremeUrl}/get.php?username=${username}&password=${password}&type=m3u_plus&output=ts`;
 
-        // Display the download URLs below the buttons
-        const epgDownloadLink = document.createElement('a');
-        epgDownloadLink.href = epgDownloadUrl;
-        epgDownloadLink.textContent = 'Download EPG XML';
-        downloadButtons.appendChild(epgDownloadLink);
-
-        const m3uDownloadLink = document.createElement('a');
-        m3uDownloadLink.href = m3uDownloadUrl;
-        m3uDownloadLink.textContent = 'Download M3U';
-        downloadButtons.appendChild(m3uDownloadLink);
+        // Set the href attribute of the download buttons
+        downloadEPGBtn.href = epgDownloadUrl;
+        downloadM3UBtn.href = m3uDownloadUrl;
     }
 });
 
-nextBtn.addEventListener('click', () => {
-    // Show Step 2
+skipBtn.addEventListener('click', () => {
+    // Show Step 2 immediately
     step1.style.display = 'none';
     step2.style.display = 'block';
 });
@@ -181,7 +174,7 @@ searchBtn.addEventListener('click', () => {
                     url = matchingChannel.url;
                 }
 
-                resultsHtml += `<tr><td><img src="<span class="math-inline">\{logoUrl\}" width\="30" height\="30"\></td\><td\></span>{channel}</td><td><span class="math-inline">\{title\}</td\><td\></span>{desc}</td><td><span class="math-inline">\{humanReadableStartTime\}</td\><td\></span>{humanReadableEndTime}</td><td><a href="${url}" target="_blank">Link</a></td></tr>`;
+                resultsHtml += `<tr><td><img src="${logoUrl}" width="30" height="30"></td><td>${channel}</td><td>${title}</td><td>${desc}</td><td>${humanReadableStartTime}</td><td>${humanReadableEndTime}</td><td><a href="${url}" target="_blank">Link</a></td></tr>`;
             }
             resultsHtml += '</table>';
 
