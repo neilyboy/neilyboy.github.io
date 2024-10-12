@@ -1,7 +1,7 @@
 const urlForm = document.getElementById('urlForm');
 const downloadButtons = document.getElementById('downloadButtons');
 const submitBtn = document.getElementById('submitBtn');
-const skipBtn = document.getElementById('skipBtn');
+const nextBtn = document.getElementById('nextBtn');
 const downloadEPGBtn = document.getElementById('downloadEPGBtn');
 const downloadM3UBtn = document.getElementById('downloadM3UBtn');
 const uploadForm = document.getElementById('uploadForm');
@@ -36,17 +36,11 @@ submitBtn.addEventListener('click', () => {
     if (xtremeUrl && username && password) {
         // Show the download buttons
         downloadButtons.style.display = 'block';
-
-        // Show Step 2 after a delay (adjust as needed)
-        setTimeout(() => {
-            step1.style.display = 'none';
-            step2.style.display = 'block';
-        }, 1000); // 1 second delay
     }
 });
 
-skipBtn.addEventListener('click', () => {
-    // Show Step 2 immediately
+nextBtn.addEventListener('click', () => {
+    // Show Step 2
     step1.style.display = 'none';
     step2.style.display = 'block';
 });
@@ -71,7 +65,7 @@ uploadBtn.addEventListener('click', () => {
 
         // Enable submit and skip buttons
         submitBtn.disabled = false;
-        skipBtn.disabled = false;
+        nextBtn.disabled = false;
 
         // Read the XML file content
         const reader = new FileReader();
