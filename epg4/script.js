@@ -23,20 +23,14 @@ function parseXML(xmlString) {
 }
 
 submitBtn.addEventListener('click', () => {
-    const xtremeUrl = document.getElementById('xtremeUrl').value;
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+    const xtremeUrl = document.getElementById('xtremeUrl').value;
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
-    if (xtremeUrl && username && password) {
-        // Show the download buttons
-        downloadButtons.style.display = 'block';
-
-        // Show Step 2 after a delay (adjust as needed)
-        setTimeout(() => {
-            step1.style.display = 'none';
-            step2.style.display = 'block';
-        }, 1000); // 1 second delay
-    }
+    if (xtremeUrl && username && password) {
+        // Show the download buttons
+        downloadButtons.style.display = 'block';
+    }
 });
 
 skipBtn.addEventListener('click', () => {
