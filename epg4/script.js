@@ -130,17 +130,17 @@ function parseM3U(m3uData) {
 
             if (tvgId && tvgName) {
                 channels.push({
-                    tvgId: tvgId
-                        tvgId: tvgId.split('=')[1],
-            tvgName: tvgName.split('=')[1],
-            tvgLogo: tvgLogo ? tvgLogo.split('=')[1] : '',
-            groupTitle: groupTitle ? groupTitle.split('=')[1].split(',')[0] : '',
-            url: groupTitle ? groupTitle.split('=')[1].split(',').pop() : '', // Get the last URL
-        });
+                    tvgId: tvgId.split('=')[1],
+                    tvgName: tvgName.split('=')[1],
+                    tvgLogo: tvgLogo ? tvgLogo.split('=')[1] : '',
+                    groupTitle: groupTitle ? groupTitle.split('=')[1].split(',')[0] : '',
+                    url: groupTitle ? groupTitle.split('=')[1].split(',').pop() : '', // Get the last URL
+                });
+            }
+        }
     }
-}
 
-return channels;
+    return channels;
 }
 
 searchBtn.addEventListener('click', () => {
