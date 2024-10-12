@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Xtreme URL Web Application</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Xtreme URL Web Application</h1>
+    </header>
+    <main>
+        <div id="step1">
+            <h2>Step 1: Enter Xtreme URL Information</h2>
+            <form id="urlForm">
+                <table style="width: 100%;">
+                    <tr>
+                        <td colspan="2">
+                            <h3 style="text-align: center;">Xtreme URL Information</h3>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Xtreme URL:</td>
+                        <td><input type="text" id="xtremeUrl" name="xtremeUrl" required></td>
+                    </tr>
+                    <tr>
+                        <td>Username:</td>
+                        <td><input type="text" id="username" name="username" required></td>
+                    </tr>
+                    <tr>
+                        <td>Password:</td>
+                        <td><input type="password" id="password" name="password" required></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: center;">
+                            <button type="button" id="submitBtn">Submit</button>
+                            <button type="button" id="skipBtn">Skip</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: center;">
+                            <div id="downloadButtons" style="display: none;">
+                                <button type="button" id="downloadEPGBtn">Download EPG XML</button>
+                                <button type="button" id="downloadM3UBtn">Download M3U</button>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+
+        <div id="step2" style="display: none;">
+            <h2>Step 2: Upload XML and M3U Files</h2>
+            <form id="uploadForm">
+                <label for="xmlFile">Upload EPG XML File:</label>
+                <input type="file" id="xmlFile" name="xmlFile" required><br><br>
+                <label for="m3uFile">Upload M3U File:</label>
+                <input type="file" id="m3uFile" name="m3uFile" required><br><br>
+                <button type="button" id="uploadBtn">Upload</button>
+                <button type="button" id="backButton">Back</button>
+            </form>
+            <div id="uploadConfirmation" style="display: none;">
+                <h3>Upload Successful!</h3>
+                <p id="uploadConfirmationMessage"></p>
+            </div>
+            <div id="searchBox" style="display: none;">
+                <h2>Search EPG Data</h2>
+                <input type="text" id="searchTerm" placeholder="Search EPG data">
+                <button type="button" id="searchBtn">Search</button>
+                <div id="searchResults" style="display: none;"></div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        </footer>
+    <script src="script.js"></script>
+</body>
+</html>
