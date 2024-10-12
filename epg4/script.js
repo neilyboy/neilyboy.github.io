@@ -131,3 +131,58 @@ function parseM3U(m3uData) {
             if (tvgId && tvgName) {
                 channels.push({
                     tvgId: tvgId
+                        tvgId: tvgId.split('=')[1],
+            tvgName: tvgName.split('=')[1],
+            tvgLogo: tvgLogo ? tvgLogo.split('=')[1] : '',
+            groupTitle: groupTitle ? groupTitle.split('=')[1].split(',')[0] : '',
+            url: groupTitle ? groupTitle.split('=')[1].split(',').pop() : '', // Get the last URL
+        });
+    }
+}
+
+return channels;
+}
+
+searchBtn.addEventListener('click', () => {
+    const searchQuery = searchTerm.value.toLowerCase();
+
+    if (window.parsedXMLData && window.parsedM3UData) { // Check for both parsed data
+        const filteredPrograms = Array.from(window.parsedXMLData.getElementsByTagName('programme'))
+            .filter(program => program.getElementsByTagName('title')[0].textContent.toLowerCase().includes(searchQuery));
+
+        if (filteredPrograms.length > 0) {
+            // Build search results table
+            let resultsHtml = '<table><tr><th>Logo</th><th>Channel</th><th>Title</th><th>Description</th><th>Start Time</th><th>End Time</th><th>Link</th></tr>';
+            for (const program of filteredPrograms) {
+                const channel = program.getAttribute('channel');
+                const title = program.getElementsByTagName('title')[0].textContent;
+                const desc = program.getElementsByTagName('desc')[0].textContent;
+                const startTime = program.getAttribute('start_timestamp');
+                const endTime = program.getAttribute('stop_timestamp');
+
+                const humanReadableStartTime = new Date(startTime * 1000).toLocaleString();
+                const humanReadableEndTime = new Date(endTime * 1000).toLocaleString();
+
+                const matchingChannel = window.parsedM3UData.find(m3uChannel => m3uChannel.tvgId === channel);
+
+                let logoUrl = '';
+                let url = '';
+                if (matchingChannel) {
+                    logoUrl = matchingChannel.tvgLogo;
+                    url = matchingChannel.url;
+                }
+
+                resultsHtml += `<tr><td><img src="${logoUrl}" width="30" height="30"></td><td>${channel}</td><td>${title}</td><td>${desc}</td><td>${humanReadableStartTime}</td><td>${humanReadableEndTime}</td><td><a href="${url}" target="_blank">Link</a></td></tr>`;
+            }
+            resultsHtml += '</table>';
+
+            searchResults.innerHTML = resultsHtml;
+            searchResults.style.display = 'block';
+        } else {
+            searchResults.textContent = 'No programs found matching your search.';
+            searchResults.style.display = 'block';
+        }
+    } else {
+        console.error('Error parsing XML or M3U data.');
+    }
+});
