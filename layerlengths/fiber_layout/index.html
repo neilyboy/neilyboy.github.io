@@ -51,7 +51,7 @@
         .error-message {
             color: red;
             margin-top: 10px;
-        }        
+        }
     </style>
 </head>
 <body>
@@ -86,6 +86,7 @@
         </table>
         
         <button onclick="exportToExcel()" style="margin-top: 20px;">Export to Excel</button>
+        
         <div id="errorMessage" class="error-message"></div>
     </div>
 
@@ -134,29 +135,6 @@
             errorMessageElement.textContent = 'Vault added successfully!';
             errorMessageElement.style.color = 'green';
         }
-        let splitterTitle = "";
-        let vaults = {
-            1: [], 2: [], 3: []
-        };
-        let addresses = [];
-
-        function addVault() {
-            const address = document.getElementById('vaultAddress').value;
-            const group = parseInt(document.getElementById('fiberGroup').value);
-            const fiberCount = parseInt(document.getElementById('fiberCount').value);
-            
-            console.log('Adding vault:', { address, group, fiberCount });
-            
-            if (address && group && fiberCount) {
-                vaults[group].push({ address, fiberCount, group });  // Added 'group' to the vault object
-                console.log('Updated vaults:', vaults);
-                updateVaultSelect();
-                updateLayoutTable();
-                clearVaultInputs();
-            } else {
-                console.log('Invalid input for adding vault');
-            }
-        }
 
         function updateVaultSelect() {
             const select = document.getElementById('vaultSelect');
@@ -177,19 +155,37 @@
 
         function addAddress() {
             const [group, vaultIndex] = document.getElementById('vaultSelect').value.split(',');
-            const name = document.getElementById('addressName').value;
+            const name = document.getElementById('addressName').value.trim();
             const fiber = parseInt(document.getElementById('fiberNumber').value);
+            const errorMessageElement = document.getElementById('errorMessage');
             
             console.log('Adding address:', { group, vaultIndex, name, fiber });
             
-            if (group && vaultIndex !== undefined && name && fiber) {
-                addresses.push({ group: parseInt(group), vaultIndex: parseInt(vaultIndex), name, fiber });
-                console.log('Updated addresses:', addresses);
-                updateLayoutTable();
-                clearAddressInputs();
-            } else {
-                console.log('Invalid input for adding address');
+            // Reset error message
+            errorMessageElement.textContent = '';
+
+            // Validate inputs
+            if (!group || vaultIndex === undefined) {
+                errorMessageElement.textContent = 'Please select a vault.';
+                return;
             }
+            if (!name) {
+                errorMessageElement.textContent = 'Please enter an address name.';
+                return;
+            }
+            if (isNaN(fiber) || fiber < 1) {
+                errorMessageElement.textContent = 'Please enter a valid fiber number.';
+                return;
+            }
+
+            addresses.push({ group: parseInt(group), vaultIndex: parseInt(vaultIndex), name, fiber });
+            console.log('Updated addresses:', addresses);
+            updateLayoutTable();
+            clearAddressInputs();
+            
+            // Confirmation message
+            errorMessageElement.textContent = 'Address added successfully!';
+            errorMessageElement.style.color = 'green';
         }
 
         function clearAddressInputs() {
@@ -248,6 +244,7 @@
             
             console.log('Layout table updated');
         }
+
         function exportToExcel() {
             const wb = XLSX.utils.book_new();
             const ws_data = [
