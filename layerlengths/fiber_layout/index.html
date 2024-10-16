@@ -84,7 +84,7 @@
         <button onclick="exportToExcel()" style="margin-top: 20px;">Export to Excel</button>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
     <script>
         let splitterTitle = "";
         let vaults = {
@@ -97,11 +97,16 @@
             const group = parseInt(document.getElementById('fiberGroup').value);
             const fiberCount = parseInt(document.getElementById('fiberCount').value);
             
+            console.log('Adding vault:', { address, group, fiberCount });
+            
             if (address && group && fiberCount) {
-                vaults[group].push({ address, fiberCount });
+                vaults[group].push({ address, fiberCount, group });  // Added 'group' to the vault object
+                console.log('Updated vaults:', vaults);
                 updateVaultSelect();
                 updateLayoutTable();
                 clearVaultInputs();
+            } else {
+                console.log('Invalid input for adding vault');
             }
         }
 
@@ -113,6 +118,7 @@
                     select.innerHTML += `<option value="${group},${index}">${vault.address}</option>`;
                 });
             });
+            console.log('Updated vault select options');
         }
 
         function clearVaultInputs() {
@@ -126,10 +132,15 @@
             const name = document.getElementById('addressName').value;
             const fiber = parseInt(document.getElementById('fiberNumber').value);
             
+            console.log('Adding address:', { group, vaultIndex, name, fiber });
+            
             if (group && vaultIndex !== undefined && name && fiber) {
                 addresses.push({ group: parseInt(group), vaultIndex: parseInt(vaultIndex), name, fiber });
+                console.log('Updated addresses:', addresses);
                 updateLayoutTable();
                 clearAddressInputs();
+            } else {
+                console.log('Invalid input for adding address');
             }
         }
 
@@ -140,6 +151,7 @@
         }
 
         function updateLayoutTable() {
+            console.log('Updating layout table');
             splitterTitle = document.getElementById('splitterTitle').value;
             const headerRow = document.getElementById('headerRow');
             const layoutBody = document.getElementById('layoutBody');
@@ -163,7 +175,7 @@
                 // Add fiber counts
                 Object.values(vaults).forEach(groupVaults => {
                     groupVaults.forEach(vault => {
-                        groupRow.insertCell().textContent = group === parseInt(vault.group) ? vault.fiberCount : '';
+                        groupRow.insertCell().textContent = vault.group === group ? vault.fiberCount : '';
                     });
                 });
             }
@@ -185,8 +197,9 @@
                     });
                 });
             });
+            
+            console.log('Layout table updated');
         }
-
         function exportToExcel() {
             const wb = XLSX.utils.book_new();
             const ws_data = [
@@ -221,6 +234,8 @@
         // Initialize
         document.getElementById('splitterTitle').addEventListener('input', updateLayoutTable);
         updateLayoutTable();
+
+        console.log('Script initialized');
     </script>
 </body>
 </html>
