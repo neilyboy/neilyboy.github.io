@@ -86,10 +86,54 @@
         </table>
         
         <button onclick="exportToExcel()" style="margin-top: 20px;">Export to Excel</button>
+        <div id="errorMessage" class="error-message"></div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
     <script>
+        let splitterTitle = "";
+        let vaults = {
+            1: [], 2: [], 3: []
+        };
+        let addresses = [];
+
+        function addVault() {
+            const address = document.getElementById('vaultAddress').value.trim();
+            const group = parseInt(document.getElementById('fiberGroup').value);
+            const fiberCount = document.getElementById('fiberCount').value.trim();
+            const errorMessageElement = document.getElementById('errorMessage');
+            
+            console.log('Adding vault:', { address, group, fiberCount });
+            
+            // Reset error message
+            errorMessageElement.textContent = '';
+
+            // Validate inputs
+            if (!address) {
+                errorMessageElement.textContent = 'Please enter a vault address.';
+                return;
+            }
+            if (isNaN(group) || group < 1 || group > 3) {
+                errorMessageElement.textContent = 'Please select a valid fiber group.';
+                return;
+            }
+            if (!fiberCount || isNaN(parseInt(fiberCount))) {
+                errorMessageElement.textContent = 'Please enter a valid number for fiber count.';
+                return;
+            }
+
+            const parsedFiberCount = parseInt(fiberCount);
+            
+            vaults[group].push({ address, fiberCount: parsedFiberCount, group });
+            console.log('Updated vaults:', vaults);
+            updateVaultSelect();
+            updateLayoutTable();
+            clearVaultInputs();
+            
+            // Confirmation message
+            errorMessageElement.textContent = 'Vault added successfully!';
+            errorMessageElement.style.color = 'green';
+        }
         let splitterTitle = "";
         let vaults = {
             1: [], 2: [], 3: []
