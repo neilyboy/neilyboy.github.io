@@ -246,7 +246,7 @@
       console.log('Layout table updated');
     }
 
-function exportToExcel() {
+    function exportToExcel() {
   const wb = XLSX.utils.book_new();
   const ws_data = [
     [splitterTitle, ...Object.values(vaults).flatMap(groupVaults => groupVaults.map(v => v.address))],
@@ -279,8 +279,6 @@ document.getElementById('splitterTitle').addEventListener('input', updateLayoutT
 updateLayoutTable();
 
 console.log('Script initialized');
-
-        console.log('Script initialized');
     </script>
 </body>
 </html>
