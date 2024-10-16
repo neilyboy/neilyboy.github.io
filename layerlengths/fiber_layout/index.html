@@ -1,284 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fiber Layout Manager</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        .container {
-            max-width: 1200px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h1, h2 {
-            color: #333;
-        }
-        input, select, button {
-            margin: 5px 0;
-            padding: 8px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .error-message {
-            color: red;
-            margin-top: 10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fiber Layout Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h1, h2 {
+      color: #333;
+    }
+
+    input, select, button {
+      margin: 5px 0;
+      padding: 8px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .error-message {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Fiber Layout Manager</h1>
-        
-        <h2>Splitter Information</h2>
-        <input type="text" id="splitterTitle" placeholder="Splitter Title">
-        
-        <h2>Add Vault Location</h2>
-        <input type="text" id="vaultAddress" placeholder="Vault Address">
-        <select id="fiberGroup">
-            <option value="1">Group 1 (1-144)</option>
-            <option value="2">Group 2 (145-288)</option>
-            <option value="3">Group 3 (289-432)</option>
-        </select>
-        <input type="number" id="fiberCount" placeholder="Fiber Count">
-        <button onclick="addVault()">Add Vault</button>
-        
-        <h2>Add Address</h2>
-        <select id="vaultSelect"></select>
-        <input type="text" id="addressName" placeholder="Address Name">
-        <input type="number" id="fiberNumber" placeholder="Fiber Number">
-        <button onclick="addAddress()">Add Address</button>
-        
-        <h2>Layout Preview</h2>
-        <table id="layoutTable">
-            <thead>
-                <tr id="headerRow"></tr>
-            </thead>
-            <tbody id="layoutBody"></tbody>
-        </table>
-        
-        <button onclick="exportToExcel()" style="margin-top: 20px;">Export to Excel</button>
-        
-        <div id="errorMessage" class="error-message"></div>
-    </div>
+  <div class="container">
+    <h1>Fiber Layout Manager</h1>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
-    <script>
-        let splitterTitle = "";
-        let vaults = {
-            1: [], 2: [], 3: []
-        };
-        let addresses = [];
+    <h2>Splitter Information</h2>
+    <input type="text" id="splitterTitle" placeholder="Splitter Title">
 
-        function addVault() {
-            const address = document.getElementById('vaultAddress').value.trim();
-            const group = parseInt(document.getElementById('fiberGroup').value);
-            const fiberCount = document.getElementById('fiberCount').value.trim();
-            const errorMessageElement = document.getElementById('errorMessage');
-            
-            console.log('Adding vault:', { address, group, fiberCount });
-            
-            // Reset error message
-            errorMessageElement.textContent = '';
+    <h2>Add Vault Location</h2>
+    <input type="text" id="vaultAddress" placeholder="Vault Address">
+    <input type="text" id="fiberRange" placeholder="Fiber Range (e.g., 1-10)">
+    <button onclick="addVault()">Add Vault</button>
 
-            // Validate inputs
-            if (!address) {
-                errorMessageElement.textContent = 'Please enter a vault address.';
-                return;
-            }
-            if (isNaN(group) || group < 1 || group > 3) {
-                errorMessageElement.textContent = 'Please select a valid fiber group.';
-                return;
-            }
-            if (!fiberCount || isNaN(parseInt(fiberCount))) {
-                errorMessageElement.textContent = 'Please enter a valid number for fiber count.';
-                return;
-            }
+    <h2>Add Address</h2>
+    <select id="vaultSelect"></select>
+    <input type="text" id="addressName" placeholder="Address Name">
+    <input type="number" id="fiberNumber" placeholder="Fiber Number">
+    <button onclick="addAddress()">Add Address</button>
 
-            const parsedFiberCount = parseInt(fiberCount);
-            
-            vaults[group].push({ address, fiberCount: parsedFiberCount, group });
-            console.log('Updated vaults:', vaults);
-            updateVaultSelect();
-            updateLayoutTable();
-            clearVaultInputs();
-            
-            // Confirmation message
-            errorMessageElement.textContent = 'Vault added successfully!';
-            errorMessageElement.style.color = 'green';
-        }
+    <h2>Layout Preview</h2>
+    <table id="layoutTable">
+      <thead>
+        <tr id="headerRow"></tr>
+      </thead>
+      <tbody id="layoutBody"></tbody>
+    </table>
 
-        function updateVaultSelect() {
-            const select = document.getElementById('vaultSelect');
-            select.innerHTML = '<option value="">Select Vault</option>';
-            Object.entries(vaults).forEach(([group, groupVaults]) => {
-                groupVaults.forEach((vault, index) => {
-                    select.innerHTML += `<option value="${group},${index}">${vault.address}</option>`;
-                });
-            });
-            console.log('Updated vault select options');
-        }
+    <button onclick="exportToExcel()" style="margin-top: 20px;">Export to Excel</button>
 
-        function clearVaultInputs() {
-            document.getElementById('vaultAddress').value = '';
-            document.getElementById('fiberGroup').selectedIndex = 0;
-            document.getElementById('fiberCount').value = '';
-        }
+    <div id="errorMessage" class="error-message"></div>
+  </div>
 
-        function addAddress() {
-            const [group, vaultIndex] = document.getElementById('vaultSelect').value.split(',');
-            const name = document.getElementById('addressName').value.trim();
-            const fiber = parseInt(document.getElementById('fiberNumber').value);
-            const errorMessageElement = document.getElementById('errorMessage');
-            
-            console.log('Adding address:', { group, vaultIndex, name, fiber });
-            
-            // Reset error message
-            errorMessageElement.textContent = '';
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+  <script>
+    let splitterTitle = "";
+    let vaults = {
+      1: [], 2: [], 3: []
+    };
+    let addresses = [];
 
-            // Validate inputs
-            if (!group || vaultIndex === undefined) {
-                errorMessageElement.textContent = 'Please select a vault.';
-                return;
-            }
-            if (!name) {
-                errorMessageElement.textContent = 'Please enter an address name.';
-                return;
-            }
-            if (isNaN(fiber) || fiber < 1) {
-                errorMessageElement.textContent = 'Please enter a valid fiber number.';
-                return;
-            }
+    function addVault() {
+      const address = document.getElementById('vaultAddress').value.trim();
+      const fiberRange = document.getElementById('fiberRange').value.trim();
+      const [startFiber, endFiber] = fiberRange.split('-').map(Number);
+      const errorMessageElement = document.getElementById('errorMessage');
 
-            addresses.push({ group: parseInt(group), vaultIndex: parseInt(vaultIndex), name, fiber });
-            console.log('Updated addresses:', addresses);
-            updateLayoutTable();
-            clearAddressInputs();
-            
-            // Confirmation message
-            errorMessageElement.textContent = 'Address added successfully!';
-            errorMessageElement.style.color = 'green';
-        }
+      // Validate inputs
+      if (!address) {
+        errorMessageElement.textContent = 'Please enter a vault address.';
+        return;
+      }
+      if (!fiberRange || isNaN(startFiber) || isNaN(endFiber) || startFiber >= endFiber) {
+        errorMessageElement.textContent = 'Please enter a valid fiber range (e.g., 1-10).';
+        return;
+      }
 
-        function clearAddressInputs() {
-            document.getElementById('vaultSelect').selectedIndex = 0;
-            document.getElementById('addressName').value = '';
-            document.getElementById('fiberNumber').value = '';
-        }
+      const parsedFiberCount = endFiber - startFiber + 1;
 
-        function updateLayoutTable() {
-            console.log('Updating layout table');
-            splitterTitle = document.getElementById('splitterTitle').value;
-            const headerRow = document.getElementById('headerRow');
-            const layoutBody = document.getElementById('layoutBody');
-            headerRow.innerHTML = `<th>${splitterTitle}</th>`;
-            layoutBody.innerHTML = '';
+      // Add vault to the appropriate group
+      vaults[group].push({ address, fiberRange, fiberCount: parsedFiberCount });
 
-            // Add vault headers
-            Object.values(vaults).forEach(groupVaults => {
-                groupVaults.forEach(vault => {
-                    headerRow.innerHTML += `<th>${vault.address}</th>`;
-                });
-            });
+      // Update vault select options
+      updateVaultSelect();
 
-            // Add group rows
-            for (let group = 1; group <= 3; group++) {
-                const startFiber = (group - 1) * 144 + 1;
-                const endFiber = group * 144;
-                const groupRow = layoutBody.insertRow();
-                groupRow.insertCell(0).textContent = `Group ${group} (${startFiber}-${endFiber})`;
+      // Update layout table
+      updateLayoutTable();
 
-                // Add fiber counts
-                Object.values(vaults).forEach(groupVaults => {
-                    groupVaults.forEach(vault => {
-                        groupRow.insertCell().textContent = vault.group === group ? vault.fiberCount : '';
-                    });
-                });
-            }
+      // Clear vault inputs
+      clearVaultInputs();
 
-            // Add address rows
-            addresses.forEach(address => {
-                const addressRow = layoutBody.insertRow();
-                addressRow.insertCell(0).textContent = address.name;
-                
-                let cellIndex = 1;
-                Object.entries(vaults).forEach(([group, groupVaults]) => {
-                    groupVaults.forEach((vault, vaultIndex) => {
-                        if (parseInt(group) === address.group && vaultIndex === address.vaultIndex) {
-                            addressRow.insertCell(cellIndex).textContent = address.fiber;
-                        } else {
-                            addressRow.insertCell(cellIndex).textContent = '';
-                        }
-                        cellIndex++;
-                    });
-                });
-            });
-            
-            console.log('Layout table updated');
-        }
+      // Display success message
+      errorMessageElement.textContent = 'Vault added successfully!';
+      errorMessageElement.style.color = 'green';
+    }
 
-        function exportToExcel() {
-            const wb = XLSX.utils.book_new();
-            const ws_data = [
-                [splitterTitle, ...Object.values(vaults).flatMap(groupVaults => groupVaults.map(v => v.address))],
-                [], // Empty row for future use
-                [], // Empty row for future use
-                ['Group 1 (1-144)', ...Object.values(vaults).flatMap(groupVaults => groupVaults.map(v => v.group === 1 ? v.fiberCount : ''))],
-                ['Group 2 (145-288)', ...Object.values(vaults).flatMap(groupVaults => groupVaults.map(v => v.group === 2 ? v.fiberCount : ''))],
-                ['Group 3 (289-432)', ...Object.values(vaults).flatMap(groupVaults => groupVaults.map(v => v.group === 3 ? v.fiberCount : ''))]
-            ];
+    function updateVaultSelect() {
+      const select = document.getElementById('vaultSelect');
+      select.innerHTML = '<option value="">Select Vault</option>';
+      Object.entries(vaults).forEach(([group, groupVaults]) => {
+        groupVaults.forEach((vault, index) => {
+          select.innerHTML += `<option value="<span class="math-inline">\{group\},</span>{index}">${vault.address}</option>`;
+        });
+      });
+    }
 
-            // Add address rows
-            addresses.forEach(address => {
-                const row = [address.name];
-                Object.entries(vaults).forEach(([group, groupVaults]) => {
-                    groupVaults.forEach((vault, vaultIndex) => {
-                        if (parseInt(group) === address.group && vaultIndex === address.vaultIndex) {
-                            row.push(address.fiber);
-                        } else {
-                            row.push('');
-                        }
-                    });
-                });
-                ws_data.push(row);
-            });
+    function clearVaultInputs() {
+      document.getElementById('vaultAddress').value = '';
+      document.getElementById('fiberRange').value = '';
+    }
 
-            const ws = XLSX.utils.aoa_to_sheet(ws_data);
-            XLSX.utils.book_append_sheet(wb, ws, "Fiber Layout");
-            XLSX.writeFile(wb, "fiber_layout.xlsx");
-        }
+    function addAddress() {
+      const [group, vaultIndex] = document.getElementById('vaultSelect').value.split(',');
+      const name = document.getElementById('addressName').value.trim();
+      const fiberNumber = parseInt(document.getElementById('fiberNumber').value);
+      const errorMessageElement = document.getElementById('errorMessage');
 
-        // Initialize
-        document.getElementById('splitterTitle').addEventListener('input', updateLayoutTable);
-        updateLayoutTable();
+      // Validate inputs
+      if (!group || vaultIndex === undefined) {
+        errorMessageElement.textContent = 'Please select a vault.';
+        return;
+      }
+      if (!name) {
+        errorMessageElement.textContent = 'Please enter an address name.';
+        return;
+      }
+      if (isNaN(fiberNumber) || fiberNumber < 1) {
+        errorMessageElement.textContent = 'Please enter a valid fiber number.';
+        return;
+      }
+
+      // Validate fiber number within range
+      const vault = vaults[group][vaultIndex];
+      const [startFiber, endFiber] = vault.fiberRange.split('-').map(Number);
+      if (fiberNumber < startFiber || fiberNumber > endFiber) {
+        errorMessageElement.textContent = 'Please enter a fiber number within the specified range.';
+        return;
+      }
+
+      // Add address to the vault
+      vault.addresses.push({ name, fiberNumber });
+
+      // Update layout table
+      updateLayoutTable();
+
+      // Clear address inputs
+      clearAddressInputs();
+
+      // Display success message
+      errorMessageElement.textContent = 'Address added successfully!';
+      errorMessageElement.style.color = 'green';
+    }
+
+    function clearAddressInputs() {
+      document.getElementById('vaultSelect').selectedIndex = 0;
+      document.getElementById('addressName').value = '';
+      document.getElementById('fiberNumber').value = '';
+    }
+
+    function updateLayoutTable() {
+      splitterTitle = document.getElementById('splitterTitle').value;
+      const headerRow = document.getElementById('headerRow');
+      const layoutBody = document.getElementById('layoutBody');
+      headerRow.innerHTML = `<th>${splitterTitle}</th>`;
+      layoutBody.innerHTML = '';
+
+      // Add vault headers
+      Object.values(vaults).forEach(groupVaults => {
+        groupVaults.forEach(vault => {
+          headerRow.innerHTML += `<th>${vault.address}</th>`;
+        });
+      });
+
+      // Add group rows
+      for (let group = 1; group <= 3; group++) {
+        const startFiber = (group - 1) * 144 + 1;
+        const endFiber = group * 144;
+        const groupRow = layoutBody.insertRow();
+        groupRow.insertCell(0).textContent = `Group <span class="math-inline">\{group\} \(</span>{startFiber}-${endFiber})`;
+
+        // Add fiber counts
+        Object.values(vaults).forEach(groupVaults => {
+          groupVaults.forEach(vault => {
+            groupRow.insertCell().textContent = vault.group === group ? vault.fiberCount : '';
+          });
+        });
+      }
+
+      // Add address rows
+      Object.values(vaults).forEach((groupVaults, groupIndex) => {
+        groupVaults.forEach((vault, vaultIndex) => {
+          const addressRow = layoutBody.insertRow();
+          addressRow.insertCell(0).textContent = vault.addresses.length ? 'Addresses' : '';
+
+          // Add address cells
+          vault.addresses.forEach(address => {
+            addressRow.insertCell().textContent = address.name;
+            addressRow.insertCell().textContent = address.fiberNumber;
+          });
+        });
+      });
+
+      console.log('Layout table updated');
+    }
+
+function exportToExcel() {
+  const wb = XLSX.utils.book_new();
+  const ws_data = [
+    [splitterTitle, ...Object.values(vaults).flatMap(groupVaults => groupVaults.map(v => v.address))],
+    [], // Empty row for future use
+    [], // Empty row for future use,
+    ['Group 1 (1-144)', ...Object.values(vaults).flatMap(groupVaults => groupVaults.map(v => v.group === 1 ? v.fiberCount : ''))],
+    ['Group 2 (145-288)', ...Object.values(vaults).flatMap(groupVaults => groupVaults.map(v => v.group === 2 ? v.fiberCount : ''))],
+    ['Group 3 (289-432)', ...Object.values(vaults).flatMap(groupVaults => groupVaults.map(v => v.group === 3 ? v.fiberCount : ''))]
+  ];
+
+  // Add address rows
+  Object.values(vaults).forEach((groupVaults, groupIndex) => {
+    groupVaults.forEach((vault, vaultIndex) => {
+      const row = [vault.addresses.length ? 'Addresses' : ''];
+      vault.addresses.forEach(address => {
+        row.push(address.name);
+        row.push(address.fiberNumber);
+      });
+      ws_data.push(row);
+    });
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+  XLSX.utils.book_append_sheet(wb, ws, "Fiber Layout");
+  XLSX.writeFile(wb, "fiber_layout.xlsx");
+}
+
+// Initialize
+document.getElementById('splitterTitle').addEventListener('input', updateLayoutTable);
+updateLayoutTable();
+
+console.log('Script initialized');
 
         console.log('Script initialized');
     </script>
