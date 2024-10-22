@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const API_URL = 'http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard';
+    const API_URL = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard';
 
     // Function to fetch data from the API
     function fetchScoreboard() {
