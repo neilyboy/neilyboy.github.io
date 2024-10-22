@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const API_URL = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?week='; // Add ?week= to specify weeks
-    const totalWeeks = 18; // Regular season has 18 weeks
+    const API_URL = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?week=';
+    const totalWeeks = 18;
 
     // Function to fetch data for a specific week
     function fetchWeekScoreboard(week) {
@@ -11,8 +11,35 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Function to display the scoreboard data
-    function displayScoreboard(events) {
-        const tbody = document.querySelector("#scoreboard tbody");
+    function displayScoreboard(week, events) {
+        const scoreboard = document.getElementById("scoreboard");
+
+        // Create week header and table
+        const weekContainer = document.createElement("div");
+
+        const weekHeader = document.createElement("div");
+        weekHeader.classList.add("week-header");
+        weekHeader.innerHTML = `
+            <span>Week ${week}</span>
+            <i class="mdi mdi-chevron-right"></i>
+        `;
+
+        const table = document.createElement("table");
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Home Team</th>
+                    <th>Home Score</th>
+                    <th>Away Team</th>
+                    <th>Away Score</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        `;
+
+        const tbody = table.querySelector("tbody");
 
         events.forEach(event => {
             const date = new Date(event.date).toLocaleDateString();
@@ -34,16 +61,30 @@ document.addEventListener("DOMContentLoaded", function() {
 
             tbody.appendChild(row);
         });
+
+        // Add click event for toggling table visibility
+        weekHeader.addEventListener("click", function() {
+            table.classList.toggle("show");
+
+            // Toggle the arrow icon
+            const icon = weekHeader.querySelector(".mdi");
+            if (table.classList.contains("show")) {
+                icon.classList.add("mdi-rotate-down");
+            } else {
+                icon.classList.remove("mdi-rotate-down");
+            }
+        });
+
+        weekContainer.appendChild(weekHeader);
+        weekContainer.appendChild(table);
+        scoreboard.appendChild(weekContainer);
     }
 
     // Fetch and display data for all weeks
     async function fetchAllWeeks() {
-        const tbody = document.querySelector("#scoreboard tbody");
-        tbody.innerHTML = ""; // Clear any existing rows before loading all weeks
-
         for (let week = 1; week <= totalWeeks; week++) {
             const events = await fetchWeekScoreboard(week);
-            displayScoreboard(events);
+            displayScoreboard(week, events);
         }
     }
 
