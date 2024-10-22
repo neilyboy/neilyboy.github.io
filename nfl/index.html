@@ -1,41 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NFL Scoreboard</title>
-    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/7.0.96/css/materialdesignicons.min.css">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NFL Pick'em Pool</title>
+  <!-- Add your CSS here for styling -->
+  <style>
+    /* Add your CSS styling */
+    #auth-section, #pick-section, #leaderboard-section {
+      margin-bottom: 20px;
+    }
+    #games-list div {
+      margin-bottom: 10px;
+    }
+    #leaderboard-section table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #leaderboard-section th, #leaderboard-section td {
+      padding: 8px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
 
-    <div id="auth-section">
-  <!-- Signup Form -->
-  <div id="signup-form" style="display:none;">
-    <h2>Sign Up</h2>
-    <input type="email" id="signup-email" placeholder="Email">
-    <input type="password" id="signup-password" placeholder="Password">
-    <button id="signup-btn">Sign Up</button>
-  </div>
-
-  <!-- Login Form -->
-  <div id="login-form">
-    <h2>Login</h2>
-    <input type="email" id="login-email" placeholder="Email">
-    <input type="password" id="login-password" placeholder="Password">
-    <button id="login-btn">Login</button>
-  </div>
-
-  <!-- Logout Button -->
-  <button id="logout-btn" style="display:none;">Logout</button>
-</div>
-
-    <div class="container">
-        <h1>NFL Scoreboard - 2024 Season</h1>
-        <div id="scoreboard">
-            <!-- Week tables will be inserted here dynamically -->
-        </div>
+  <!-- User Authentication Section -->
+  <div id="auth-section">
+    <div id="signup-form" style="display:none;">
+      <h2>Sign Up</h2>
+      <input type="email" id="signup-email" placeholder="Email">
+      <input type="password" id="signup-password" placeholder="Password">
+      <button id="signup-btn">Sign Up</button>
     </div>
-    <script src="script.js"></script>
+
+    <div id="login-form">
+      <h2>Login</h2>
+      <input type="email" id="login-email" placeholder="Email">
+      <input type="password" id="login-password" placeholder="Password">
+      <button id="login-btn">Login</button>
+    </div>
+
+    <button id="logout-btn" style="display:none;">Logout</button>
+  </div>
+
+  <!-- Pick Submission Section -->
+  <div id="pick-section" style="display:none;">
+    <h2>Make Your Picks for Week <span id="current-week"></span></h2>
+    <form id="picks-form">
+      <div id="games-list"></div>
+      <input type="number" id="tie-breaker" placeholder="Total Monday Night Points" required>
+      <button type="submit">Submit Picks</button>
+    </form>
+  </div>
+
+  <!-- Leaderboard Section -->
+  <div id="leaderboard-section" style="display:none;">
+    <h2>Leaderboard</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Correct Picks</th>
+          <th>Tie Breaker (Closest)</th>
+        </tr>
+      </thead>
+      <tbody id="leaderboard-body">
+        <!-- Dynamically populated leaderboard rows -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Add Firebase JS SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"></script>
+
+  <!-- Main Script -->
+  <script>
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // User Authentication Handlers
+    document.getElementById('signup-btn').addEventListener('click', () => {
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(userCredential => {
+          console.log('User signed up:', userCredential.user);
+          db.collection('users').doc(userCredential.user.uid).set({
+            email: email,
+            displayName: email.split('@')[0]
+          });
+          showLoggedInUI();
+        })
+        .catch(error => {
+          console.error('Error during signup:', error);
+        });
+    });
+
+    document.getElementById('login-btn').addEventListener('click', () => {
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then(userCredential => {
+          console.log('User logged in:', userCredential.user);
+          showLoggedInUI();
+        })
+        .catch(error => {
+          console.error('Error during login:', error);
+        });
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      auth.signOut().then(() => {
+        console.log('User logged out');
+        showLoggedOutUI();
+      });
+    });
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        console.log('User is logged in:', user);
+        showLoggedInUI();
+        loadGamesForCurrentWeek(); // Load games if logged in
+      } else {
+        console.log('No user logged in');
+        showLoggedOutUI();
+      }
+    });
+
+    function showLoggedInUI() {
+      document.getElementById('signup-form').style.display = 'none';
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('logout-btn').style.display = 'block';
+      document.getElementById('pick-section').style.display = 'block';
+      document.getElementById('leaderboard-section').style.display = 'block';
+    }
+
+    function showLoggedOutUI() {
+      document.getElementById('signup-form').style.display = 'block';
+      document.getElementById('login-form').style.display = 'block';
+      document.getElementById('logout-btn').style.display = 'none';
+      document.getElementById('pick-section').style.display = 'none';
+      document.getElementById('leaderboard-section').style.display = 'none';
+    }
+
+    // Fetching NFL games for the current week
+    function loadGamesForCurrentWeek() {
+      const week = 1; // Dynamically set based on API or user selection
+      document.getElementById('current-week').textContent = week;
+
+      const url = `https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?week=${week}`;
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          const gamesList = document.getElementById('games-list');
+          gamesList.innerHTML = ''; // Clear any previous games
+
+          data.events.forEach(game => {
+            const gameId = game.id;
+            const homeTeam = game.competitions[0].competitors[0];
+            const awayTeam = game.competitions[0].competitors[1];
+
+            const gameItem = `
+              <div>
+                <label>
+                  ${awayTeam.team.displayName} vs ${homeTeam.team.displayName}
+                  <select data-game-id="${gameId}">
+                    <option value="${awayTeam.team.displayName}">${awayTeam.team.displayName}</option>
+                    <option value="${homeTeam.team.displayName}">${homeTeam.team.displayName}</option>
+                  </select>
+                </label>
+              </div>
+            `;
+            gamesList.insertAdjacentHTML('beforeend', gameItem);
+          });
+        });
+    }
+
+    // Handle Pick Submission
+    document.getElementById('picks-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const user = auth.currentUser;
+      if (!user) {
+        alert('You must be logged in to submit picks!');
+        return;
+      }
+
+      const week = 1; // Set this dynamically
+      const tieBreaker = document.getElementById('tie-breaker').value;
+      const picks = [];
+
+      document.querySelectorAll('#games-list select').forEach(select => {
+        const gameId = select.getAttribute('data-game-id');
+        const teamPicked = select.value;
+        picks.push({ gameId, teamPicked });
+      });
+
+      db.collection('picks').doc(user.uid).set({
+        week: week,
+        picks: picks,
+        tieBreaker: tieBreaker
+      }).then(() => {
+        console.log('Picks submitted successfully');
+        alert('Your picks have been submitted!');
+      }).catch(error => {
+        console.error('Error submitting picks:', error);
+      });
+    });
+
+    // Leaderboard logic to be implemented here - fetching scores, calculating correct picks, etc.
+
+  </script>
 </body>
 </html>
