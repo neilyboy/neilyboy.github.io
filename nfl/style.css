@@ -1,5 +1,5 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
     background-color: #f4f4f9;
     margin: 0;
     padding: 20px;
@@ -20,10 +20,36 @@ h1 {
     color: #333;
 }
 
+.week-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    margin-top: 20px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.week-header:hover {
+    background-color: #444;
+}
+
+.mdi {
+    font-size: 24px;
+    transition: transform 0.3s ease;
+}
+
+.mdi-rotate-down {
+    transform: rotate(90deg);
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 10px;
+    display: none; /* Hidden by default */
 }
 
 table, th, td {
@@ -36,10 +62,14 @@ th, td {
 }
 
 th {
-    background-color: #333;
+    background-color: #666;
     color: white;
 }
 
 tr:nth-child(even) {
     background-color: #f2f2f2;
+}
+
+.show {
+    display: table; /* Show table when week is expanded */
 }
