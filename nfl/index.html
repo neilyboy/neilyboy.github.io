@@ -6,8 +6,93 @@
   <title>NFL Pick'em Pool</title>
   <!-- Add your CSS here for styling -->
   <style>
-    /* Add your CSS styling */
-    #auth-section, #pick-section, #leaderboard-section {
+    body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.week-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    margin-top: 20px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.week-header:hover {
+    background-color: #444;
+}
+
+.mdi {
+    font-size: 24px;
+    transition: transform 0.3s ease;
+}
+
+.mdi-rotate-down {
+    transform: rotate(90deg);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    display: none; /* Hidden by default */
+}
+
+table, th, td {
+    border: 1px solid #ccc;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background-color: #666;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.show {
+    display: table; /* Show table when week is expanded */
+}
+
+/* Style for team logos */
+.team-logo {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+td img {
+    border-radius: 50%;
+}    #auth-section, #pick-section, #leaderboard-section {
       margin-bottom: 20px;
     }
     #games-list div {
