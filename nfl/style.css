@@ -73,3 +73,15 @@ tr:nth-child(even) {
 .show {
     display: table; /* Show table when week is expanded */
 }
+
+/* Style for team logos */
+.team-logo {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+td img {
+    border-radius: 50%;
+}
