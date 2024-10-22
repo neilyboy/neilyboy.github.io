@@ -43,18 +43,25 @@ document.addEventListener("DOMContentLoaded", function() {
 
         events.forEach(event => {
             const date = new Date(event.date).toLocaleDateString();
-            const homeTeam = event.competitions[0].competitors.find(team => team.homeAway === 'home').team.displayName;
-            const homeScore = event.competitions[0].competitors.find(team => team.homeAway === 'home').score || '-';
-            const awayTeam = event.competitions[0].competitors.find(team => team.homeAway === 'away').team.displayName;
-            const awayScore = event.competitions[0].competitors.find(team => team.homeAway === 'away').score || '-';
+            const homeTeam = event.competitions[0].competitors.find(team => team.homeAway === 'home');
+            const awayTeam = event.competitions[0].competitors.find(team => team.homeAway === 'away');
+            
+            const homeTeamName = homeTeam.team.displayName;
+            const homeTeamLogo = homeTeam.team.logo;
+            const homeScore = homeTeam.score || '-';
+            
+            const awayTeamName = awayTeam.team.displayName;
+            const awayTeamLogo = awayTeam.team.logo;
+            const awayScore = awayTeam.score || '-';
+
             const status = event.status.type.shortDetail;
 
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${date}</td>
-                <td>${homeTeam}</td>
+                <td><img src="${homeTeamLogo}" alt="${homeTeamName} Logo" class="team-logo"> ${homeTeamName}</td>
                 <td>${homeScore}</td>
-                <td>${awayTeam}</td>
+                <td><img src="${awayTeamLogo}" alt="${awayTeamName} Logo" class="team-logo"> ${awayTeamName}</td>
                 <td>${awayScore}</td>
                 <td>${status}</td>
             `;
