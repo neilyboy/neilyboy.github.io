@@ -1,100 +1,92 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const API_URL = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?week=';
-    const totalWeeks = 18;
+// Firebase config
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
 
-    // Function to fetch data for a specific week
-    function fetchWeekScoreboard(week) {
-        return fetch(`${API_URL}${week}`)
-            .then(response => response.json())
-            .then(data => data.events)
-            .catch(error => console.error(`Error fetching data for week ${week}:`, error));
-    }
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-    // Function to display the scoreboard data
-    function displayScoreboard(week, events) {
-        const scoreboard = document.getElementById("scoreboard");
-
-        // Create week header and table
-        const weekContainer = document.createElement("div");
-
-        const weekHeader = document.createElement("div");
-        weekHeader.classList.add("week-header");
-        weekHeader.innerHTML = `
-            <span>Week ${week}</span>
-            <i class="mdi mdi-chevron-right"></i>
-        `;
-
-        const table = document.createElement("table");
-        table.innerHTML = `
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Home Team</th>
-                    <th>Home Score</th>
-                    <th>Away Team</th>
-                    <th>Away Score</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        `;
-
-        const tbody = table.querySelector("tbody");
-
-        events.forEach(event => {
-            const date = new Date(event.date).toLocaleDateString();
-            const homeTeam = event.competitions[0].competitors.find(team => team.homeAway === 'home');
-            const awayTeam = event.competitions[0].competitors.find(team => team.homeAway === 'away');
-            
-            const homeTeamName = homeTeam.team.displayName;
-            const homeTeamLogo = homeTeam.team.logo;
-            const homeScore = homeTeam.score || '-';
-            
-            const awayTeamName = awayTeam.team.displayName;
-            const awayTeamLogo = awayTeam.team.logo;
-            const awayScore = awayTeam.score || '-';
-
-            const status = event.status.type.shortDetail;
-
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${date}</td>
-                <td><img src="${homeTeamLogo}" alt="${homeTeamName} Logo" class="team-logo"> ${homeTeamName}</td>
-                <td>${homeScore}</td>
-                <td><img src="${awayTeamLogo}" alt="${awayTeamName} Logo" class="team-logo"> ${awayTeamName}</td>
-                <td>${awayScore}</td>
-                <td>${status}</td>
-            `;
-
-            tbody.appendChild(row);
-        });
-
-        // Add click event for toggling table visibility
-        weekHeader.addEventListener("click", function() {
-            table.classList.toggle("show");
-
-            // Toggle the arrow icon
-            const icon = weekHeader.querySelector(".mdi");
-            if (table.classList.contains("show")) {
-                icon.classList.add("mdi-rotate-down");
-            } else {
-                icon.classList.remove("mdi-rotate-down");
-            }
-        });
-
-        weekContainer.appendChild(weekHeader);
-        weekContainer.appendChild(table);
-        scoreboard.appendChild(weekContainer);
-    }
-
-    // Fetch and display data for all weeks
-    async function fetchAllWeeks() {
-        for (let week = 1; week <= totalWeeks; week++) {
-            const events = await fetchWeekScoreboard(week);
-            displayScoreboard(week, events);
-        }
-    }
-
-    // Fetch and display all weeks on page load
-    fetchAllWeeks();
+// Toggle between Login and Sign Up forms
+document.getElementById('go-to-signup').addEventListener('click', () => {
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('signup-form').style.display = 'block';
 });
+
+document.getElementById('go-to-login').addEventListener('click', () => {
+  document.getElementById('signup-form').style.display = 'none';
+  document.getElementById('login-form').style.display = 'block';
+});
+
+// Sign Up User
+document.getElementById('signup-btn').addEventListener('click', () => {
+  const email = document.getElementById('signup-email').value;
+  const password = document.getElementById('signup-password').value;
+
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(userCredential => {
+      console.log('User signed up:', userCredential.user);
+      showLoggedInUI();
+    })
+    .catch(error => {
+      console.error('Error during signup:', error);
+    });
+});
+
+// Login User
+document.getElementById('login-btn').addEventListener('click', () => {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then(userCredential => {
+      console.log('User logged in:', userCredential.user);
+      showLoggedInUI();
+    })
+    .catch(error => {
+      console.error('Error during login:', error);
+    });
+});
+
+// Logout User
+document.getElementById('logout-btn').addEventListener('click', () => {
+  auth.signOut().then(() => {
+    console.log('User logged out');
+    showLoggedOutUI();
+  });
+});
+
+// Auth state listener
+auth.onAuthStateChanged(user => {
+  if (user) {
+    console.log('User is logged in:', user);
+    showLoggedInUI();
+  } else {
+    console.log('No user logged in');
+    showLoggedOutUI();
+  }
+});
+
+// Show the UI when a user is logged in
+function showLoggedInUI() {
+  document.getElementById('signup-form').style.display = 'none';
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('logout-btn').style.display = 'block';
+  document.getElementById('pick-section').style.display = 'block';
+  document.getElementById('leaderboard-section').style.display = 'block';
+}
+
+// Show the UI when no user is logged in
+function showLoggedOutUI() {
+  document.getElementById('signup-form').style.display = 'none';
+  document.getElementById('login-form').style.display = 'block';
+  document.getElementById('logout-btn').style.display = 'none';
+  document.getElementById('pick-section').style.display = 'none';
+  document.getElementById('leaderboard-section').style.display = 'none';
+}
