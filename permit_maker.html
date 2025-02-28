@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Permit Map Editor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
     <style>
         * {
@@ -120,6 +121,11 @@
         #drawing-tools button.active {
             background-color: #e6f2ff;
             border-color: #0078D7;
+        }
+        
+        #drawing-tools button i {
+            color: #333;
+            font-size: 16px;
         }
         
         .tool-group {
@@ -422,15 +428,6 @@
         </div>
     </div>
     
-    <div id="pdf-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" id="close-pdf">&times;</span>
-            <h2>PDF Preview</h2>
-            <button id="download-pdf">Download PDF</button>
-            <div id="pdf-preview"></div>
-        </div>
-    </div>
-    
     <div id="text-input-modal" class="modal">
         <div class="modal-content" style="max-width: 400px;">
             <span class="close" id="close-text-input">&times;</span>
@@ -456,20 +453,42 @@
             const drawnItems = new L.FeatureGroup();
             map.addLayer(drawnItems);
             
-            // Drawing control
-            const drawControl = new L.Control.Draw({
-                edit: {
-                    featureGroup: drawnItems
-                },
+            // Drawing control options
+            const drawControlOptions = {
+                position: 'topright',
                 draw: {
-                    polygon: true,
-                    polyline: true,
-                    rectangle: true,
-                    circle: true,
-                    marker: true,
-                    circlemarker: false
+                    polyline: {
+                        shapeOptions: {
+                            color: '#ff0000',
+                            weight: 3
+                        }
+                    },
+                    polygon: {
+                        allowIntersection: false,
+                        shapeOptions: {
+                            color: '#ff0000'
+                        }
+                    },
+                    circle: {
+                        shapeOptions: {
+                            color: '#ff0000'
+                        }
+                    },
+                    rectangle: {
+                        shapeOptions: {
+                            color: '#ff0000'
+                        }
+                    },
+                    marker: true
+                },
+                edit: {
+                    featureGroup: drawnItems,
+                    remove: true
                 }
-            });
+            };
+            
+            // Initialize the drawing control
+            const drawControl = new L.Control.Draw(drawControlOptions);
             
             // Current drawing tool and color
             let currentTool = 'pan';
@@ -540,6 +559,17 @@
                 // Color picker
                 document.getElementById('color-picker').addEventListener('change', (e) => {
                     currentColor = e.target.value;
+                    
+                    // Update drawing options with new color
+                    drawControlOptions.draw.polyline.shapeOptions.color = currentColor;
+                    drawControlOptions.draw.polygon.shapeOptions.color = currentColor;
+                    drawControlOptions.draw.rectangle.shapeOptions.color = currentColor;
+                    drawControlOptions.draw.circle.shapeOptions.color = currentColor;
+                    
+                    // If a tool is active, reactivate it with the new color
+                    if (currentTool !== 'pan' && currentTool !== 'text') {
+                        setActiveTool(currentTool);
+                    }
                 });
                 
                 // Search functionality
@@ -561,18 +591,10 @@
                 document.getElementById('save-project').addEventListener('click', saveCurrentProject);
                 document.getElementById('export-pdf').addEventListener('click', showPdfPreview);
                 
-                // Modal close buttons
-                document.getElementById('close-pdf').addEventListener('click', () => {
-                    document.getElementById('pdf-modal').style.display = 'none';
-                });
+                // Text input modal events
                 document.getElementById('close-text-input').addEventListener('click', () => {
                     document.getElementById('text-input-modal').style.display = 'none';
                 });
-                
-                // Download PDF
-                document.getElementById('download-pdf').addEventListener('click', downloadPdf);
-                
-                // Text input
                 document.getElementById('add-text').addEventListener('click', addTextToMap);
                 
                 // Input field updates
@@ -625,6 +647,18 @@
                 // Enable/disable map dragging based on tool
                 if (tool === 'pan') {
                     map.dragging.enable();
+                    // Remove any active draw handlers
+                    if (map.pm && map.pm.Draw) {
+                        map.pm.disableDraw();
+                    }
+                    // Remove Leaflet.draw handlers if any
+                    if (map._toolbars && map._toolbars.draw) {
+                        map._toolbars.draw._modes.each(mode => {
+                            if (mode.handler && mode.handler.enabled()) {
+                                mode.handler.disable();
+                            }
+                        });
+                    }
                 } else {
                     map.dragging.disable();
                     
@@ -632,6 +666,43 @@
                         document.getElementById('text-input-modal').style.display = 'flex';
                         document.getElementById('text-input').value = '';
                         document.getElementById('text-input').focus();
+                    } else {
+                        // Activate the appropriate drawing tool
+                        let drawingTool;
+                        
+                        switch(tool) {
+                            case 'pencil':
+                                // For pencil, use polyline
+                                new L.Draw.Polyline(map, {
+                                    shapeOptions: {
+                                        color: currentColor,
+                                        weight: 3
+                                    }
+                                }).enable();
+                                break;
+                            case 'line':
+                                new L.Draw.Polyline(map, {
+                                    shapeOptions: {
+                                        color: currentColor,
+                                        weight: 3
+                                    }
+                                }).enable();
+                                break;
+                            case 'rectangle':
+                                new L.Draw.Rectangle(map, {
+                                    shapeOptions: {
+                                        color: currentColor
+                                    }
+                                }).enable();
+                                break;
+                            case 'circle':
+                                new L.Draw.Circle(map, {
+                                    shapeOptions: {
+                                        color: currentColor
+                                    }
+                                }).enable();
+                                break;
+                        }
                     }
                 }
             }
@@ -955,187 +1026,466 @@
             
             // Show PDF preview
             function showPdfPreview() {
-                document.getElementById('pdf-modal').style.display = 'flex';
                 generatePdf();
             }
             
             // Generate PDF
             function generatePdf() {
-                // Create a canvas for the map
-                const canvas = document.createElement('canvas');
-                canvas.width = 1000;
-                canvas.height = 700;
-                const ctx = canvas.getContext('2d');
+                // Get map dimensions
+                const mapSize = map.getSize();
+                const width = mapSize.x;
+                const height = mapSize.y;
                 
-                // Draw map background (simplified for demo)
-                ctx.fillStyle = '#F2F2F2';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                // Create hidden canvas
+                const hiddenCanvas = document.createElement('canvas');
+                document.body.appendChild(hiddenCanvas);
+                hiddenCanvas.style.display = 'none';
+                hiddenCanvas.width = mapSize.x;
+                hiddenCanvas.height = mapSize.y;
                 
-                // Get a screenshot of the map using Leaflet's rendering
-                html2canvas(document.getElementById('map'), {
-                    useCORS: true
-                }).then(function(mapCanvas) {
-                    ctx.drawImage(mapCanvas, 50, 100, 900, 500);
+                try {
+                    // Temporarily hide the overlay pane to capture only the base map
+                    const overlayPane = document.querySelector('.leaflet-overlay-pane');
+                    const overlayStyle = overlayPane ? overlayPane.style.display : null;
+                    if (overlayPane) {
+                        overlayPane.style.display = 'none';
+                    }
                     
-                    // Draw header
-                    ctx.fillStyle = '#000000';
-                    ctx.font = 'bold 24px Arial';
-                    const projectName = document.getElementById('project-name').value || 'Untitled Project';
-                    ctx.fillText(projectName.toUpperCase(), 50, 50);
-                    
-                    // Draw company info section
-                    ctx.font = '12px Arial';
-                    const companyName = document.getElementById('company-name').value || '';
-                    const companyAddress = document.getElementById('company-address').value || '';
-                    
-                    if (state.companyLogo) {
-                        const img = new Image();
-                        img.onload = function() {
-                            ctx.drawImage(img, 50, 620, 100, 50);
+                    // First capture only the base map (without overlays)
+                    html2canvas(document.getElementById('map'), {
+                        useCORS: true,
+                        allowTaint: true,
+                        scale: 2,
+                    }).then(baseMapCanvas => {
+                        // Restore overlay pane
+                        if (overlayPane) {
+                            overlayPane.style.display = overlayStyle || '';
+                        }
+                        
+                        // Create context for our hidden canvas
+                        const ctx = hiddenCanvas.getContext('2d');
+                        
+                        // Draw the base map to our hidden canvas
+                        ctx.drawImage(baseMapCanvas, 0, 0, hiddenCanvas.width, hiddenCanvas.height);
+                        
+                        // Apply desaturation to the base map
+                        const imageData = ctx.getImageData(0, 0, width, height);
+                        const data = imageData.data;
+                        
+                        // Saturation level for the base map
+                        const saturationLevel = 0.3; // 30% of original saturation
+                        
+                        // Apply desaturation to all pixels of the base map
+                        for (let i = 0; i < data.length; i += 4) {
+                            const r = data[i];
+                            const g = data[i + 1];
+                            const b = data[i + 2];
                             
-                            // Draw company info
-                            ctx.fillText(companyName, 160, 630);
-                            ctx.fillText(companyAddress, 160, 650);
-                            
-                            // Draw page number
-                            const pageNumber = document.getElementById('page-number').value || '1';
-                            const totalPages = document.getElementById('total-pages').value || '1';
-                            ctx.fillText(`Page ${pageNumber} of ${totalPages}`, 900, 650);
-                            
-                            // Draw drawn by
-                            const drawnBy = document.getElementById('drawn-by').value || '';
-                            const dateDrawn = document.getElementById('date-drawn').value || '';
-                            ctx.fillText(`Drawn by: ${drawnBy}, ${dateDrawn}`, 700, 670);
-                            
-                            // Draw compass rose
-                            const compass = new Image();
-                            compass.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMzMzIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNNTAgNSB2IDkwIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik01IDUwIGggOTAiIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iNTAiIHk9IjE1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIj5OPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSI5NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMiI+UzwvdGV4dD48dGV4dCB4PSI4NSIgeT0iNTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTIiPkU8L3RleHQ+PHRleHQgeD0iMTUiIHk9IjUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIj5XPC90ZXh0Pjwvc3ZnPg==';
-                            compass.onload = function() {
-                                ctx.drawImage(compass, 900, 60, 50, 50);
-                                
-                                // Draw legend
-                                ctx.font = 'bold 14px Arial';
-                                ctx.fillText('LEGEND', 50, 615);
-                                
-                                const legendItems = document.querySelectorAll('.legend-item');
-                                
-                                let yPos = 635;
-                                legendItems.forEach((item, index) => {
-                                    const colorElement = item.querySelector('.legend-color');
-                                    const labelElement = item.querySelector('input');
+                            // Apply desaturation
+                            const gray = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+                            data[i] = gray + (r - gray) * saturationLevel;     // Red
+                            data[i + 1] = gray + (g - gray) * saturationLevel; // Green
+                            data[i + 2] = gray + (b - gray) * saturationLevel; // Blue
+                            // Alpha channel (data[i + 3]) remains unchanged
+                        }
+                        
+                        // Put the modified image data back onto the canvas
+                        ctx.putImageData(imageData, 0, 0);
+                        
+                        // Now manually draw all the overlays in their correct positions with full color
+                        drawnItems.getLayers().forEach(layer => {
+                            try {
+                                // For polylines (including LineString from drawings)
+                                if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
+                                    ctx.strokeStyle = layer.options ? (layer.options.color || '#ff0000') : '#ff0000';
+                                    ctx.lineWidth = layer.options ? (layer.options.weight || 3) : 3;
+                                    ctx.beginPath();
                                     
-                                    const color = colorElement.style.backgroundColor;
+                                    // Get all points
+                                    const points = layer.getLatLngs();
+                                    let first = true;
+                                    
+                                    // Convert each point to pixel coordinates and draw
+                                    points.forEach(point => {
+                                        const pixelPoint = map.latLngToContainerPoint(point);
+                                        if (first) {
+                                            ctx.moveTo(pixelPoint.x, pixelPoint.y);
+                                            first = false;
+                                        } else {
+                                            ctx.lineTo(pixelPoint.x, pixelPoint.y);
+                                        }
+                                    });
+                                    
+                                    ctx.stroke();
+                                }
+                                // For polygons and rectangles
+                                else if (layer instanceof L.Polygon || layer instanceof L.Rectangle) {
+                                    ctx.fillStyle = layer.options ? (layer.options.fillColor || '#ff0000') : '#ff0000';
+                                    ctx.strokeStyle = layer.options ? (layer.options.color || '#ff0000') : '#ff0000';
+                                    ctx.lineWidth = layer.options ? (layer.options.weight || 3) : 3;
+                                    ctx.globalAlpha = layer.options ? (layer.options.fillOpacity || 0.2) : 0.2;
+                                    
+                                    ctx.beginPath();
+                                    
+                                    // Get all points
+                                    const points = layer.getLatLngs()[0]; // First ring of coordinates
+                                    let first = true;
+                                    
+                                    // Convert each point to pixel coordinates and draw
+                                    points.forEach(point => {
+                                        const pixelPoint = map.latLngToContainerPoint(point);
+                                        if (first) {
+                                            ctx.moveTo(pixelPoint.x, pixelPoint.y);
+                                            first = false;
+                                        } else {
+                                            ctx.lineTo(pixelPoint.x, pixelPoint.y);
+                                        }
+                                    });
+                                    
+                                    ctx.closePath();
+                                    ctx.fill();
+                                    
+                                    // Reset alpha for stroke
+                                    ctx.globalAlpha = 1.0;
+                                    ctx.stroke();
+                                }
+                                // For markers
+                                else if (layer instanceof L.Marker) {
+                                    const markerIcon = document.querySelector('.leaflet-marker-icon');
+                                    if (markerIcon) {
+                                        const markerPoint = map.latLngToContainerPoint(layer.getLatLng());
+                                        const iconSize = 25; // Default size
+                                        ctx.drawImage(markerIcon, markerPoint.x - iconSize/2, markerPoint.y - iconSize, iconSize, iconSize);
+                                    }
+                                }
+                                // For circles (including CircleMarker)
+                                else if (layer instanceof L.Circle || layer instanceof L.CircleMarker) {
+                                    const centerPoint = map.latLngToContainerPoint(layer.getLatLng());
+                                    const radius = layer instanceof L.Circle ? 
+                                        map.distance(layer.getLatLng(), layer._getLatLng(layer.getLatLng(), layer.getRadius(), 0)) :
+                                        layer.options.radius || 10;
+                                    
+                                    // Fill
+                                    ctx.fillStyle = layer.options ? (layer.options.fillColor || '#ff0000') : '#ff0000';
+                                    ctx.globalAlpha = layer.options ? (layer.options.fillOpacity || 0.2) : 0.2;
+                                    ctx.beginPath();
+                                    ctx.arc(centerPoint.x, centerPoint.y, radius, 0, Math.PI * 2);
+                                    ctx.fill();
+                                    
+                                    // Stroke
+                                    ctx.strokeStyle = layer.options ? (layer.options.color || '#ff0000') : '#ff0000';
+                                    ctx.lineWidth = layer.options ? (layer.options.weight || 1) : 1;
+                                    ctx.globalAlpha = 1.0;
+                                    ctx.stroke();
+                                }
+                            } catch (err) {
+                                console.error('Error drawing layer:', err);
+                            }
+                        });
+                        
+                        // Convert canvas to image
+                        const mapImgData = hiddenCanvas.toDataURL('image/png');
+                        
+                        // Create a new jsPDF instance
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF({
+                            orientation: 'landscape',
+                            unit: 'in',
+                            format: 'letter'
+                        });
+                        
+                        // PDF dimensions
+                        const pageWidth = pdf.internal.pageSize.getWidth();
+                        const pageHeight = pdf.internal.pageSize.getHeight();
+                        
+                        // Set margins for the page with border
+                        const margin = 0.4; // margin inside the border
+                        const innerWidth = pageWidth - (margin * 2);
+                        const innerHeight = pageHeight - (margin * 2);
+                        
+                        // Draw outer border around the entire page
+                        pdf.setDrawColor(0);
+                        pdf.setLineWidth(0.01);
+                        pdf.rect(margin, margin, innerWidth, innerHeight);
+                        
+                        // Add title box
+                        const titleBoxHeight = 0.8;
+                        pdf.rect(margin, margin, innerWidth, titleBoxHeight);
+                        
+                        // Add title (centered)
+                        pdf.setFontSize(18);
+                        pdf.setFont('helvetica', 'bold');
+                        const projectName = document.getElementById('project-name').value || 'PROJECT NAME';
+                        pdf.text(projectName.toUpperCase(), pageWidth / 2, margin + (titleBoxHeight / 2), { align: 'center', baseline: 'middle' });
+                        
+                        // Map box
+                        const mapBoxTop = margin + titleBoxHeight;
+                        const mapBoxHeight = innerHeight - titleBoxHeight - 2.0; // Leave space for legend and footer
+                        pdf.rect(margin, mapBoxTop, innerWidth, mapBoxHeight);
+                        
+                        // Calculate map dimensions and position - slightly inset from the box
+                        const mapInset = 0.2;
+                        const mapWidth = innerWidth - (mapInset * 2);
+                        const mapHeight = mapBoxHeight - (mapInset * 2);
+                        const mapX = margin + mapInset;
+                        const mapY = mapBoxTop + mapInset;
+                        
+                        // Add map image
+                        pdf.addImage(mapImgData, 'PNG', mapX, mapY, mapWidth, mapHeight);
+                        
+                        function addSimpleCompassRose(pdf, x, y) {
+                            // Create a clean compass rose
+                            const size = 0.25; // Size of the compass rose
+                            
+                            // Draw a thin circular outline
+                            pdf.setDrawColor(0);
+                            pdf.setFillColor(255, 255, 255);
+                            pdf.setLineWidth(0.01);
+                            pdf.circle(x, y, size, 'FD');
+                            
+                            // Draw the main cardinal directions
+                            pdf.setLineWidth(0.015);
+                            
+                            // North line
+                            pdf.line(x, y - size * 0.3, x, y - size * 0.9);
+                            // South line
+                            pdf.line(x, y + size * 0.3, x, y + size * 0.9);
+                            // East line
+                            pdf.line(x + size * 0.3, y, x + size * 0.9, y);
+                            // West line
+                            pdf.line(x - size * 0.3, y, x - size * 0.9, y);
+                            
+                            // Draw a small black circle in the center
+                            pdf.setFillColor(0);
+                            pdf.circle(x, y, size * 0.15, 'F');
+                            
+                            // Cardinal letters
+                            pdf.setFontSize(8);
+                            pdf.setTextColor(0);
+                            pdf.setFont('helvetica', 'bold');
+                            pdf.text('N', x - 0.03, y - size - 0.1);
+                            pdf.text('S', x - 0.03, y + size + 0.15);
+                            pdf.text('E', x + size + 0.1, y + 0.03);
+                            pdf.text('W', x - size - 0.15, y + 0.03);
+                        }
+                        
+                        // Add compass rose to top right of map
+                        addSimpleCompassRose(pdf, mapX + mapWidth - 0.6, mapY + 0.6);
+                        
+                        // Legend box
+                        const legendBoxTop = mapBoxTop + mapBoxHeight;
+                        const legendBoxHeight = 0.6; // A bit shorter to give more room to footer
+                        pdf.rect(margin, legendBoxTop, innerWidth, legendBoxHeight);
+                        
+                        // Add LEGEND title
+                        pdf.setFontSize(12);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.text('Legend', margin + 0.2, legendBoxTop + 0.25 + 0.06);
+                        
+                        // Working with the actual legend items from legend-items element
+                        const legendItems = document.querySelectorAll('#legend-items .legend-item');
+                        
+                        if (legendItems.length > 0) {
+                            // Calculate positions
+                            const startX = margin + 1.0;
+                            const itemY = legendBoxTop + 0.35; // Center vertically better
+                            const legendItemWidth = 1.2; // space for each legend item
+                            
+                            // Add each legend item
+                            pdf.setFontSize(10);
+                            pdf.setFont('helvetica', 'normal');
+                            
+                            legendItems.forEach((item, index) => {
+                                const colorBox = item.querySelector('.legend-color');
+                                const labelElement = item.querySelector('input');
+                                
+                                if (colorBox && labelElement) {
+                                    // Get color from the box
+                                    const computedStyle = window.getComputedStyle(colorBox);
+                                    const bgColor = computedStyle.backgroundColor;
+                                    
+                                    // Get label from the input value
                                     const label = labelElement.value;
                                     
-                                    if (index < 4) { // First column
-                                        ctx.fillStyle = color;
-                                        ctx.fillRect(450, yPos - 10, 15, 15);
-                                        ctx.fillStyle = '#000000';
-                                        ctx.font = '12px Arial';
-                                        ctx.fillText(label, 475, yPos);
+                                    // Extract RGB values
+                                    const rgbMatch = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+                                    if (rgbMatch) {
+                                        const r = parseInt(rgbMatch[1]);
+                                        const g = parseInt(rgbMatch[2]);
+                                        const b = parseInt(rgbMatch[3]);
                                         
-                                        if (index === 3) {
-                                            yPos = 635; // Reset Y position for second column
-                                        } else {
-                                            yPos += 20;
-                                        }
-                                    } else { // Second column
-                                        ctx.fillStyle = color;
-                                        ctx.fillRect(600, yPos - 10, 15, 15);
-                                        ctx.fillStyle = '#000000';
-                                        ctx.font = '12px Arial';
-                                        ctx.fillText(label, 625, yPos);
-                                        yPos += 20;
+                                        // Calculate position
+                                        const xPos = startX + (index * legendItemWidth);
+                                        
+                                        // Draw color box
+                                        pdf.setFillColor(r, g, b);
+                                        pdf.rect(xPos, itemY - 0.15, 0.2, 0.15, 'F');
+                                        
+                                        // Add label
+                                        pdf.text(label, xPos + 0.25, itemY);
                                     }
-                                });
+                                }
+                            });
+                        }
+                        
+                        // Footer box
+                        const footerBoxTop = legendBoxTop + legendBoxHeight;
+                        const footerBoxHeight = 1.3; // Taller to accommodate the logo
+                        pdf.rect(margin, footerBoxTop, innerWidth, footerBoxHeight);
+                        
+                        // Define box dimensions for layout
+                        const logoBoxWidth = 2.0;
+                        const pageInfoBoxWidth = 2.1; // Wider to fit text better
+                        
+                        // Add page info in bottom right with proper spacing
+                        pdf.rect(margin + innerWidth - pageInfoBoxWidth, footerBoxTop, pageInfoBoxWidth, footerBoxHeight);
+                        
+                        // Description box (centered in footer)
+                        pdf.setFontSize(12);
+                        pdf.setFont('helvetica', 'normal');
+                        const description = document.getElementById('project-description').value || 'DESCRIPTION GOES HERE';
+                        
+                        // Calculate the description position with proper padding
+                        const descX = margin + (innerWidth / 2);
+                        const descY = footerBoxTop + (footerBoxHeight / 2);
+                        
+                        // Apply text wrapping for description to ensure it stays within bounds
+                        const maxDescWidth = innerWidth - logoBoxWidth - pageInfoBoxWidth - 0.4; // Allow for padding
+                        const descLines = pdf.splitTextToSize(description, maxDescWidth);
+                        pdf.text(descLines, descX, descY - ((descLines.length - 1) * 0.15), { align: 'center', baseline: 'middle' });
+                        
+                        // Add page info text with separation
+                        pdf.setFontSize(10);
+                        const pageInfoX = margin + innerWidth - pageInfoBoxWidth + 0.2; // Left padding for text
+                        const pageInfoY = footerBoxTop + 0.25; // Start higher
+                        
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.text(`Page ${document.getElementById('page-number').value} of ${document.getElementById('total-pages').value}`, pageInfoX, pageInfoY);
+                        
+                        // Add horizontal line separator
+                        pdf.setDrawColor(0);
+                        pdf.line(pageInfoX, pageInfoY + 0.1, margin + innerWidth - 0.2, pageInfoY + 0.1);
+                        
+                        // Add drawn by info with date below
+                        pdf.text('Drawn by:', pageInfoX, pageInfoY + 0.3);
+                        const drawnByValue = document.getElementById('drawn-by').value || 'N/A';
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.text(drawnByValue, pageInfoX + 0.7, pageInfoY + 0.3);
+                        
+                        // Date below drawn by
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.text('Date:', pageInfoX, pageInfoY + 0.5);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.text(document.getElementById('date-drawn').value || new Date().toLocaleDateString(), pageInfoX + 0.7, pageInfoY + 0.5);
+                        
+                        // Add company logo and info in bottom left
+                        pdf.rect(margin, footerBoxTop, logoBoxWidth, footerBoxHeight);
+                        
+                        // Clean up
+                        document.body.removeChild(hiddenCanvas);
+                        
+                        // Try to get logo from state
+                        let companyLogo = state.companyLogo;
+                        
+                        console.log("Logo source:", companyLogo ? "Found" : "Not found");
+                        if (companyLogo) {
+                            console.log("Logo type:", typeof companyLogo);
+                            console.log("Logo starts with:", companyLogo.substring(0, 30) + "...");
+                        }
+                        
+                        // Add company logo if available
+                        if (companyLogo) {
+                            const logoImg = new Image();
+                            logoImg.src = companyLogo;
+                            
+                            // Set a timeout to save PDF in case logo loading takes too long
+                            const saveTimeout = setTimeout(() => {
+                                console.log("Logo load timeout - saving PDF anyway");
+                                const projectFileName = projectName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_').toLowerCase();
+                                pdf.save(`${projectFileName || 'map'}.pdf`);
+                            }, 2000); // 2 second timeout
+                            
+                            logoImg.onload = function() {
+                                clearTimeout(saveTimeout); // Clear the timeout
                                 
-                                // Draw description
-                                const description = document.getElementById('project-description').value;
-                                if (description) {
-                                    ctx.font = 'bold 14px Arial';
-                                    ctx.fillText('DESCRIPTION', 50, 70);
-                                    
-                                    ctx.font = '12px Arial';
-                                    // Simple word wrap for description
-                                    const words = description.split(' ');
-                                    let line = '';
-                                    let yLine = 90;
-                                    
-                                    for (let i = 0; i < words.length; i++) {
-                                        const testLine = line + words[i] + ' ';
-                                        const metrics = ctx.measureText(testLine);
-                                        const testWidth = metrics.width;
-                                        
-                                        if (testWidth > 800 && i > 0) {
-                                            ctx.fillText(line, 50, yLine);
-                                            line = words[i] + ' ';
-                                            yLine += 18;
-                                        } else {
-                                            line = testLine;
-                                        }
-                                    }
-                                    ctx.fillText(line, 50, yLine);
+                                // Add logo to bottom left box - centered and moved up
+                                const logoWidth = 0.8; // Smaller logo
+                                const logoHeight = logoWidth * (logoImg.height / logoImg.width);
+                                
+                                // Center logo horizontally and position it higher to leave room for text below
+                                const logoX = margin + (logoBoxWidth - logoWidth) / 2;
+                                const logoY = footerBoxTop + 0.2; // Position logo at top with padding
+                                
+                                pdf.addImage(companyLogo, 'JPEG', logoX, logoY, logoWidth, logoHeight);
+                                
+                                // Add company info below logo
+                                pdf.setFontSize(9);
+                                const companyNameY = logoY + logoHeight + 0.15;
+                                pdf.text(document.getElementById('company-name').value || 'COMPANY NAME', margin + logoBoxWidth/2, companyNameY, { align: 'center' });
+                                
+                                // Add address below company name if it exists
+                                if (document.getElementById('company-address').value) {
+                                    pdf.setFontSize(8);
+                                    pdf.text(document.getElementById('company-address').value, margin + logoBoxWidth/2, companyNameY + 0.2, { align: 'center' });
                                 }
                                 
-                                // Convert canvas to image
-                                const dataUrl = canvas.toDataURL('image/png');
-                                
-                                // Create PDF using jsPDF
-                                const { jsPDF } = window.jspdf;
-                                const pdf = new jsPDF('p', 'mm', 'a4');
-                                
-                                // Add image to PDF
-                                const imgWidth = 210; // A4 width in mm
-                                const imgHeight = canvas.height * imgWidth / canvas.width;
-                                pdf.addImage(dataUrl, 'PNG', 0, 0, imgWidth, imgHeight);
-                                
-                                // Set PDF preview
-                                const pdfData = pdf.output('datauristring');
-                                const pdfPreview = document.getElementById('pdf-preview');
-                                pdfPreview.innerHTML = `<iframe src="${pdfData}" width="100%" height="100%"></iframe>`;
-                                
-                                // Store the PDF for download
-                                window.pdfForDownload = pdf;
+                                const projectFileName = projectName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_').toLowerCase();
+                                pdf.save(`${projectFileName || 'map'}.pdf`);
                             };
-                        };
-                        img.src = state.companyLogo;
-                    } else {
-                        // Render without logo
-                        ctx.fillText(companyName, 50, 630);
-                        ctx.fillText(companyAddress, 50, 650);
-                        
-                        // Continue with page number, etc.
-                        const pageNumber = document.getElementById('page-number').value || '1';
-                        const totalPages = document.getElementById('total-pages').value || '1';
-                        ctx.fillText(`Page ${pageNumber} of ${totalPages}`, 900, 650);
-                        
-                        // Draw drawn by
-                        const drawnBy = document.getElementById('drawn-by').value || '';
-                        const dateDrawn = document.getElementById('date-drawn').value || '';
-                        ctx.fillText(`Drawn by: ${drawnBy}, ${dateDrawn}`, 700, 670);
-                        
-                        // ... (continue with compass and legend)
-                    }
-                });
-            }
-            
-            // Download PDF
-            function downloadPdf() {
-                if (window.pdfForDownload) {
-                    const projectName = document.getElementById('project-name').value || 'permit-map';
-                    window.pdfForDownload.save(`${projectName}.pdf`);
+                            
+                            logoImg.onerror = function() {
+                                clearTimeout(saveTimeout); // Clear the timeout
+                                console.error('Error loading company logo');
+                                
+                                // Add just company info
+                                pdf.setFontSize(9);
+                                const textY = footerBoxTop + (footerBoxHeight / 2);
+                                pdf.text(document.getElementById('company-name').value || 'COMPANY NAME', margin + logoBoxWidth/2, textY - 0.1, { align: 'center' });
+                                pdf.text(document.getElementById('company-address').value, margin + logoBoxWidth/2, textY + 0.1, { align: 'center' });
+                                
+                                // Save the PDF
+                                const projectFileName = projectName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_').toLowerCase();
+                                pdf.save(`${projectFileName || 'map'}.pdf`);
+                            };
+                        } else {
+                            // No logo, just company info - centered in the box
+                            pdf.setFontSize(9);
+                            const textY = footerBoxTop + (footerBoxHeight / 2);
+                            pdf.text(document.getElementById('company-name').value || 'COMPANY NAME', margin + logoBoxWidth/2, textY - 0.1, { align: 'center' });
+                            pdf.text(document.getElementById('company-address').value, margin + logoBoxWidth/2, textY + 0.1, { align: 'center' });
+                            
+                            // Save the PDF 
+                            const projectFileName = projectName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_').toLowerCase();
+                            pdf.save(`${projectFileName || 'map'}.pdf`);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error preparing map for PDF:', error);
+                    document.body.removeChild(hiddenCanvas);
+                    alert('There was an error generating the PDF. Please try again.');
                 }
             }
             
             // Handle map drawing events
             map.on(L.Draw.Event.CREATED, function(event) {
                 const layer = event.layer;
+                
+                // Set the color of the drawn item
+                if (layer.setStyle) {
+                    layer.setStyle({
+                        color: currentColor,
+                        fillColor: currentColor,
+                        fillOpacity: 0.2
+                    });
+                }
+                
                 drawnItems.addLayer(layer);
                 
                 // Store drawing in state based on type
                 const type = event.layerType;
                 const drawingData = {
-                    type: type
+                    type: type,
+                    color: currentColor
                 };
                 
                 if (type === 'marker') {
@@ -1156,6 +1506,17 @@
             // Initialize the app
             loadState();
             initEventHandlers();
+            
+            // Add the draw control to the map
+            map.addControl(drawControl);
+            
+            // Hide the default Leaflet.draw control buttons
+            setTimeout(() => {
+                const leafletDrawControl = document.querySelector('.leaflet-draw.leaflet-control');
+                if (leafletDrawControl) {
+                    leafletDrawControl.style.display = 'none';
+                }
+            }, 100);
             
             // Set current date by default
             const today = new Date();
