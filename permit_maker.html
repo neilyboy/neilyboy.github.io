@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permit Map Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+        
+        #sidebar {
+            width: 300px;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #sidebar h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        
+        .sidebar-section:last-child {
+            border-bottom: none;
+        }
+        
+        .sidebar-section h3 {
+            margin-bottom: 10px;
+            color: #555;
+            font-size: 1.1rem;
+        }
+        
+        #main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #search-container {
+            padding: 15px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        
+        #search-input {
+            width: 350px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        #search-button {
+            padding: 10px 15px;
+            background-color: #0078D7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        #map-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+        
+        #drawing-tools {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+        
+        #drawing-tools button {
+            width: 40px;
+            height: 40px;
+            margin: 0 5px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #drawing-tools button.active {
+            background-color: #e6f2ff;
+            border-color: #0078D7;
+        }
+        
+        .tool-group {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        
+        input[type="text"], 
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+        }
+        
+        .color-picker {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .color-picker input[type="color"] {
+            margin-right: 10px;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button {
+            padding: 10px 15px;
+            background-color: #0078D7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        #legend-items {
+            margin-bottom: 15px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 3px;
+        }
+        
+        .legend-item input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        .remove-legend {
+            background: none;
+            color: #ff3b30;
+            border: none;
+            cursor: pointer;
+            padding: 0 5px;
+            margin: 0 0 0 10px;
+        }
+        
+        #saved-projects {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        
+        .saved-project {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        
+        .saved-project:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+        
+        .logo-preview {
+            width: 150px;
+            height: 80px;
+            border: 1px dashed #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        #logo-select {
+            margin-bottom: 15px;
+        }
+        
+        .compass-preview {
+            width: 60px;
+            height: 60px;
+            margin: 10px 0;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMzMzIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNNTAgNSB2IDkwIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik01IDUwIGggOTAiIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iNTAiIHk9IjE1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIj5OPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSI5NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMiI+UzwvdGV4dD48dGV4dCB4PSI4NSIgeT0iNTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTIiPkU8L3RleHQ+PHRleHQgeD0iMTUiIHk9IjUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIj5XPC90ZXh0Pjwvc3ZnPg==');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .flex-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .close {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        #pdf-preview {
+            width: 100%;
+            height: 80vh;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar">
+        <h2>Permit Map Editor</h2>
+        
+        <div class="sidebar-section">
+            <h3>Project Information</h3>
+            <label for="project-name">Project Name</label>
+            <input type="text" id="project-name" placeholder="Enter project name">
+            
+            <label for="project-description">Description</label>
+            <textarea id="project-description" placeholder="Enter project description"></textarea>
+            
+            <label for="page-number">Page Number</label>
+            <div class="flex-row">
+                <input type="number" id="page-number" min="1" value="1">
+                <span>of</span>
+                <input type="number" id="total-pages" min="1" value="1">
+            </div>
+        </div>
+        
+        <div class="sidebar-section">
+            <h3>Company Information</h3>
+            <label for="company-name">Company Name</label>
+            <input type="text" id="company-name" placeholder="Enter company name">
+            
+            <label for="company-address">Company Address</label>
+            <input type="text" id="company-address" placeholder="Enter company address">
+            
+            <label for="drawn-by">Drawn By</label>
+            <input type="text" id="drawn-by" placeholder="Enter your name">
+            
+            <label for="date-drawn">Date</label>
+            <input type="text" id="date-drawn" placeholder="MM/DD/YY">
+            
+            <label for="logo-upload">Company Logo</label>
+            <div class="logo-preview" id="logo-preview"></div>
+            <input type="file" id="logo-upload" accept="image/*" style="margin-bottom: 10px;">
+            
+            <label for="logo-select">Saved Logos</label>
+            <select id="logo-select">
+                <option value="">Select a saved logo</option>
+            </select>
+        </div>
+        
+        <div class="sidebar-section">
+            <h3>Legend</h3>
+            <div id="legend-items"></div>
+            <button id="add-legend-item">Add Legend Item</button>
+        </div>
+        
+        <div class="sidebar-section">
+            <h3>Project Management</h3>
+            <div id="saved-projects"></div>
+            <div class="action-buttons">
+                <button id="save-project">Save Current Project</button>
+                <button id="export-pdf">Export as PDF</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="main-content">
+        <div id="search-container">
+            <input type="text" id="search-input" placeholder="Search for a location...">
+            <button id="search-button">Search</button>
+        </div>
+        
+        <div id="map-container">
+            <div id="map"></div>
+            
+            <div id="drawing-tools">
+                <div class="tool-group">
+                    <button id="pan-tool" class="active" title="Pan Tool">
+                        <i class="fas fa-hand-paper"></i>
+                    </button>
+                    <button id="pencil-tool" title="Pencil Tool">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                    <button id="line-tool" title="Line Tool">
+                        <i class="fas fa-slash"></i>
+                    </button>
+                </div>
+                <div class="tool-group">
+                    <button id="rectangle-tool" title="Rectangle Tool">
+                        <i class="far fa-square"></i>
+                    </button>
+                    <button id="circle-tool" title="Circle Tool">
+                        <i class="far fa-circle"></i>
+                    </button>
+                    <button id="text-tool" title="Text Tool">
+                        <i class="fas fa-font"></i>
+                    </button>
+                </div>
+                <div class="tool-group">
+                    <div class="color-picker">
+                        <input type="color" id="color-picker" value="#ff0000">
+                        <span>Color</span>
+                    </div>
+                </div>
+                <div class="tool-group">
+                    <button id="delete-selected" title="Delete Selected">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button id="clear-all" title="Clear All">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="pdf-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-pdf">&times;</span>
+            <h2>PDF Preview</h2>
+            <button id="download-pdf">Download PDF</button>
+            <div id="pdf-preview"></div>
+        </div>
+    </div>
+    
+    <div id="text-input-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close" id="close-text-input">&times;</span>
+            <h2>Add Text</h2>
+            <textarea id="text-input" placeholder="Enter text" rows="4" style="width: 100%; margin: 15px 0;"></textarea>
+            <button id="add-text">Add</button>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize map
+            const map = L.map('map').setView([40.505, -99.09], 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Initialize drawing features
+            const drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+            
+            // Drawing control
+            const drawControl = new L.Control.Draw({
+                edit: {
+                    featureGroup: drawnItems
+                },
+                draw: {
+                    polygon: true,
+                    polyline: true,
+                    rectangle: true,
+                    circle: true,
+                    marker: true,
+                    circlemarker: false
+                }
+            });
+            
+            // Current drawing tool and color
+            let currentTool = 'pan';
+            let currentColor = '#ff0000';
+            
+            // App state
+            const state = {
+                projectName: '',
+                description: '',
+                pageNumber: 1,
+                totalPages: 1,
+                companyName: '',
+                companyAddress: '',
+                drawnBy: '',
+                dateDrawn: '',
+                companyLogo: null,
+                legendItems: [],
+                savedLogos: [],
+                drawings: [],
+                savedProjects: []
+            };
+            
+            // Load state from localStorage
+            function loadState() {
+                const savedState = localStorage.getItem('permitMapEditorState');
+                if (savedState) {
+                    const parsedState = JSON.parse(savedState);
+                    Object.assign(state, parsedState);
+                    
+                    // Update UI with saved state
+                    document.getElementById('project-name').value = state.projectName;
+                    document.getElementById('project-description').value = state.description;
+                    document.getElementById('page-number').value = state.pageNumber;
+                    document.getElementById('total-pages').value = state.totalPages;
+                    document.getElementById('company-name').value = state.companyName;
+                    document.getElementById('company-address').value = state.companyAddress;
+                    document.getElementById('drawn-by').value = state.drawnBy;
+                    document.getElementById('date-drawn').value = state.dateDrawn;
+                    
+                    // Load legend items
+                    state.legendItems.forEach(item => addLegendItem(item.color, item.label));
+                    
+                    // Load saved logos to dropdown
+                    updateLogoDropdown();
+                    
+                    // Load saved projects list
+                    updateSavedProjectsList();
+                }
+            }
+            
+            // Save state to localStorage
+            function saveState() {
+                localStorage.setItem('permitMapEditorState', JSON.stringify(state));
+            }
+            
+            // Initialize event handlers
+            function initEventHandlers() {
+                // Drawing tool buttons
+                document.getElementById('pan-tool').addEventListener('click', () => setActiveTool('pan'));
+                document.getElementById('pencil-tool').addEventListener('click', () => setActiveTool('pencil'));
+                document.getElementById('line-tool').addEventListener('click', () => setActiveTool('line'));
+                document.getElementById('rectangle-tool').addEventListener('click', () => setActiveTool('rectangle'));
+                document.getElementById('circle-tool').addEventListener('click', () => setActiveTool('circle'));
+                document.getElementById('text-tool').addEventListener('click', () => setActiveTool('text'));
+                document.getElementById('delete-selected').addEventListener('click', deleteSelected);
+                document.getElementById('clear-all').addEventListener('click', clearAll);
+                
+                // Color picker
+                document.getElementById('color-picker').addEventListener('change', (e) => {
+                    currentColor = e.target.value;
+                });
+                
+                // Search functionality
+                document.getElementById('search-button').addEventListener('click', searchLocation);
+                document.getElementById('search-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') searchLocation();
+                });
+                
+                // Legend
+                document.getElementById('add-legend-item').addEventListener('click', () => {
+                    addLegendItem(currentColor, '');
+                });
+                
+                // Company logo
+                document.getElementById('logo-upload').addEventListener('change', handleLogoUpload);
+                document.getElementById('logo-select').addEventListener('change', handleLogoSelect);
+                
+                // Project management
+                document.getElementById('save-project').addEventListener('click', saveCurrentProject);
+                document.getElementById('export-pdf').addEventListener('click', showPdfPreview);
+                
+                // Modal close buttons
+                document.getElementById('close-pdf').addEventListener('click', () => {
+                    document.getElementById('pdf-modal').style.display = 'none';
+                });
+                document.getElementById('close-text-input').addEventListener('click', () => {
+                    document.getElementById('text-input-modal').style.display = 'none';
+                });
+                
+                // Download PDF
+                document.getElementById('download-pdf').addEventListener('click', downloadPdf);
+                
+                // Text input
+                document.getElementById('add-text').addEventListener('click', addTextToMap);
+                
+                // Input field updates
+                document.getElementById('project-name').addEventListener('input', (e) => {
+                    state.projectName = e.target.value;
+                    saveState();
+                });
+                document.getElementById('project-description').addEventListener('input', (e) => {
+                    state.description = e.target.value;
+                    saveState();
+                });
+                document.getElementById('page-number').addEventListener('input', (e) => {
+                    state.pageNumber = e.target.value;
+                    saveState();
+                });
+                document.getElementById('total-pages').addEventListener('input', (e) => {
+                    state.totalPages = e.target.value;
+                    saveState();
+                });
+                document.getElementById('company-name').addEventListener('input', (e) => {
+                    state.companyName = e.target.value;
+                    saveState();
+                });
+                document.getElementById('company-address').addEventListener('input', (e) => {
+                    state.companyAddress = e.target.value;
+                    saveState();
+                });
+                document.getElementById('drawn-by').addEventListener('input', (e) => {
+                    state.drawnBy = e.target.value;
+                    saveState();
+                });
+                document.getElementById('date-drawn').addEventListener('input', (e) => {
+                    state.dateDrawn = e.target.value;
+                    saveState();
+                });
+            }
+            
+            // Set active drawing tool
+            function setActiveTool(tool) {
+                currentTool = tool;
+                
+                // Update UI
+                const toolButtons = document.querySelectorAll('#drawing-tools button');
+                toolButtons.forEach(button => {
+                    button.classList.remove('active');
+                });
+                
+                document.getElementById(`${tool}-tool`).classList.add('active');
+                
+                // Enable/disable map dragging based on tool
+                if (tool === 'pan') {
+                    map.dragging.enable();
+                } else {
+                    map.dragging.disable();
+                    
+                    if (tool === 'text') {
+                        document.getElementById('text-input-modal').style.display = 'flex';
+                        document.getElementById('text-input').value = '';
+                        document.getElementById('text-input').focus();
+                    }
+                }
+            }
+            
+            // Add text to map
+            function addTextToMap() {
+                const text = document.getElementById('text-input').value.trim();
+                if (!text) return;
+                
+                const center = map.getCenter();
+                const marker = L.marker(center, {
+                    icon: L.divIcon({
+                        html: `<div style="color:${currentColor}; font-weight:bold; background:white; padding:5px; border-radius:3px;">${text}</div>`,
+                        className: 'text-marker'
+                    })
+                }).addTo(drawnItems);
+                
+                document.getElementById('text-input-modal').style.display = 'none';
+                setActiveTool('pan');
+                
+                // Store drawing
+                state.drawings.push({
+                    type: 'text',
+                    position: center,
+                    text: text,
+                    color: currentColor
+                });
+                saveState();
+            }
+            
+            // Delete selected drawing
+            function deleteSelected() {
+                // For a simple implementation, just clear the last drawn item
+                const layers = drawnItems.getLayers();
+                if (layers.length > 0) {
+                    const lastLayer = layers[layers.length - 1];
+                    drawnItems.removeLayer(lastLayer);
+                    
+                    // Remove from state
+                    if (state.drawings.length > 0) {
+                        state.drawings.pop();
+                        saveState();
+                    }
+                }
+            }
+            
+            // Clear all drawings
+            function clearAll() {
+                if (confirm('Are you sure you want to clear all drawings?')) {
+                    drawnItems.clearLayers();
+                    state.drawings = [];
+                    saveState();
+                }
+            }
+            
+            // Search for location
+            function searchLocation() {
+                const searchTerm = document.getElementById('search-input').value.trim();
+                if (!searchTerm) return;
+                
+                // Using Nominatim for geocoding (OpenStreetMap)
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchTerm)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.length > 0) {
+                            const location = data[0];
+                            map.setView([location.lat, location.lon], 15);
+                        } else {
+                            alert('Location not found. Please try again with a different search term.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error searching for location:', error);
+                        alert('An error occurred while searching for the location.');
+                    });
+            }
+            
+            // Add legend item
+            function addLegendItem(color, label) {
+                const legendContainer = document.getElementById('legend-items');
+                const legendItem = document.createElement('div');
+                legendItem.className = 'legend-item';
+                
+                const colorSquare = document.createElement('div');
+                colorSquare.className = 'legend-color';
+                colorSquare.style.backgroundColor = color;
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = 'Enter legend description';
+                input.value = label;
+                
+                const removeButton = document.createElement('button');
+                removeButton.className = 'remove-legend';
+                removeButton.innerHTML = '&times;';
+                
+                legendItem.appendChild(colorSquare);
+                legendItem.appendChild(input);
+                legendItem.appendChild(removeButton);
+                legendContainer.appendChild(legendItem);
+                
+                // Save to state if not already there
+                if (!state.legendItems.some(item => item.color === color && item.label === label)) {
+                    state.legendItems.push({ color, label });
+                    saveState();
+                }
+                
+                // Event handlers
+                input.addEventListener('input', (e) => {
+                    const index = state.legendItems.findIndex(item => 
+                        item.color === color && item.label === label
+                    );
+                    if (index !== -1) {
+                        state.legendItems[index].label = e.target.value;
+                        saveState();
+                    }
+                });
+                
+                removeButton.addEventListener('click', () => {
+                    legendContainer.removeChild(legendItem);
+                    const index = state.legendItems.findIndex(item => 
+                        item.color === color && (item.label === label || item.label === input.value)
+                    );
+                    if (index !== -1) {
+                        state.legendItems.splice(index, 1);
+                        saveState();
+                    }
+                });
+            }
+            
+            // Handle logo upload
+            function handleLogoUpload(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const logoPreview = document.getElementById('logo-preview');
+                    logoPreview.style.backgroundImage = `url(${event.target.result})`;
+                    
+                    // Save to state
+                    const logoName = file.name;
+                    state.companyLogo = event.target.result;
+                    
+                    // Add to saved logos if not already there
+                    if (!state.savedLogos.some(logo => logo.name === logoName)) {
+                        state.savedLogos.push({
+                            name: logoName,
+                            data: event.target.result
+                        });
+                        updateLogoDropdown();
+                    }
+                    
+                    saveState();
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            // Handle logo selection
+            function handleLogoSelect(e) {
+                const logoName = e.target.value;
+                if (!logoName) return;
+                
+                const logo = state.savedLogos.find(logo => logo.name === logoName);
+                if (logo) {
+                    const logoPreview = document.getElementById('logo-preview');
+                    logoPreview.style.backgroundImage = `url(${logo.data})`;
+                    state.companyLogo = logo.data;
+                    saveState();
+                }
+            }
+            
+            // Update logo dropdown
+            function updateLogoDropdown() {
+                const logoSelect = document.getElementById('logo-select');
+                logoSelect.innerHTML = '<option value="">Select a saved logo</option>';
+                
+                state.savedLogos.forEach(logo => {
+                    const option = document.createElement('option');
+                    option.value = logo.name;
+                    option.textContent = logo.name;
+                    logoSelect.appendChild(option);
+                });
+            }
+            
+            // Save current project
+            function saveCurrentProject() {
+                const projectName = document.getElementById('project-name').value.trim();
+                if (!projectName) {
+                    alert('Please enter a project name before saving.');
+                    return;
+                }
+                
+                // Capture current map view
+                const center = map.getCenter();
+                const zoom = map.getZoom();
+                
+                // Create project object
+                const project = {
+                    id: Date.now().toString(),
+                    name: projectName,
+                    description: document.getElementById('project-description').value,
+                    pageNumber: document.getElementById('page-number').value,
+                    totalPages: document.getElementById('total-pages').value,
+                    companyName: document.getElementById('company-name').value,
+                    companyAddress: document.getElementById('company-address').value,
+                    drawnBy: document.getElementById('drawn-by').value,
+                    dateDrawn: document.getElementById('date-drawn').value,
+                    companyLogo: state.companyLogo,
+                    legendItems: state.legendItems,
+                    drawings: state.drawings,
+                    mapView: {
+                        lat: center.lat,
+                        lng: center.lng,
+                        zoom: zoom
+                    },
+                    savedAt: new Date().toLocaleString()
+                };
+                
+                // Check if project already exists
+                const existingIndex = state.savedProjects.findIndex(p => p.name === projectName);
+                if (existingIndex !== -1) {
+                    if (confirm(`Project "${projectName}" already exists. Do you want to overwrite it?`)) {
+                        // Update existing project
+                        state.savedProjects[existingIndex] = project;
+                    } else {
+                        return;
+                    }
+                } else {
+                    // Add new project
+                    state.savedProjects.push(project);
+                }
+                
+                saveState();
+                updateSavedProjectsList();
+                alert(`Project "${projectName}" saved successfully.`);
+            }
+            
+            // Load saved project
+            function loadProject(projectId) {
+                const project = state.savedProjects.find(p => p.id === projectId);
+                if (!project) return;
+                
+                // Confirm if there are unsaved changes
+                if (state.drawings.length > 0) {
+                    if (!confirm('Loading a project will overwrite any unsaved changes. Continue?')) {
+                        return;
+                    }
+                }
+                
+                // Update state and UI
+                state.projectName = project.name;
+                state.description = project.description;
+                state.pageNumber = project.pageNumber;
+                state.totalPages = project.totalPages;
+                state.companyName = project.companyName;
+                state.companyAddress = project.companyAddress;
+                state.drawnBy = project.drawnBy;
+                state.dateDrawn = project.dateDrawn;
+                state.companyLogo = project.companyLogo;
+                state.legendItems = project.legendItems;
+                state.drawings = project.drawings;
+                
+                // Update form fields
+                document.getElementById('project-name').value = project.name;
+                document.getElementById('project-description').value = project.description;
+                document.getElementById('page-number').value = project.pageNumber;
+                document.getElementById('total-pages').value = project.totalPages;
+                document.getElementById('company-name').value = project.companyName;
+                document.getElementById('company-address').value = project.companyAddress;
+                document.getElementById('drawn-by').value = project.drawnBy;
+                document.getElementById('date-drawn').value = project.dateDrawn;
+                
+                // Update logo
+                if (project.companyLogo) {
+                    const logoPreview = document.getElementById('logo-preview');
+                    logoPreview.style.backgroundImage = `url(${project.companyLogo})`;
+                }
+                
+                // Update legend
+                const legendContainer = document.getElementById('legend-items');
+                legendContainer.innerHTML = '';
+                project.legendItems.forEach(item => {
+                    addLegendItem(item.color, item.label);
+                });
+                
+                // Update map view
+                if (project.mapView) {
+                    map.setView([project.mapView.lat, project.mapView.lng], project.mapView.zoom);
+                }
+                
+                // Clear and redraw drawings
+                drawnItems.clearLayers();
+                // Here you'd need to recreate each drawing based on its type and properties
+                // This is a simplified implementation
+                
+                alert(`Project "${project.name}" loaded successfully.`);
+            }
+            
+            // Update saved projects list
+            function updateSavedProjectsList() {
+                const projectsContainer = document.getElementById('saved-projects');
+                projectsContainer.innerHTML = '';
+                
+                if (state.savedProjects.length === 0) {
+                    const noProjects = document.createElement('div');
+                    noProjects.textContent = 'No saved projects.';
+                    projectsContainer.appendChild(noProjects);
+                    return;
+                }
+                
+                state.savedProjects.forEach(project => {
+                    const projectItem = document.createElement('div');
+                    projectItem.className = 'saved-project';
+                    projectItem.textContent = `${project.name} (${project.savedAt})`;
+                    projectItem.addEventListener('click', () => loadProject(project.id));
+                    
+                    projectsContainer.appendChild(projectItem);
+                });
+            }
+            
+            // Show PDF preview
+            function showPdfPreview() {
+                document.getElementById('pdf-modal').style.display = 'flex';
+                generatePdf();
+            }
+            
+            // Generate PDF
+            function generatePdf() {
+                // Create a canvas for the map
+                const canvas = document.createElement('canvas');
+                canvas.width = 1000;
+                canvas.height = 700;
+                const ctx = canvas.getContext('2d');
+                
+                // Draw map background (simplified for demo)
+                ctx.fillStyle = '#F2F2F2';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Get a screenshot of the map using Leaflet's rendering
+                html2canvas(document.getElementById('map'), {
+                    useCORS: true
+                }).then(function(mapCanvas) {
+                    ctx.drawImage(mapCanvas, 50, 100, 900, 500);
+                    
+                    // Draw header
+                    ctx.fillStyle = '#000000';
+                    ctx.font = 'bold 24px Arial';
+                    const projectName = document.getElementById('project-name').value || 'Untitled Project';
+                    ctx.fillText(projectName.toUpperCase(), 50, 50);
+                    
+                    // Draw company info section
+                    ctx.font = '12px Arial';
+                    const companyName = document.getElementById('company-name').value || '';
+                    const companyAddress = document.getElementById('company-address').value || '';
+                    
+                    if (state.companyLogo) {
+                        const img = new Image();
+                        img.onload = function() {
+                            ctx.drawImage(img, 50, 620, 100, 50);
+                            
+                            // Draw company info
+                            ctx.fillText(companyName, 160, 630);
+                            ctx.fillText(companyAddress, 160, 650);
+                            
+                            // Draw page number
+                            const pageNumber = document.getElementById('page-number').value || '1';
+                            const totalPages = document.getElementById('total-pages').value || '1';
+                            ctx.fillText(`Page ${pageNumber} of ${totalPages}`, 900, 650);
+                            
+                            // Draw drawn by
+                            const drawnBy = document.getElementById('drawn-by').value || '';
+                            const dateDrawn = document.getElementById('date-drawn').value || '';
+                            ctx.fillText(`Drawn by: ${drawnBy}, ${dateDrawn}`, 700, 670);
+                            
+                            // Draw compass rose
+                            const compass = new Image();
+                            compass.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMzMzIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNNTAgNSB2IDkwIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik01IDUwIGggOTAiIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iNTAiIHk9IjE1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIj5OPC90ZXh0Pjx0ZXh0IHg9IjUwIiB5PSI5NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMiI+UzwvdGV4dD48dGV4dCB4PSI4NSIgeT0iNTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTIiPkU8L3RleHQ+PHRleHQgeD0iMTUiIHk9IjUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIj5XPC90ZXh0Pjwvc3ZnPg==';
+                            compass.onload = function() {
+                                ctx.drawImage(compass, 900, 60, 50, 50);
+                                
+                                // Draw legend
+                                ctx.font = 'bold 14px Arial';
+                                ctx.fillText('LEGEND', 50, 615);
+                                
+                                const legendItems = document.querySelectorAll('.legend-item');
+                                
+                                let yPos = 635;
+                                legendItems.forEach((item, index) => {
+                                    const colorElement = item.querySelector('.legend-color');
+                                    const labelElement = item.querySelector('input');
+                                    
+                                    const color = colorElement.style.backgroundColor;
+                                    const label = labelElement.value;
+                                    
+                                    if (index < 4) { // First column
+                                        ctx.fillStyle = color;
+                                        ctx.fillRect(450, yPos - 10, 15, 15);
+                                        ctx.fillStyle = '#000000';
+                                        ctx.font = '12px Arial';
+                                        ctx.fillText(label, 475, yPos);
+                                        
+                                        if (index === 3) {
+                                            yPos = 635; // Reset Y position for second column
+                                        } else {
+                                            yPos += 20;
+                                        }
+                                    } else { // Second column
+                                        ctx.fillStyle = color;
+                                        ctx.fillRect(600, yPos - 10, 15, 15);
+                                        ctx.fillStyle = '#000000';
+                                        ctx.font = '12px Arial';
+                                        ctx.fillText(label, 625, yPos);
+                                        yPos += 20;
+                                    }
+                                });
+                                
+                                // Draw description
+                                const description = document.getElementById('project-description').value;
+                                if (description) {
+                                    ctx.font = 'bold 14px Arial';
+                                    ctx.fillText('DESCRIPTION', 50, 70);
+                                    
+                                    ctx.font = '12px Arial';
+                                    // Simple word wrap for description
+                                    const words = description.split(' ');
+                                    let line = '';
+                                    let yLine = 90;
+                                    
+                                    for (let i = 0; i < words.length; i++) {
+                                        const testLine = line + words[i] + ' ';
+                                        const metrics = ctx.measureText(testLine);
+                                        const testWidth = metrics.width;
+                                        
+                                        if (testWidth > 800 && i > 0) {
+                                            ctx.fillText(line, 50, yLine);
+                                            line = words[i] + ' ';
+                                            yLine += 18;
+                                        } else {
+                                            line = testLine;
+                                        }
+                                    }
+                                    ctx.fillText(line, 50, yLine);
+                                }
+                                
+                                // Convert canvas to image
+                                const dataUrl = canvas.toDataURL('image/png');
+                                
+                                // Create PDF using jsPDF
+                                const { jsPDF } = window.jspdf;
+                                const pdf = new jsPDF('p', 'mm', 'a4');
+                                
+                                // Add image to PDF
+                                const imgWidth = 210; // A4 width in mm
+                                const imgHeight = canvas.height * imgWidth / canvas.width;
+                                pdf.addImage(dataUrl, 'PNG', 0, 0, imgWidth, imgHeight);
+                                
+                                // Set PDF preview
+                                const pdfData = pdf.output('datauristring');
+                                const pdfPreview = document.getElementById('pdf-preview');
+                                pdfPreview.innerHTML = `<iframe src="${pdfData}" width="100%" height="100%"></iframe>`;
+                                
+                                // Store the PDF for download
+                                window.pdfForDownload = pdf;
+                            };
+                        };
+                        img.src = state.companyLogo;
+                    } else {
+                        // Render without logo
+                        ctx.fillText(companyName, 50, 630);
+                        ctx.fillText(companyAddress, 50, 650);
+                        
+                        // Continue with page number, etc.
+                        const pageNumber = document.getElementById('page-number').value || '1';
+                        const totalPages = document.getElementById('total-pages').value || '1';
+                        ctx.fillText(`Page ${pageNumber} of ${totalPages}`, 900, 650);
+                        
+                        // Draw drawn by
+                        const drawnBy = document.getElementById('drawn-by').value || '';
+                        const dateDrawn = document.getElementById('date-drawn').value || '';
+                        ctx.fillText(`Drawn by: ${drawnBy}, ${dateDrawn}`, 700, 670);
+                        
+                        // ... (continue with compass and legend)
+                    }
+                });
+            }
+            
+            // Download PDF
+            function downloadPdf() {
+                if (window.pdfForDownload) {
+                    const projectName = document.getElementById('project-name').value || 'permit-map';
+                    window.pdfForDownload.save(`${projectName}.pdf`);
+                }
+            }
+            
+            // Handle map drawing events
+            map.on(L.Draw.Event.CREATED, function(event) {
+                const layer = event.layer;
+                drawnItems.addLayer(layer);
+                
+                // Store drawing in state based on type
+                const type = event.layerType;
+                const drawingData = {
+                    type: type
+                };
+                
+                if (type === 'marker') {
+                    drawingData.position = layer.getLatLng();
+                } else if (type === 'circle') {
+                    drawingData.position = layer.getLatLng();
+                    drawingData.radius = layer.getRadius();
+                } else if (type === 'rectangle' || type === 'polygon') {
+                    drawingData.points = layer.getLatLngs();
+                } else if (type === 'polyline') {
+                    drawingData.points = layer.getLatLngs();
+                }
+                
+                state.drawings.push(drawingData);
+                saveState();
+            });
+            
+            // Initialize the app
+            loadState();
+            initEventHandlers();
+            
+            // Set current date by default
+            const today = new Date();
+            const formattedDate = `${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getDate().toString().padStart(2, '0')}/${today.getFullYear().toString().slice(2)}`;
+            document.getElementById('date-drawn').value = formattedDate;
+            state.dateDrawn = formattedDate;
+            
+            // For demo purposes - add some legend items
+            if (state.legendItems.length === 0) {
+                addLegendItem('#ff0000', 'Fiber Optic');
+                addLegendItem('#0000ff', 'Vaults');
+                addLegendItem('#00ff00', 'Existing Utilities');
+                addLegendItem('#ff00ff', 'Right of Way');
+            }
+        });
+    </script>
+</body>
+</html>
