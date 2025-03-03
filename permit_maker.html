@@ -1333,7 +1333,7 @@
                         
                         // Legend box
                         const legendBoxTop = mapBoxTop + mapBoxHeight;
-                        const legendBoxHeight = 0.6; // A bit shorter to give more room to footer
+                        const legendBoxHeight = 0.5; // A bit shorter to give more room to footer
                         
                         // Add light gray background for legend box
                         pdf.setFillColor(240, 240, 240); // Light gray
@@ -1346,7 +1346,7 @@
                         
                         // Add LEGEND title
                         pdf.setFontSize(12);
-                        pdf.setFont('helvetica', 'bold');
+                        pdf.setFont('helvetica', 'normal');
                         // Center the LEGEND title in the box
                         pdf.text('LEGEND', margin + innerWidth/2, legendBoxTop + 0.2, { align: 'center' });
                         
@@ -1710,9 +1710,6 @@
             // For demo purposes - add some legend items
             if (state.legendItems.length === 0) {
                 addLegendItem('#ff0000', 'Fiber Optic');
-                addLegendItem('#0000ff', 'Vaults');
-                addLegendItem('#00ff00', 'Existing Utilities');
-                addLegendItem('#ff00ff', 'Right of Way');
             }
         });
     </script>
