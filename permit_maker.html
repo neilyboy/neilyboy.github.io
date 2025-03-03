@@ -1203,10 +1203,9 @@
                         const innerWidth = pageWidth - (margin * 2);
                         const innerHeight = pageHeight - (margin * 2);
                         
-                        // Draw outer border around the entire page
+                        // We'll draw individual sections instead of an outer border
                         pdf.setDrawColor(0);
                         pdf.setLineWidth(0.01);
-                        pdf.rect(margin, margin, innerWidth, innerHeight);
                         
                         // Add title box
                         const titleBoxHeight = 0.8;
@@ -1233,6 +1232,7 @@
                         // Add map image
                         pdf.addImage(mapImgData, 'PNG', mapX, mapY, mapWidth, mapHeight);
                         
+                        // Add compass rose to top right of map
                         function addSimpleCompassRose(pdf, x, y) {
                             // Create a clean compass rose
                             const size = 0.25; // Size of the compass rose
@@ -1269,18 +1269,20 @@
                             pdf.text('W', x - size - 0.15, y + 0.03);
                         }
                         
-                        // Add compass rose to top right of map
                         addSimpleCompassRose(pdf, mapX + mapWidth - 0.6, mapY + 0.6);
                         
                         // Legend box
                         const legendBoxTop = mapBoxTop + mapBoxHeight;
                         const legendBoxHeight = 0.6; // A bit shorter to give more room to footer
-                        pdf.rect(margin, legendBoxTop, innerWidth, legendBoxHeight);
+                        pdf.line(margin, legendBoxTop, margin + innerWidth, legendBoxTop); // Top horizontal line
+                        pdf.line(margin, legendBoxTop, margin, legendBoxTop + legendBoxHeight); // Left vertical line
+                        pdf.line(margin + innerWidth, legendBoxTop, margin + innerWidth, legendBoxTop + legendBoxHeight); // Right vertical line
+                        pdf.line(margin, legendBoxTop + legendBoxHeight, margin + innerWidth, legendBoxTop + legendBoxHeight); // Bottom line
                         
                         // Add LEGEND title
                         pdf.setFontSize(12);
                         pdf.setFont('helvetica', 'bold');
-                        pdf.text('Legend', margin + 0.2, legendBoxTop + 0.25 + 0.06);
+                        pdf.text('LEGEND', margin + 0.2, legendBoxTop + 0.25);
                         
                         // Working with the actual legend items from legend-items element
                         const legendItems = document.querySelectorAll('#legend-items .legend-item');
@@ -1331,28 +1333,47 @@
                         // Footer box
                         const footerBoxTop = legendBoxTop + legendBoxHeight;
                         const footerBoxHeight = 1.3; // Taller to accommodate the logo
-                        pdf.rect(margin, footerBoxTop, innerWidth, footerBoxHeight);
+                        pdf.line(margin, footerBoxTop, margin + innerWidth, footerBoxTop); // Top horizontal line
+                        pdf.line(margin, footerBoxTop, margin, footerBoxTop + footerBoxHeight); // Left vertical line
+                        pdf.line(margin + innerWidth, footerBoxTop, margin + innerWidth, footerBoxTop + footerBoxHeight); // Right vertical line
+                        pdf.line(margin, footerBoxTop + footerBoxHeight, margin + innerWidth, footerBoxTop + footerBoxHeight); // Bottom line
                         
                         // Define box dimensions for layout
                         const logoBoxWidth = 2.0;
                         const pageInfoBoxWidth = 2.1; // Wider to fit text better
                         
-                        // Add page info in bottom right with proper spacing
-                        pdf.rect(margin + innerWidth - pageInfoBoxWidth, footerBoxTop, pageInfoBoxWidth, footerBoxHeight);
+                        // Add page info in bottom right - draw the vertical line
+                        pdf.line(margin + innerWidth - pageInfoBoxWidth, footerBoxTop, margin + innerWidth - pageInfoBoxWidth, footerBoxTop + footerBoxHeight); // Left vertical line
+                        
+                        // Add company logo section - draw the vertical line
+                        pdf.line(margin + logoBoxWidth, footerBoxTop, margin + logoBoxWidth, footerBoxTop + footerBoxHeight); // Right vertical line
+                        
+                        // Add bottom lines for each section
+                        pdf.line(margin, footerBoxTop + footerBoxHeight, margin + logoBoxWidth, footerBoxTop + footerBoxHeight); // Logo section bottom
+                        pdf.line(margin + logoBoxWidth, footerBoxTop + footerBoxHeight, margin + innerWidth - pageInfoBoxWidth, footerBoxTop + footerBoxHeight); // Description section bottom
+                        pdf.line(margin + innerWidth - pageInfoBoxWidth, footerBoxTop + footerBoxHeight, margin + innerWidth, footerBoxTop + footerBoxHeight); // Page info section bottom
                         
                         // Description box (centered in footer)
                         pdf.setFontSize(12);
                         pdf.setFont('helvetica', 'normal');
                         const description = document.getElementById('project-description').value || 'DESCRIPTION GOES HERE';
                         
-                        // Calculate the description position with proper padding
-                        const descX = margin + (innerWidth / 2);
+                        // Calculate the description position - centered in the middle section
+                        const descX = margin + logoBoxWidth + ((innerWidth - logoBoxWidth - pageInfoBoxWidth) / 2);
                         const descY = footerBoxTop + (footerBoxHeight / 2);
                         
                         // Apply text wrapping for description to ensure it stays within bounds
-                        const maxDescWidth = innerWidth - logoBoxWidth - pageInfoBoxWidth - 0.4; // Allow for padding
+                        // Use a more conservative width to prevent overflow
+                        const maxDescWidth = innerWidth - logoBoxWidth - pageInfoBoxWidth - 0.8; // More padding to prevent overflow
                         const descLines = pdf.splitTextToSize(description, maxDescWidth);
-                        pdf.text(descLines, descX, descY - ((descLines.length - 1) * 0.15), { align: 'center', baseline: 'middle' });
+                        
+                        // Adjust vertical position if there are multiple lines
+                        const lineHeight = 0.15; // Approximate line height
+                        const totalTextHeight = descLines.length * lineHeight;
+                        const descStartY = descY - (totalTextHeight / 2) + (lineHeight / 2);
+                        
+                        // Center text in the middle section
+                        pdf.text(descLines, descX, descStartY, { align: 'center' });
                         
                         // Add page info text with separation
                         pdf.setFontSize(10);
@@ -1378,23 +1399,12 @@
                         pdf.setFont('helvetica', 'bold');
                         pdf.text(document.getElementById('date-drawn').value || new Date().toLocaleDateString(), pageInfoX + 0.7, pageInfoY + 0.5);
                         
-                        // Add company logo and info in bottom left
-                        pdf.rect(margin, footerBoxTop, logoBoxWidth, footerBoxHeight);
-                        
-                        // Clean up
-                        document.body.removeChild(hiddenCanvas);
-                        
                         // Try to get logo from state
                         let companyLogo = state.companyLogo;
                         
-                        console.log("Logo source:", companyLogo ? "Found" : "Not found");
+                        // Handle logo and company info
                         if (companyLogo) {
-                            console.log("Logo type:", typeof companyLogo);
-                            console.log("Logo starts with:", companyLogo.substring(0, 30) + "...");
-                        }
-                        
-                        // Add company logo if available
-                        if (companyLogo) {
+                            // Create a new image for the logo
                             const logoImg = new Image();
                             logoImg.src = companyLogo;
                             
@@ -1403,34 +1413,34 @@
                                 console.log("Logo load timeout - saving PDF anyway");
                                 const projectFileName = projectName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_').toLowerCase();
                                 pdf.save(`${projectFileName || 'map'}.pdf`);
+                                document.body.removeChild(hiddenCanvas); // Clean up
                             }, 2000); // 2 second timeout
                             
                             logoImg.onload = function() {
                                 clearTimeout(saveTimeout); // Clear the timeout
                                 
-                                // Add logo to bottom left box - centered and moved up
-                                const logoWidth = 0.8; // Smaller logo
-                                const logoHeight = logoWidth * (logoImg.height / logoImg.width);
-                                
-                                // Center logo horizontally and position it higher to leave room for text below
+                                // Calculate logo position
+                                const logoWidth = 0.7; // Slightly smaller logo
+                                const logoHeight = 0.7; // Slightly smaller logo
                                 const logoX = margin + (logoBoxWidth - logoWidth) / 2;
-                                const logoY = footerBoxTop + 0.2; // Position logo at top with padding
+                                const logoY = footerBoxTop + 0.15; // Position logo closer to top with less padding
                                 
-                                pdf.addImage(companyLogo, 'JPEG', logoX, logoY, logoWidth, logoHeight);
+                                // Draw the logo
+                                pdf.addImage(logoImg, 'JPEG', logoX, logoY, logoWidth, logoHeight);
                                 
-                                // Add company info below logo
-                                pdf.setFontSize(9);
-                                const companyNameY = logoY + logoHeight + 0.15;
-                                pdf.text(document.getElementById('company-name').value || 'COMPANY NAME', margin + logoBoxWidth/2, companyNameY, { align: 'center' });
+                                // Add company info below logo with tighter spacing
+                                pdf.setFontSize(8); // Smaller font size
+                                pdf.text(document.getElementById('company-name').value || 'COMPANY NAME', margin + logoBoxWidth/2, logoY + logoHeight + 0.15, { align: 'center' });
                                 
                                 // Add address below company name if it exists
                                 if (document.getElementById('company-address').value) {
-                                    pdf.setFontSize(8);
-                                    pdf.text(document.getElementById('company-address').value, margin + logoBoxWidth/2, companyNameY + 0.2, { align: 'center' });
+                                    pdf.setFontSize(7); // Even smaller font for address
+                                    pdf.text(document.getElementById('company-address').value, margin + logoBoxWidth/2, logoY + logoHeight + 0.25, { align: 'center' });
                                 }
                                 
                                 const projectFileName = projectName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_').toLowerCase();
                                 pdf.save(`${projectFileName || 'map'}.pdf`);
+                                document.body.removeChild(hiddenCanvas); // Clean up
                             };
                             
                             logoImg.onerror = function() {
@@ -1439,24 +1449,34 @@
                                 
                                 // Add just company info
                                 pdf.setFontSize(9);
-                                const textY = footerBoxTop + (footerBoxHeight / 2);
-                                pdf.text(document.getElementById('company-name').value || 'COMPANY NAME', margin + logoBoxWidth/2, textY - 0.1, { align: 'center' });
-                                pdf.text(document.getElementById('company-address').value, margin + logoBoxWidth/2, textY + 0.1, { align: 'center' });
+                                const textY = footerBoxTop + 0.4; // Position from top with padding
+                                pdf.text(document.getElementById('company-name').value || 'COMPANY NAME', margin + logoBoxWidth/2, textY, { align: 'center' });
                                 
-                                // Save the PDF
+                                // Add address below company name
+                                if (document.getElementById('company-address').value) {
+                                    pdf.setFontSize(8);
+                                    pdf.text(document.getElementById('company-address').value, margin + logoBoxWidth/2, textY + 0.2, { align: 'center' });
+                                }
+                                
                                 const projectFileName = projectName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_').toLowerCase();
                                 pdf.save(`${projectFileName || 'map'}.pdf`);
+                                document.body.removeChild(hiddenCanvas); // Clean up
                             };
                         } else {
                             // No logo, just company info - centered in the box
                             pdf.setFontSize(9);
-                            const textY = footerBoxTop + (footerBoxHeight / 2);
-                            pdf.text(document.getElementById('company-name').value || 'COMPANY NAME', margin + logoBoxWidth/2, textY - 0.1, { align: 'center' });
-                            pdf.text(document.getElementById('company-address').value, margin + logoBoxWidth/2, textY + 0.1, { align: 'center' });
+                            const textY = footerBoxTop + 0.4; // Position from top with padding
+                            pdf.text(document.getElementById('company-name').value || 'COMPANY NAME', margin + logoBoxWidth/2, textY, { align: 'center' });
                             
-                            // Save the PDF 
+                            // Add address below company name
+                            if (document.getElementById('company-address').value) {
+                                pdf.setFontSize(8);
+                                pdf.text(document.getElementById('company-address').value, margin + logoBoxWidth/2, textY + 0.2, { align: 'center' });
+                            }
+                            
                             const projectFileName = projectName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_').toLowerCase();
                             pdf.save(`${projectFileName || 'map'}.pdf`);
+                            document.body.removeChild(hiddenCanvas); // Clean up
                         }
                     });
                 } catch (error) {
