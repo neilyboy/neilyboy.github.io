@@ -1208,17 +1208,26 @@
                         pdf.setLineWidth(0.01);
                         
                         // Add title box
-                        const titleBoxHeight = 0.8;
-                        pdf.rect(margin, margin, innerWidth, titleBoxHeight);
+                        const titleBoxHeight = 0.5; // Reduced from default height
+                        const titleBoxTop = margin;
                         
-                        // Add title (centered)
-                        pdf.setFontSize(18);
+                        // Add light gray background for title box
+                        pdf.setFillColor(240, 240, 240); // Light gray
+                        pdf.rect(margin, titleBoxTop, innerWidth, titleBoxHeight, 'F');
+                        
+                        // Add title box border
+                        pdf.setDrawColor(0);
+                        pdf.setLineWidth(0.01);
+                        pdf.rect(margin, titleBoxTop, innerWidth, titleBoxHeight);
+                        
+                        // Add title text
+                        pdf.setFontSize(14);
                         pdf.setFont('helvetica', 'bold');
                         const projectName = document.getElementById('project-name').value || 'PROJECT NAME';
-                        pdf.text(projectName.toUpperCase(), pageWidth / 2, margin + (titleBoxHeight / 2), { align: 'center', baseline: 'middle' });
+                        pdf.text(projectName.toUpperCase(), pageWidth / 2, titleBoxTop + (titleBoxHeight / 2) + 0.05, { align: 'center' });
                         
                         // Map box
-                        const mapBoxTop = margin + titleBoxHeight;
+                        const mapBoxTop = titleBoxTop + titleBoxHeight;
                         const mapBoxHeight = innerHeight - titleBoxHeight - 2.0; // Leave space for legend and footer
                         pdf.rect(margin, mapBoxTop, innerWidth, mapBoxHeight);
                         
@@ -1274,6 +1283,11 @@
                         // Legend box
                         const legendBoxTop = mapBoxTop + mapBoxHeight;
                         const legendBoxHeight = 0.6; // A bit shorter to give more room to footer
+                        
+                        // Add light gray background for legend box
+                        pdf.setFillColor(240, 240, 240); // Light gray
+                        pdf.rect(margin, legendBoxTop, innerWidth, legendBoxHeight, 'F');
+                        
                         pdf.line(margin, legendBoxTop, margin + innerWidth, legendBoxTop); // Top horizontal line
                         pdf.line(margin, legendBoxTop, margin, legendBoxTop + legendBoxHeight); // Left vertical line
                         pdf.line(margin + innerWidth, legendBoxTop, margin + innerWidth, legendBoxTop + legendBoxHeight); // Right vertical line
@@ -1283,16 +1297,21 @@
                         pdf.setFontSize(12);
                         pdf.setFont('helvetica', 'bold');
                         // Center the LEGEND title in the box
-                        pdf.text('LEGEND', margin + innerWidth/2, legendBoxTop + 0.25, { align: 'center' });
+                        pdf.text('LEGEND', margin + innerWidth/2, legendBoxTop + 0.2, { align: 'center' });
                         
                         // Working with the actual legend items from legend-items element
                         const legendItems = document.querySelectorAll('#legend-items .legend-item');
                         
                         if (legendItems.length > 0) {
                             // Calculate positions
-                            const startX = margin + 1.0;
-                            const itemY = legendBoxTop + 0.35; // Center vertically better
+                            const itemY = legendBoxTop + 0.4; // Increased vertical position to avoid overlap with title
                             const legendItemWidth = 1.2; // space for each legend item
+                            
+                            // Calculate total width needed for all legend items
+                            const totalItemsWidth = legendItems.length * legendItemWidth;
+                            
+                            // Calculate starting X position to center all items
+                            const startX = margin + (innerWidth - totalItemsWidth) / 2;
                             
                             // Add each legend item
                             pdf.setFontSize(10);
