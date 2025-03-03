@@ -1282,7 +1282,8 @@
                         // Add LEGEND title
                         pdf.setFontSize(12);
                         pdf.setFont('helvetica', 'bold');
-                        pdf.text('LEGEND', margin + 0.2, legendBoxTop + 0.25);
+                        // Center the LEGEND title in the box
+                        pdf.text('LEGEND', margin + innerWidth/2, legendBoxTop + 0.25, { align: 'center' });
                         
                         // Working with the actual legend items from legend-items element
                         const legendItems = document.querySelectorAll('#legend-items .legend-item');
@@ -1319,9 +1320,14 @@
                                         // Calculate position
                                         const xPos = startX + (index * legendItemWidth);
                                         
-                                        // Draw color box
+                                        // Draw color box with outline
                                         pdf.setFillColor(r, g, b);
                                         pdf.rect(xPos, itemY - 0.15, 0.2, 0.15, 'F');
+                                        
+                                        // Add black outline to the color box
+                                        pdf.setDrawColor(0, 0, 0); // Black outline
+                                        pdf.setLineWidth(0.01); // Thin line
+                                        pdf.rect(xPos, itemY - 0.15, 0.2, 0.15, 'S'); // 'S' for stroke (outline only)
                                         
                                         // Add label
                                         pdf.text(label, xPos + 0.25, itemY);
