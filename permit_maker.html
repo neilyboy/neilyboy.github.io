@@ -1430,7 +1430,6 @@
                         pdf.line(margin + innerWidth - pageInfoBoxWidth, footerBoxTop + footerBoxHeight, margin + innerWidth, footerBoxTop + footerBoxHeight); // Page info section bottom
                         
                         // Description box (centered in footer)
-                        pdf.setFontSize(12);
                         pdf.setFont('helvetica', 'normal');
                         const description = document.getElementById('project-description').value || 'DESCRIPTION GOES HERE';
                         
@@ -1438,14 +1437,102 @@
                         const descX = margin + logoBoxWidth + ((innerWidth - logoBoxWidth - pageInfoBoxWidth) / 2);
                         const descY = footerBoxTop + (footerBoxHeight / 2);
                         
-                        // Apply text wrapping for description to ensure it stays within bounds
-                        // Use a more conservative width to prevent overflow
-                        const maxDescWidth = innerWidth - logoBoxWidth - pageInfoBoxWidth - 0.8; // More padding to prevent overflow
-                        const descLines = pdf.splitTextToSize(description, maxDescWidth);
+                        // Define the available space for the description - use more conservative values
+                        const maxDescWidth = innerWidth - logoBoxWidth - pageInfoBoxWidth - 1.0; // More padding to prevent overflow
+                        const maxDescHeight = footerBoxHeight - 0.4; // More padding at top and bottom
                         
-                        // Adjust vertical position if there are multiple lines
-                        const lineHeight = 0.15; // Approximate line height
-                        const totalTextHeight = descLines.length * lineHeight;
+                        // Auto-size text based on content length
+                        let fontSize = 12; // Start with default size
+                        const minFontSize = 6; // Allow smaller font for very long text
+                        const maxFontSize = 14; // Don't go larger than this
+                        
+                        // Function to check if text fits within available space
+                        const textFits = (text, fontSize, maxWidth, maxHeight) => {
+                            pdf.setFontSize(fontSize);
+                            const lines = pdf.splitTextToSize(text, maxWidth);
+                            const lineHeight = fontSize * 0.0167; // Convert font size to inches (approximate)
+                            const totalHeight = lines.length * lineHeight;
+                            return (totalHeight <= maxHeight && lines.length > 0);
+                        };
+                        
+                        // Find the optimal font size
+                        if (description.length > 300) {
+                            // For very long text, start with smaller font
+                            fontSize = 7;
+                        } else if (description.length > 150) {
+                            fontSize = 9;
+                        } else if (description.length < 50) {
+                            // For very short text, start with larger font
+                            fontSize = maxFontSize;
+                        }
+                        
+                        // Binary search to find the optimal font size
+                        let minSize = minFontSize;
+                        let maxSize = fontSize;
+                        let currentSize = fontSize;
+                        let finalLines = [];
+                        
+                        // Try to fit text with binary search
+                        if (description.length > 30) {
+                            let iterations = 0;
+                            const maxIterations = 10; // Prevent infinite loops
+                            
+                            while (maxSize - minSize > 0.5 && iterations < maxIterations) {
+                                iterations++;
+                                currentSize = (minSize + maxSize) / 2;
+                                
+                                pdf.setFontSize(currentSize);
+                                const lines = pdf.splitTextToSize(description, maxDescWidth);
+                                const lineHeight = currentSize * 0.0167;
+                                const totalHeight = lines.length * lineHeight;
+                                
+                                if (totalHeight <= maxDescHeight) {
+                                    // This size fits, try a larger one
+                                    minSize = currentSize;
+                                    finalLines = lines; // Save these lines as they fit
+                                } else {
+                                    // Too big, try a smaller size
+                                    maxSize = currentSize;
+                                }
+                            }
+                            
+                            fontSize = minSize; // Use the largest size that fits
+                        }
+                        
+                        // Set the final font size
+                        pdf.setFontSize(fontSize);
+                        
+                        // Apply text wrapping for description
+                        let descLines = finalLines.length > 0 ? finalLines : pdf.splitTextToSize(description, maxDescWidth);
+                        
+                        // Calculate line height based on font size
+                        const lineHeight = fontSize * 0.0167; // Convert font size to inches
+                        
+                        // Check if text still doesn't fit even with minimum font size
+                        let totalTextHeight = descLines.length * lineHeight;
+                        
+                        // If text still doesn't fit, truncate it
+                        if (totalTextHeight > maxDescHeight) {
+                            // Calculate how many lines can fit
+                            const maxLines = Math.floor(maxDescHeight / lineHeight);
+                            
+                            // Keep only the lines that fit
+                            if (maxLines < descLines.length) {
+                                // If we have more than 3 lines, keep first lines and add "..." at the end
+                                if (maxLines > 3) {
+                                    descLines = descLines.slice(0, maxLines - 1);
+                                    descLines.push("...");
+                                } else {
+                                    // Just truncate to max lines
+                                    descLines = descLines.slice(0, maxLines);
+                                }
+                                
+                                // Recalculate height
+                                totalTextHeight = descLines.length * lineHeight;
+                            }
+                        }
+                        
+                        // Center text vertically
                         const descStartY = descY - (totalTextHeight / 2) + (lineHeight / 2);
                         
                         // Center text in the middle section
