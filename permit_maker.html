@@ -224,24 +224,6 @@
             margin: 0 0 0 10px;
         }
         
-        #saved-projects {
-            max-height: 200px;
-            overflow-y: auto;
-            margin-bottom: 15px;
-        }
-        
-        .saved-project {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 5px;
-            cursor: pointer;
-        }
-        
-        .saved-project:hover {
-            background-color: #f0f0f0;
-        }
-        
         .action-buttons {
             display: flex;
             flex-direction: column;
@@ -370,9 +352,10 @@
         
         <div class="sidebar-section">
             <h3>Project Management</h3>
-            <div id="saved-projects"></div>
+            <button id="export-project">Export Project as JSON</button>
+            <button id="import-project">Import Project from JSON</button>
+            <input type="file" id="import-project-file" accept=".json" style="display: none;">
             <div class="action-buttons">
-                <button id="save-project">Save Current Project</button>
                 <button id="export-pdf">Export as PDF</button>
             </div>
         </div>
@@ -507,8 +490,7 @@
                 companyLogo: null,
                 legendItems: [],
                 savedLogos: [],
-                drawings: [],
-                savedProjects: []
+                drawings: []
             };
             
             // Load state from localStorage
@@ -533,9 +515,6 @@
                     
                     // Load saved logos to dropdown
                     updateLogoDropdown();
-                    
-                    // Load saved projects list
-                    updateSavedProjectsList();
                 }
             }
             
@@ -588,7 +567,11 @@
                 document.getElementById('logo-select').addEventListener('change', handleLogoSelect);
                 
                 // Project management
-                document.getElementById('save-project').addEventListener('click', saveCurrentProject);
+                document.getElementById('export-project').addEventListener('click', exportProjectAsJson);
+                document.getElementById('import-project').addEventListener('click', () => {
+                    document.getElementById('import-project-file').click();
+                });
+                document.getElementById('import-project-file').addEventListener('change', importProjectFromJson);
                 document.getElementById('export-pdf').addEventListener('click', showPdfPreview);
                 
                 // Text input modal events
@@ -888,11 +871,11 @@
                 });
             }
             
-            // Save current project
-            function saveCurrentProject() {
+            // Export project as JSON file
+            function exportProjectAsJson() {
                 const projectName = document.getElementById('project-name').value.trim();
                 if (!projectName) {
-                    alert('Please enter a project name before saving.');
+                    alert('Please enter a project name before exporting.');
                     return;
                 }
                 
@@ -922,106 +905,174 @@
                     savedAt: new Date().toLocaleString()
                 };
                 
-                // Check if project already exists
-                const existingIndex = state.savedProjects.findIndex(p => p.name === projectName);
-                if (existingIndex !== -1) {
-                    if (confirm(`Project "${projectName}" already exists. Do you want to overwrite it?`)) {
-                        // Update existing project
-                        state.savedProjects[existingIndex] = project;
-                    } else {
-                        return;
-                    }
-                } else {
-                    // Add new project
-                    state.savedProjects.push(project);
-                }
+                // Convert to JSON string
+                const jsonData = JSON.stringify(project, null, 2);
                 
-                saveState();
-                updateSavedProjectsList();
-                alert(`Project "${projectName}" saved successfully.`);
+                // Create download link
+                const blob = new Blob([jsonData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${projectName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_').toLowerCase()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Clean up
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 0);
             }
             
-            // Load saved project
-            function loadProject(projectId) {
-                const project = state.savedProjects.find(p => p.id === projectId);
-                if (!project) return;
+            // Import project from JSON file
+            function importProjectFromJson(e) {
+                const file = e.target.files[0];
+                if (!file) return;
                 
-                // Confirm if there are unsaved changes
-                if (state.drawings.length > 0) {
-                    if (!confirm('Loading a project will overwrite any unsaved changes. Continue?')) {
-                        return;
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const project = JSON.parse(event.target.result);
+                        
+                        // Validate project data
+                        if (!project.name || !project.mapView) {
+                            throw new Error('Invalid project file');
+                        }
+                        
+                        // Confirm if there are unsaved changes
+                        if (state.drawings.length > 0) {
+                            if (!confirm('Importing a project will overwrite any unsaved changes. Continue?')) {
+                                return;
+                            }
+                        }
+                        
+                        // Update state with imported project data
+                        state.projectName = project.name;
+                        state.description = project.description;
+                        state.pageNumber = project.pageNumber;
+                        state.totalPages = project.totalPages;
+                        state.companyName = project.companyName;
+                        state.companyAddress = project.companyAddress;
+                        state.drawnBy = project.drawnBy;
+                        state.dateDrawn = project.dateDrawn;
+                        state.companyLogo = project.companyLogo;
+                        state.legendItems = project.legendItems || [];
+                        state.drawings = project.drawings || [];
+                        
+                        // Import saved logos if they exist
+                        if (project.savedLogos && Array.isArray(project.savedLogos)) {
+                            // Merge with existing logos, avoiding duplicates
+                            project.savedLogos.forEach(importedLogo => {
+                                if (!state.savedLogos.some(logo => logo.name === importedLogo.name)) {
+                                    state.savedLogos.push(importedLogo);
+                                }
+                            });
+                        }
+                        
+                        // Update form fields
+                        document.getElementById('project-name').value = project.name;
+                        document.getElementById('project-description').value = project.description || '';
+                        document.getElementById('page-number').value = project.pageNumber || '1';
+                        document.getElementById('total-pages').value = project.totalPages || '1';
+                        document.getElementById('company-name').value = project.companyName || '';
+                        document.getElementById('company-address').value = project.companyAddress || '';
+                        document.getElementById('drawn-by').value = project.drawnBy || '';
+                        document.getElementById('date-drawn').value = project.dateDrawn || '';
+                        
+                        // Update logo
+                        if (project.companyLogo) {
+                            const logoPreview = document.getElementById('logo-preview');
+                            logoPreview.style.backgroundImage = `url(${project.companyLogo})`;
+                        }
+                        
+                        // Update logo dropdown
+                        updateLogoDropdown();
+                        
+                        // Update legend
+                        const legendContainer = document.getElementById('legend-items');
+                        legendContainer.innerHTML = '';
+                        if (project.legendItems && Array.isArray(project.legendItems)) {
+                            project.legendItems.forEach(item => {
+                                addLegendItem(item.color, item.label);
+                            });
+                        }
+                        
+                        // Update map view
+                        if (project.mapView) {
+                            map.setView([project.mapView.lat, project.mapView.lng], project.mapView.zoom);
+                        }
+                        
+                        // Clear and redraw drawings
+                        drawnItems.clearLayers();
+                        
+                        // Recreate drawings on the map
+                        if (project.drawings && Array.isArray(project.drawings)) {
+                            project.drawings.forEach(drawing => {
+                                recreateDrawing(drawing);
+                            });
+                        }
+                        
+                        // Save to state
+                        saveState();
+                        
+                        alert(`Project "${project.name}" imported successfully.`);
+                    } catch (error) {
+                        console.error('Error importing project:', error);
+                        alert('Failed to import project. The file may be corrupted or in an invalid format.');
                     }
-                }
-                
-                // Update state and UI
-                state.projectName = project.name;
-                state.description = project.description;
-                state.pageNumber = project.pageNumber;
-                state.totalPages = project.totalPages;
-                state.companyName = project.companyName;
-                state.companyAddress = project.companyAddress;
-                state.drawnBy = project.drawnBy;
-                state.dateDrawn = project.dateDrawn;
-                state.companyLogo = project.companyLogo;
-                state.legendItems = project.legendItems;
-                state.drawings = project.drawings;
-                
-                // Update form fields
-                document.getElementById('project-name').value = project.name;
-                document.getElementById('project-description').value = project.description;
-                document.getElementById('page-number').value = project.pageNumber;
-                document.getElementById('total-pages').value = project.totalPages;
-                document.getElementById('company-name').value = project.companyName;
-                document.getElementById('company-address').value = project.companyAddress;
-                document.getElementById('drawn-by').value = project.drawnBy;
-                document.getElementById('date-drawn').value = project.dateDrawn;
-                
-                // Update logo
-                if (project.companyLogo) {
-                    const logoPreview = document.getElementById('logo-preview');
-                    logoPreview.style.backgroundImage = `url(${project.companyLogo})`;
-                }
-                
-                // Update legend
-                const legendContainer = document.getElementById('legend-items');
-                legendContainer.innerHTML = '';
-                project.legendItems.forEach(item => {
-                    addLegendItem(item.color, item.label);
-                });
-                
-                // Update map view
-                if (project.mapView) {
-                    map.setView([project.mapView.lat, project.mapView.lng], project.mapView.zoom);
-                }
-                
-                // Clear and redraw drawings
-                drawnItems.clearLayers();
-                // Here you'd need to recreate each drawing based on its type and properties
-                // This is a simplified implementation
-                
-                alert(`Project "${project.name}" loaded successfully.`);
-            }
-            
-            // Update saved projects list
-            function updateSavedProjectsList() {
-                const projectsContainer = document.getElementById('saved-projects');
-                projectsContainer.innerHTML = '';
-                
-                if (state.savedProjects.length === 0) {
-                    const noProjects = document.createElement('div');
-                    noProjects.textContent = 'No saved projects.';
-                    projectsContainer.appendChild(noProjects);
-                    return;
-                }
-                
-                state.savedProjects.forEach(project => {
-                    const projectItem = document.createElement('div');
-                    projectItem.className = 'saved-project';
-                    projectItem.textContent = `${project.name} (${project.savedAt})`;
-                    projectItem.addEventListener('click', () => loadProject(project.id));
                     
-                    projectsContainer.appendChild(projectItem);
-                });
+                    // Reset file input
+                    e.target.value = '';
+                };
+                reader.readAsText(file);
+            }
+            
+            // Recreate a drawing on the map from saved data
+            function recreateDrawing(drawingData) {
+                if (!drawingData || !drawingData.type) return;
+                
+                let layer;
+                
+                switch (drawingData.type) {
+                    case 'marker':
+                        if (drawingData.position) {
+                            layer = L.marker(drawingData.position);
+                        }
+                        break;
+                    case 'circle':
+                        if (drawingData.position && drawingData.radius) {
+                            layer = L.circle(drawingData.position, { radius: drawingData.radius });
+                        }
+                        break;
+                    case 'rectangle':
+                        if (drawingData.points) {
+                            layer = L.rectangle(drawingData.points);
+                        }
+                        break;
+                    case 'polygon':
+                        if (drawingData.points) {
+                            layer = L.polygon(drawingData.points);
+                        }
+                        break;
+                    case 'polyline':
+                        if (drawingData.points) {
+                            layer = L.polyline(drawingData.points);
+                        }
+                        break;
+                }
+                
+                if (layer) {
+                    // Set the color of the drawn item
+                    if (layer.setStyle && drawingData.color) {
+                        layer.setStyle({
+                            color: drawingData.color,
+                            fillColor: drawingData.color,
+                            fillOpacity: 0.2
+                        });
+                    }
+                    
+                    drawnItems.addLayer(layer);
+                }
             }
             
             // Show PDF preview
