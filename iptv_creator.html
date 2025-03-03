@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IPTV Playlist Manager</title>
+    <style>
+        body { font-family: sans-serif; }
+        #fileInput { display: none; }
+        .playlist { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+        .channel { display: flex; align-items: center; }
+        .channel input[type="checkbox"] { margin-right: 10px; }
+        #combinedPlaylist { border: 1px solid #000; padding: 10px; margin-top: 20px; }
+        #combinedPlaylist textarea { width: 95%; height: 200px; }
+    </style>
+</head>
+<body>
+    <h1>IPTV Playlist Manager</h1>
+    <button id="uploadButton">Upload M3U Playlist</button>
+    <input type="file" id="fileInput" accept=".m3u" />
+    <div id="playlists"></div>
+    <h2>Combined Playlist</h2>
+    <div id="combinedPlaylist">
+        <textarea id="combinedM3U"></textarea>
+        <button id="exportButton">Export M3U</button>
+    </div>
+
+    <script>
+        const uploadButton = document.getElementById('uploadButton');
+        const fileInput = document.getElementById('fileInput');
+        const playlistsDiv = document.getElementById('playlists');
+        const combinedM3U = document.getElementById('combinedM3U');
+        const exportButton = document.getElementById('exportButton');
+
+        uploadButton.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    parseM3U(e.target.result, file.name);
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function parseM3U(m3uContent, fileName) {
+            const lines = m3uContent.split('\n');
+            const channels = [];
+            let currentChannel = null;
+
+            for (const line of lines) {
+                if (line.startsWith('#EXTINF:')) {
+                    const name = line.split(',')[1];
+                    currentChannel = { name: name, url: null, checked: false };
+                    channels.push(currentChannel);
+                } else if (line.startsWith('http')) {
+                    if (currentChannel) {
+                        currentChannel.url = line.trim();
+                    }
+                }
+            }
+            displayPlaylist(channels, fileName);
+        }
+
+        function displayPlaylist(channels, fileName) {
+            const playlistDiv = document.createElement('div');
+            playlistDiv.classList.add('playlist');
+            playlistDiv.innerHTML = `<h3>${fileName}</h3>`;
+
+            channels.forEach(channel => {
+                const channelDiv = document.createElement('div');
+                channelDiv.classList.add('channel');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.addEventListener('change', () => {
+                    channel.checked = checkbox.checked;
+                    updateCombinedPlaylist();
+                });
+                channelDiv.appendChild(checkbox);
+                channelDiv.innerHTML += channel.name;
+                playlistDiv.appendChild(channelDiv);
+            });
+            playlistsDiv.appendChild(playlistDiv);
+        }
+
+        function updateCombinedPlaylist() {
+            let combinedM3UContent = '#EXTM3U\n';
+            const allPlaylists = document.querySelectorAll('.playlist');
+            allPlaylists.forEach(playlist => {
+                const channels = Array.from(playlist.querySelectorAll('.channel'));
+                channels.forEach(channelDiv => {
+                    const checkbox = channelDiv.querySelector('input[type="checkbox"]');
+                    if (checkbox.checked) {
+                        const channelName = channelDiv.textContent.trim();
+                        const playlistTitle = playlist.querySelector('h3').textContent;
+                        const channelObject = getChannelObject(channelName, playlistTitle);
+                        if(channelObject){
+                            combinedM3UContent += `#EXTINF:-1,${channelObject.name}\n${channelObject.url}\n`;
+                        }
+                    }
+                });
+            });
+            combinedM3U.value = combinedM3UContent;
+        }
+
+        function getChannelObject(channelName, playlistTitle){
+          const playlistDivs = document.querySelectorAll('.playlist');
+          for(const playlistDiv of playlistDivs){
+            if(playlistDiv.querySelector('h3').textContent === playlistTitle){
+              const channels = Array.from(playlistDiv.querySelectorAll('.channel'));
+              for(const channelDiv of channels){
+                if(channelDiv.textContent.trim() === channelName){
+                  const channelObj = {};
+                  const allChannels = getChannelsFromPlaylist(playlistDiv);
+                  for (let i = 0; i < allChannels.length; i++){
+                    if(allChannels[i].name === channelName){
+                      return allChannels[i];
+                    }
+                  }
+                }
+              }
+            }
+          }
+          return null;
+        }
+
+        function getChannelsFromPlaylist(playlistDiv){
+          const channels = [];
+          const lines = playlistDiv.textContent.split('\n');
+          let currentChannel = null;
+
+          for (const line of lines) {
+              if (line.startsWith('#EXTINF:')) {
+                  const name = line.split(',')[1];
+                  currentChannel = { name: name, url: null, checked: false };
+                  channels.push(currentChannel);
+              } else if (line.startsWith('http')) {
+                  if (currentChannel) {
+                      currentChannel.url = line.trim();
+                  }
+              }
+          }
+          return channels;
+        }
+
+        exportButton.addEventListener('click', () => {
+            const blob = new Blob([combinedM3U.value], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'combined.m3u';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body>
+</html>
