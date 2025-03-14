@@ -1,3 +1,5 @@
 #EXTM3U
 #EXTINF:-1 | DirtVision tvg-logo="http://xplatinmedia.com:8080/images/aef14ad5ae37cf56f0dcc161f08cf94e.png" group-title="DOCUMENTARIES",DirtVision
 http://192.168.0.54:8080/stream/1741994181308/playlist.m3u8
+#EXTINF:-1 | DirtVision2 tvg-logo="http://xplatinmedia.com:8080/images/aef14ad5ae37cf56f0dcc161f08cf94e.png" group-title="DOCUMENTARIES",DirtVision2
+http://192.168.0.54:8080/stream/1741994245329/playlist.m3u8
