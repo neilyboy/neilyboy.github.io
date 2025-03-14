@@ -1,7 +1,20 @@
-#EXTM3U
-#EXTINF:-1 tvg-id="" tvg-name="US: CBS 31 (WMBD) PEORIA HD" tvg-logo="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/e0ed59b0-cee0-4bd6-99de-db967d3b93b0/de4r6an-ac6fd9c2-b383-4fef-b06a-fb1b90c046fd.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2UwZWQ1OWIwLWNlZTAtNGJkNi05OWRlLWRiOTY3ZDNiOTNiMFwvZGU0cjZhbi1hYzZmZDljMi1iMzgzLTRmZWYtYjA2YS1mYjFiOTBjMDQ2ZmQucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.fgxqO2HN-PTgJ3y2POap-0I0L8-xnCbwPli0voGx8u8" group-title="LOCALS",CBS - PEORIA
-http://207.179.200.75:8088/CBS31_LOCALS/
-#EXTINF:-1 tvg-id="" tvg-name="US: NBC 25 (WEEK) PEORIA HD" tvg-logo="https://media.licdn.com/dms/image/v2/C4E0BAQFF6MPAVFy5LQ/company-logo_200_200/company-logo_200_200/0/1631356093414?e=2147483647&v=beta&t=ZDf-tIZ6nINbHjvlczKLA3Kwz_UBoT_7-uhvoU1oFHo" group-title="LOCALS",NBC - PEORIA
-http://207.179.200.75:8088/NBC25_LOCALS/
-#EXTINF:-1 tvg-id="KTVI.us" tvg-name="US: FOX 43 (WYZZ) PEORIA" tvg-logo="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/e0ed59b0-cee0-4bd6-99de-db967d3b93b0/ddyiwf4-a9d9c6d6-25e3-4d43-91b7-af215245b676.png/v1/fill/w_936,h_854/fox_43_wyzz_tv_by_cplanas1985_ddyiwf4-pre.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTU1MCIsInBhdGgiOiJcL2ZcL2UwZWQ1OWIwLWNlZTAtNGJkNi05OWRlLWRiOTY3ZDNiOTNiMFwvZGR5aXdmNC1hOWQ5YzZkNi0yNWUzLTRkNDMtOTFiNy1hZjIxNTI0NWI2NzYucG5nIiwid2lkdGgiOiI8PTE2OTkifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.H0r8TSovWn7X7154LJ1tAlrOreJQYmHTqvP3WnqjEtc" group-title="LOCALS",FOX - PEORIA
-http://207.179.200.75:8088/FOX43_LOCALS/
+#EXTINF:-1 xui-id="{XUI_ID}" tvg-id="mgm+drive.us" tvg-name="USA MGM+ Drive-In UHD" tvg-logo="https://cdn.tvpassport.com/image/station/240x135/v2/s68409_h15_ad.png" group-title="MOVIES",MGM+ DRIVE-IN
+http://fl2.moveonjoy.com/EPIX_DRIVE_IN/index.m3u8
+#EXTINF:-1 xui-id="{XUI_ID}" tvg-id="mgm+hits.us" tvg-name="USA MGM+ HITS" tvg-logo="https://www.tvinsider.com/wp-content/uploads/2023/01/mgm-hits.png" group-title="MOVIES",MGM+ HITS
+http://cdn1host.online:2999/kratorius/opLcbhlXaT/388
+#EXTINF:-1 xui-id="{XUI_ID}" tvg-id="mgm+marquee.us" tvg-name="USA MGM+ MARQUEE" tvg-logo="https://www.tvinsider.com/wp-content/uploads/2023/01/mgm-plus-marquee.png" group-title="MOVIES",MGM+ MARQUEE
+http://cdn1host.online:2999/kratorius/opLcbhlXaT/132
+#EXTINF:-1 xui-id="{XUI_ID}" tvg-id="outermax.us" tvg-name="USA CINEMAX OUTERMAX" tvg-logo="https://www.tvinsider.com/wp-content/uploads/2023/08/outer-max.png" group-title="MOVIES",CINEMAX OUTERMAX
+http://fl2.moveonjoy.com/OUTER_MAX/index.m3u8
+#EXTINF:-1 xui-id="{XUI_ID}" tvg-id="outsidetv.us" tvg-name="USA Outside TV" tvg-logo="https://yt3.googleusercontent.com/zkWNgZ0kIiG26i4EA4SyL1gJ4a74kJUa_BCYS5bwL1HT0lIYpn-sw3ovdqPzgl3eSgvkUJVDow=s900-c-k-c0x00ffffff-no-rj" group-title="SPORTS",Outside TV
+http://fl2.moveonjoy.com/OUTSIDE_TV/index.m3u8
+#EXTINF:-1 xui-id="{XUI_ID}" tvg-id="smithsonianchannel.ca" tvg-name="USA Smithsonian Channel" tvg-logo="https://logo.iptveditor.com/smithsonianchannel.png" group-title="DOCUMENTARIES",SMITHSONIAN CHANNEL
+http://fl2.moveonjoy.com/SMITHSONIAN_CHANNEL/index.m3u8
+#EXTINF:-1 xui-id="{XUI_ID}" tvg-id="travelchannel.us" tvg-name="USA Travel Channel" tvg-logo="https://cordcutting.com/wp-content/uploads/2018/06/travel-channel-logo.jpg" group-title="DOCUMENTARIES",TRAVEL CHANNEL
+http://fl2.moveonjoy.com/Travel_Channel/index.m3u8
+#EXTINF:-1 xui-id="{XUI_ID}" tvg-id="nbcwmaqwmaqchicago.us" tvg-name="IL | Chicago | NBC WMAQ" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/WMAQ-TV_NBC_5_Chicago%2C_Illinois_Logo.svg/200px-WMAQ-TV_NBC_5_Chicago%2C_Illinois_Logo.svg.png" group-title="LOCALS",NBC - CHICAGO
+http://fl2.moveonjoy.com/NBC_EAST/index.m3u8
+#EXTINF:-1 xui-id="{XUI_ID}" tvg-id="nbcwnbcwnbcnycny.us" tvg-name="NY | New York | NBC WNBC" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/4/43/WNBC_4_NY.svg" group-title="LOCALS",NBC - New York
+http://185.150.191.249/NYNewYorkNBCWNBC/index.m3u8
+EXTINF:-1 tvg-id="Oxygen.us" tvg-name="US: OXYGEN HD" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/0/02/Oxygen_TV_%282017_Logo%29.png" group-title="ENTERTAINMENT",OXYGEN
+http://fl2.moveonjoy.com/OXYGEN/index.m3u8
