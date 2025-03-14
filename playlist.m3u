@@ -1,3 +1,3 @@
 #EXTM3U
-#EXTINF:-1 | WTF TEST01 tvg-logo="http://23.227.147.172:80/images/520ac951a7b37ca494c6b6d558f990ed.jpg" group-title="DOCUMENTARIES",NATIONAL GEOGRAPHIC
+#EXTINF:-1 | DirtVision tvg-logo="http://xplatinmedia.com:8080/images/aef14ad5ae37cf56f0dcc161f08cf94e.png" group-title="DOCUMENTARIES",NATIONAL GEOGRAPHIC
 http://192.168.0.54:8080/stream/1741994181308/playlist.m3u8
