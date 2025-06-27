@@ -107,7 +107,7 @@ const itinerary = [
       { text: "Carlinville Scavenger Hunt", url: "https://www.scavengerhunt.com/scavenger-hunt/carlinville-il" },
       { text: "Beaver Dam State Park", url: "https://dnr.illinois.gov/parks/park.beaverdam.html" },
       { text: "Grafton Flea Market", url: "https://www.graftonloadingdock.com/flea-market" },
-      { text: "Aerie's Winery", url: "https://www.riversandroutes.com/directory/aeries-winery/" },
+      { text: "Aerie's Winery", url: "https://aeriesresort.com" },
       { text: "Anthony Nanney Live Music", url: "https://www.aeriesresort.com/event-details/anthony-nanney-live-music-2025-06-28-14-00" }
     ]
   },
