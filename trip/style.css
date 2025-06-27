@@ -1,0 +1,166 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+:root {
+  --bg: #101624;
+  --card-bg: #181f2f;
+  --accent: #64f4e7;
+  --accent2: #7f6bff;
+  --text: #f7faff;
+  --muted: #9bb3c9;
+  --border: #232c3c;
+  --shadow: 0 4px 24px #0007;
+  --shadow-soft: 0 2px 12px #0003;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, #101624 0%, #1a2233 100%);
+  color: var(--text);
+  min-height: 100vh;
+  letter-spacing: 0.01em;
+}
+header {
+  padding: 1.7rem 1rem 0.7rem 1rem;
+  background: linear-gradient(90deg, #181f2f 0%, #232a36 100%);
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+}
+header h1 {
+  margin: 0 0 0.4rem 0;
+  font-size: 2.15rem;
+  color: var(--accent2);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-shadow: 0 2px 16px #0004;
+}
+header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.08rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+main {
+  padding: 1rem 0.5rem 4rem 0.5rem;
+  max-width: 600px;
+  margin: auto;
+}
+.card {
+  background: var(--card-bg);
+  border-radius: 1.3rem;
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 1.5rem;
+  padding: 1.2rem 1.1rem 1rem 1.1rem;
+  border: 1.5px solid var(--border);
+  transition: box-shadow 0.22s, border-color 0.22s, transform 0.22s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  will-change: box-shadow, transform;
+}
+.card:hover, .card:active {
+  box-shadow: var(--shadow);
+  border-color: var(--accent2);
+  transform: translateY(-2px) scale(1.018);
+}
+.card.expanded {
+  box-shadow: 0 4px 24px #0007;
+}
+.card h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.3rem;
+  color: var(--accent);
+  font-weight: 700;
+}
+.card .subtitle {
+  color: var(--muted);
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+.card .details {
+  display: none;
+  margin-top: 0.8rem;
+  font-size: 1.01rem;
+  color: var(--text);
+}
+.card.expanded .details {
+  display: block;
+  animation: fadeIn 0.4s;
+}
+.card .photos {
+  display: flex;
+  gap: 0.6rem;
+  margin: 0.8rem 0 0.5rem 0;
+  overflow-x: auto;
+}
+.card .photos img {
+  border-radius: 1.1rem;
+  height: 92px;
+  min-width: 124px;
+  object-fit: cover;
+  border: 2px solid var(--border);
+  box-shadow: 0 2px 8px #0005;
+  transition: transform 0.18s, border 0.18s;
+  background: #222e44;
+}
+.card .photos img:hover, .card .photos img:active {
+  transform: scale(1.06) rotate(-1deg);
+  border-color: var(--accent);
+}
+.card .links {
+  margin-top: 0.7rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+.card .links a {
+  color: var(--accent2);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.03rem;
+  padding: 0.13em 0.6em;
+  border-radius: 0.7em;
+  background: rgba(127,107,255,0.10);
+  transition: background 0.18s, color 0.18s;
+}
+.card .links a:hover {
+  background: var(--accent2);
+  color: #fff;
+  text-decoration: none;
+}
+footer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(90deg, #181f2f 0%, #232a36 100%);
+  color: var(--muted);
+  text-align: center;
+  padding: 0.8rem 0 0.7rem 0;
+  font-size: 1.05rem;
+  border-top: 1.5px solid var(--border);
+  z-index: 10;
+  box-shadow: 0 -2px 12px #0003;
+}
+@media (max-width: 600px) {
+  main {
+    padding: 0.5rem 0.02rem 4rem 0.02rem;
+  }
+  .card {
+    padding: 0.8rem 0.2rem 0.7rem 0.3rem;
+    border-radius: 1rem;
+  }
+  .card .photos img {
+    height: 74px;
+    min-width: 88px;
+    border-radius: 0.7rem;
+  }
+  header h1 {
+    font-size: 1.35rem;
+  }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
