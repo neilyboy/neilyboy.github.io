@@ -8,9 +8,9 @@ const itinerary = [
       <li><b>Optional Stop:</b> <a href='https://www.facebook.com/slaughterhousebrewing/' target='_blank'>Slaughterhouse Brewing Co</a> (<a href='https://maps.google.com/?q=321+W+Madison+St,+Auburn,+IL' target='_blank'>321 W. Madison St. Auburn, IL</a>)</li>
       <li><b>Check-in:</b> After 4PM at <a href='https://maps.google.com/?q=320+E+2nd+South,+Carlinville,+IL+62626' target='_blank'>320 E 2nd South Carlinville, IL 62626</a></li>
       <li>Park in driveway (avoid rocks)</li>
-      <li>Press Yale button on lock, code <b>2123</b>, then check mark</li>
+      <li>Press Yale button on lock, code <b>redacted</b>, then check mark</li>
       <li>Luggage under bed</li>
-      <li><b>Wi-Fi:</b> SSID: <code>TheHideaway</code> / Password: <code>Password</code></li>
+      <li><b>Wi-Fi:</b> SSID: <code>TheHideaway</code> / Password: <code>redacted</code></li>
     </ul>`,
     photos: [
       "https://lh3.googleusercontent.com/gps-cs-s/AC9h4nrgMLitBslDofg3_N9ije_4Kq2tO7rcmq0ZoTX_T0xa7QjnBJ3AEq0KATUmcHyJeQDsBCli2874q9L-T0o0DzVxMi85yJQNwyKGo8U0DQ93SjDYt2Xbf2oj8kMbVmhRrTRvZwv7OQ=s680-w680-h510-rw",
