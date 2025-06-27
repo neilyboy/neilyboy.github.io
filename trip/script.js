@@ -91,7 +91,7 @@ const itinerary = [
       <li><b>Carlinville Scavenger Hunt</b> – <a href='https://www.scavengerhunt.com/scavenger-hunt/carlinville-il' target='_blank'>scavengerhunt.com</a> (1.5 hr app-guided tour)</li>
       <li><b>Beaver Dam State Park</b> – <a href='https://dnr.illinois.gov/parks/park.beaverdam.html' target='_blank'>14548 Beaver Dam Ln</a> (13 min, 8.2 miles SW)</li>
       <li><b>Grafton Flea Market</b> – <a href='https://www.graftonloadingdock.com/flea-market' target='_blank'>401 Front St.</a> (Opens 9AM)</li>
-      <li><b>The Winery @ Aerie's Resort</b> – <a href='https://www.riversandroutes.com/directory/aeries-winery/' target='_blank'>3 W Clinton, Grafton</a> (Sky Tour, Live Music 2-6PM)</li>
+      <li><b>The Winery @ Aerie's Resort</b> – <a href='https://aeriesresort.com' target='_blank'>3 W Clinton, Grafton</a> (Sky Tour, Live Music 2-6PM)</li>
       <li><b>Anthony Nanney Live Music</b> – <a href='https://www.aeriesresort.com/event-details/anthony-nanney-live-music-2025-06-28-14-00' target='_blank'>601 Timber Ridge Dr, Grafton</a></li>
     </ul>`,
     photos: [
