@@ -88,11 +88,11 @@ const itinerary = [
     subtitle: "Explore Carlinville & Beyond",
     details: `<ul>
       <li><b>Starr's Primal Meats</b> – <a href='https://maps.google.com/?q=116+S+Plum+St,+Carlinville,+IL+62626' target='_blank'>116 S Plum St.</a> (Open 9AM-8PM)</li>
-      <li><b>Carlinville Scavenger Hunt</b> – <a href='https://www.letsroam.com/scavenger_hunt/Carlinville_Scavenger_Hunt' target='_blank'>letsroam.com</a> (1.5 hr app-guided tour)</li>
-      <li><b>Beaver Dam State Park</b> – <a href='https://maps.google.com/?q=14548+Beaver+Dam+Ln,+Royal+Lakes,+IL+62685' target='_blank'>14548 Beaver Dam Ln</a> (13 min, 8.2 miles SW)</li>
-      <li><b>Grafton Flea Market</b> – <a href='https://maps.google.com/?q=401+Front+St,+Grafton,+IL+62037' target='_blank'>401 Front St.</a> (Opens 9AM)</li>
-      <li><b>The Winery @ Aerie's Resort</b> – <a href='https://aeriesview.com/winery/' target='_blank'>3 W Clinton, Grafton</a> (Sky Tour, Live Music 2-6PM)</li>
-      <li><b>Anthony Nanney Live Music</b> – <a href='https://www.facebook.com/AnthonyNanneyMusic/' target='_blank'>601 Timber Ridge Dr, Grafton</a></li>
+      <li><b>Carlinville Scavenger Hunt</b> – <a href='https://www.scavengerhunt.com/scavenger-hunt/carlinville-il' target='_blank'>scavengerhunt.com</a> (1.5 hr app-guided tour)</li>
+      <li><b>Beaver Dam State Park</b> – <a href='https://dnr.illinois.gov/parks/park.beaverdam.html' target='_blank'>14548 Beaver Dam Ln</a> (13 min, 8.2 miles SW)</li>
+      <li><b>Grafton Flea Market</b> – <a href='https://www.graftonloadingdock.com/flea-market' target='_blank'>401 Front St.</a> (Opens 9AM)</li>
+      <li><b>The Winery @ Aerie's Resort</b> – <a href='https://www.riversandroutes.com/directory/aeries-winery/' target='_blank'>3 W Clinton, Grafton</a> (Sky Tour, Live Music 2-6PM)</li>
+      <li><b>Anthony Nanney Live Music</b> – <a href='https://www.aeriesresort.com/event-details/anthony-nanney-live-music-2025-06-28-14-00' target='_blank'>601 Timber Ridge Dr, Grafton</a></li>
     </ul>`,
     photos: [
       "https://photos.scavengerhunt.com/scavenger_hunt_locations/___scavenger_hunt_1734786761_medium.jpg",
@@ -111,6 +111,41 @@ const itinerary = [
       { text: "Anthony Nanney Live Music", url: "https://www.aeriesresort.com/event-details/anthony-nanney-live-music-2025-06-28-14-00" }
     ]
   },
+  // --- NEW STOP: Grafton Sky Tour ---
+  {
+    day: "Saturday",
+    title: "Grafton Sky Tour",
+    subtitle: "Scenic Chairlift Ride",
+    details: `<ul>
+      <li>Enjoy breathtaking views of the Mississippi and Illinois Rivers from the Grafton SkyTour chairlift.</li>
+      <li><a href='https://www.enjoyillinois.com/explore/listing/grafton-skytour/' target='_blank'>Official Info & Tickets</a></li>
+    </ul>`,
+    photos: [
+      "https://www.riversandroutes.com/imager/files_idss_com/C391/images/listings/listing_8ca41_lg_e45adf5f6bc0c5c2a30a39868f44eab6.jpg",
+      "https://www.riversandroutes.com/imager/files_idss_com/C391/3ca7be98-c616-4cee-a11f-fbf3888558a4_91852798b59be8b28fc00edfe4aec23a.jpg"
+    ],
+    links: [
+      { text: "Grafton Sky Tour", url: "https://www.enjoyillinois.com/explore/listing/grafton-skytour/" }
+    ]
+  },
+  // --- NEW STOP: Grafton Oyster Bar ---
+  {
+    day: "Saturday",
+    title: "Grafton Oyster Bar",
+    subtitle: "Riverside Dining Option",
+    details: `<ul>
+      <li>Fresh seafood and Cajun cuisine on the riverfront.</li>
+      <li><a href='https://www.graftonoysterbar.com/index.html' target='_blank'>View Menu & Info</a></li>
+    </ul>`,
+    photos: [
+      "https://enjoyillinois.dottie.io/assets/Tourism-Operators/images/grafton-oyster-bar__FocusFillWyIwLjAwIiwiMC4wMCIsMTIwMCw5MDBd.jpg",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpkAGEsXOF102Aaj5JbuJRCoTJBf2Rj-wG1A&s"
+    ],
+    links: [
+      { text: "Grafton Oyster Bar", url: "https://www.graftonoysterbar.com/index.html" }
+    ]
+  },
+
   {
     day: "Saturday",
     title: "Evening: Back to Airbnb",
