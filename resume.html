@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neil T. Hagan - Resume Builder</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --header-bg: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            --main-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --font-size-base: 1rem;
+            --border-radius: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--main-bg);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .customizer {
+            width: 350px;
+            background: white;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+            padding: 20px;
+            overflow-y: auto;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            transform: translateX(-350px);
+            transition: transform 0.3s ease;
+        }
+
+        .customizer.open {
+            transform: translateX(0);
+        }
+
+        .customizer h2 {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        .customizer-section {
+            margin-bottom: 25px;
+        }
+
+        .customizer-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .control-group input, .control-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .color-picker {
+            width: 100%;
+            height: 40px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .toggle-btn {
+            position: fixed;
+            left: 10px;
+            top: 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1001;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.shifted {
+            margin-left: 350px;
+        }
+
+        .resume-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: var(--header-bg);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: calc(var(--font-size-base) * 0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .contact-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .contact-item i {
+            width: 20px;
+            text-align: center;
+            color: var(--primary-color);
+            font-size: var(--font-size-base);
+        }
+
+        /* Fallback for missing icons */
+        .contact-item i.fas.fa-phone::before {
+            content: "📞";
+            font-family: "Segoe UI Emoji", sans-serif;
+        }
+
+        .contact-item i.fas.fa-envelope::before {
+            content: "✉️";
+            font-family: "Segoe UI Emoji", sans-serif;
+        }
+
+        .contact-item i.fas.fa-map-marker-alt::before {
+            content: "📍";
+            font-family: "Segoe UI Emoji", sans-serif;
+        }
+
+        .section-title i.fas.fa-user::before {
+            content: "👤";
+            font-family: "Segoe UI Emoji", sans-serif;
+        }
+
+        .section-title i.fas.fa-briefcase::before {
+            content: "💼";
+            font-family: "Segoe UI Emoji", sans-serif;
+        }
+
+        .section-title i.fas.fa-graduation-cap::before {
+            content: "🎓";
+            font-family: "Segoe UI Emoji", sans-serif;
+        }
+
+        .section-title i.fas.fa-heart::before {
+            content: "❤️";
+            font-family: "Segoe UI Emoji", sans-serif;
+        }
+
+        .export-btn i.fas.fa-download::before {
+            content: "⬇️";
+            font-family: "Segoe UI Emoji", sans-serif;
+        }
+
+        .content {
+            padding: 0;
+        }
+
+        .section {
+            padding: 30px 40px;
+            border-bottom: 1px solid #ecf0f1;
+            transition: background-color 0.3s ease;
+        }
+
+        .section:hover {
+            background-color: var(--light-bg);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: calc(var(--font-size-base) * 1.8);
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), transparent);
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        .summary {
+            font-size: calc(var(--font-size-base) * 1.1);
+            line-height: 1.7;
+            color: #555;
+            text-align: justify;
+        }
+
+        .job {
+            margin-bottom: 30px;
+            border-left: 3px solid var(--primary-color);
+            padding-left: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .job:hover {
+            transform: translateX(5px);
+        }
+
+        .job-header {
+            margin-bottom: 15px;
+        }
+
+        .company {
+            font-size: calc(var(--font-size-base) * 1.3);
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+
+        .position {
+            font-size: calc(var(--font-size-base) * 1.1);
+            font-weight: 500;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .duration {
+            font-size: calc(var(--font-size-base) * 0.9);
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .job-description {
+            font-size: calc(var(--font-size-base) * 0.95);
+            line-height: 1.6;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .responsibilities {
+            margin-bottom: 15px;
+        }
+
+        .responsibilities h4 {
+            font-size: calc(var(--font-size-base) * 1.05);
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+
+        .responsibilities ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .responsibilities li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+            font-size: calc(var(--font-size-base) * 0.9);
+            line-height: 1.5;
+        }
+
+        .responsibilities li::before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-size: calc(var(--font-size-base) * 0.8);
+        }
+
+        .education-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--light-bg);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .education-item:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .school {
+            font-size: calc(var(--font-size-base) * 1.1);
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .degree {
+            font-size: calc(var(--font-size-base) * 0.95);
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .year {
+            font-size: calc(var(--font-size-base) * 0.85);
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .personal {
+            background: linear-gradient(135deg, var(--light-bg) 0%, #e9ecef 100%);
+            font-size: calc(var(--font-size-base) * 1.05);
+            line-height: 1.7;
+            color: #555;
+            text-align: justify;
+        }
+
+        .export-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(52, 152, 219, 0.4);
+        }
+
+        .export-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .editable {
+            outline: none;
+            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
+            border-radius: 3px;
+            padding: 2px 4px;
+        }
+
+        .editable:focus {
+            border-color: var(--primary-color);
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            .customizer {
+                width: 100%;
+                transform: translateX(-100%);
+            }
+            
+            .main-content.shifted {
+                margin-left: 0;
+            }
+            
+            .resume-container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .contact-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .section {
+                padding: 20px 25px;
+            }
+            
+            .export-btn {
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+
+        @media print {
+            .customizer, .toggle-btn, .export-btn {
+                display: none !important;
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+            }
+            
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .resume-container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            
+            .section:hover {
+                background-color: transparent;
+            }
+            
+            .job:hover {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="toggle-btn" onclick="toggleCustomizer()">
+        <i class="fas fa-cog"></i> Customize
+    </button>
+
+    <div class="customizer" id="customizer">
+        <h2><i class="fas fa-palette"></i> Resume Customizer</h2>
+        
+        <div class="customizer-section">
+            <h3>Colors</h3>
+            <div class="control-group">
+                <label for="primaryColor">Primary Color</label>
+                <input type="color" id="primaryColor" class="color-picker" value="#3498db" onchange="updateColor('--primary-color', this.value)">
+            </div>
+            <div class="control-group">
+                <label for="secondaryColor">Secondary Color</label>
+                <input type="color" id="secondaryColor" class="color-picker" value="#2c3e50" onchange="updateColor('--secondary-color', this.value)">
+            </div>
+            <div class="control-group">
+                <label for="accentColor">Accent Color</label>
+                <input type="color" id="accentColor" class="color-picker" value="#e74c3c" onchange="updateColor('--accent-color', this.value)">
+            </div>
+        </div>
+
+        <div class="customizer-section">
+            <h3>Typography</h3>
+            <div class="control-group">
+                <label for="fontFamily">Font Family</label>
+                <select id="fontFamily" onchange="updateFont(this.value)">
+                    <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Segoe UI</option>
+                    <option value="'Arial', sans-serif">Arial</option>
+                    <option value="'Times New Roman', serif">Times New Roman</option>
+                    <option value="'Georgia', serif">Georgia</option>
+                    <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                    <option value="'Courier New', monospace">Courier New</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="fontSize">Base Font Size</label>
+                <input type="range" id="fontSize" min="12" max="20" value="16" onchange="updateFontSize(this.value)">
+                <span id="fontSizeValue">16px</span>
+            </div>
+        </div>
+
+        <div class="customizer-section">
+            <h3>Layout</h3>
+            <div class="control-group">
+                <label for="borderRadius">Border Radius</label>
+                <input type="range" id="borderRadius" min="0" max="30" value="20" onchange="updateBorderRadius(this.value)">
+                <span id="borderRadiusValue">20px</span>
+            </div>
+        </div>
+
+        <div class="customizer-section">
+            <h3>Background</h3>
+            <div class="control-group">
+                <label for="bgStyle">Background Style</label>
+                <select id="bgStyle" onchange="updateBackground(this.value)">
+                    <option value="gradient1">Purple Gradient</option>
+                    <option value="gradient2">Blue Gradient</option>
+                    <option value="gradient3">Green Gradient</option>
+                    <option value="gradient4">Orange Gradient</option>
+                    <option value="solid">Solid Color</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="customizer-section">
+            <h3>Content</h3>
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="editMode" onchange="toggleEditMode(this.checked)">
+                    Enable Text Editing
+                </label>
+            </div>
+        </div>
+
+        <div class="customizer-section">
+            <button onclick="resetToDefaults()" style="width: 100%; padding: 10px; background: var(--accent-color); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Reset to Defaults
+            </button>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="resume-container">
+            <div class="header">
+                <h1 class="editable" contenteditable="false">Neil T. Hagan</h1>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span class="editable" contenteditable="false">(309) 264-8336</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span class="editable" contenteditable="false">nhagan@corp.mtco.com</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span class="editable" contenteditable="false">1013A Coal Bank Rd, Metamora, IL</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="section">
+                    <h2 class="section-title">
+                        <i class="fas fa-user"></i>
+                        Professional Summary
+                    </h2>
+                    <div class="summary editable" contenteditable="false">
+                        I am a dedicated and versatile telecommunications specialist with deep expertise across all aspects of the industry, from frontline support to technical field operations and management. Adept at troubleshooting complex issues, providing exceptional customer service, and confidently leading teams. I am an honest and fair team player, known for my creative problem-solving and commitment to delivering projects to completion.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <i class="fas fa-briefcase"></i>
+                        Professional Experience
+                    </h2>
+
+                    <div class="job">
+                        <div class="job-header">
+                            <div class="company editable" contenteditable="false">MTCO Communications</div>
+                            <div class="position editable" contenteditable="false">Telecom Systems Network Engineer</div>
+                            <div class="duration editable" contenteditable="false">July 2021 - Present | Metamora, IL</div>
+                        </div>
+                        <div class="job-description editable" contenteditable="false">
+                            As a Telecom Systems Network Engineer, I am responsible for managing both the technical and operational sides of our fiber network, ensuring new plant is built efficiently and existing infrastructure is maintained. My unique background allows me to provide hands-on assistance, creatively solve complex issues, and serve as a point of contact for our customers, splicers and vendors.
+                        </div>
+                        
+                        <div class="responsibilities">
+                            <h4>Engineering & Project Management</h4>
+                            <ul>
+                                <li class="editable" contenteditable="false">Manage all aspects of fiber plant engineering, from new area layout and splicing design to creating and submitting permits and easements, records, as well as splitters and optics</li>
+                                <li class="editable" contenteditable="false">Supervise our team of splicers, providing them with daily instructions and splice sheets for both new construction and emergency repair</li>
+                                <li class="editable" contenteditable="false">Oversee daily operations, including managing 'Julie' locate requests for installations, repairs, and maintenance to ensure crew safety and compliance</li>
+                                <li class="editable" contenteditable="false">Integrate historical splice data from Excel spreadsheets into new mapping software to enhance network planning and accuracy</li>
+                            </ul>
+                        </div>
+
+                        <div class="responsibilities">
+                            <h4>Technical Expertise & Field Operations</h4>
+                            <ul>
+                                <li class="editable" contenteditable="false">Performed advanced fiber troubleshooting with tools like OTDRs to locate and repair network damages during outages</li>
+                                <li class="editable" contenteditable="false">Maintained hands-on involvement with outside construction and splicing, assisting with safety, maintenance, and problem-solving in the field as needed</li>
+                                <li class="editable" contenteditable="false">Leveraged a background in installation and support to address complex, non-routine projects and find creative solutions for customer issues</li>
+                                <li class="editable" contenteditable="false">Manage and maintain all field equipment, including inventory control and coordinating repairs for splicing hardware and tools</li>
+                            </ul>
+                        </div>
+
+                        <div class="responsibilities">
+                            <h4>Vendor & Customer Relations</h4>
+                            <ul>
+                                <li class="editable" contenteditable="false">Act as a liaison with vendors, staying current on industry trends, new hardware, and tools through trade shows and in-person meetings</li>
+                                <li class="editable" contenteditable="false">Collaborated directly with customers to resolve construction complaints and find effective solutions for unique technical challenges</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="job">
+                        <div class="job-header">
+                            <div class="company editable" contenteditable="false">MTCO Communications</div>
+                            <div class="position editable" contenteditable="false">Network Tech Supervisor</div>
+                            <div class="duration editable" contenteditable="false">May 2014 - July 2021 | Metamora, IL</div>
+                        </div>
+                        <div class="job-description editable" contenteditable="false">
+                            As a Network Tech Supervisor, I led a highly effective team of 5-7 installers, ensuring the successful and efficient deployment of ADSL, VDSL, and fiber optic services. I fostered a positive and collaborative environment where open communication and teamwork were prioritized, resulting in high levels of productivity and employee morale.
+                        </div>
+                        
+                        <div class="responsibilities">
+                            <h4>Key Responsibilities & Accomplishments</h4>
+                            <ul>
+                                <li class="editable" contenteditable="false">Managed a team of 5-7 installers, supervising daily schedules and ensuring work was completed efficiently and to a high standard</li>
+                                <li class="editable" contenteditable="false">Fostered a strong, collaborative team environment based on open communication and mutual support, leading to a highly cohesive and productive crew</li>
+                                <li class="editable" contenteditable="false">Served as the primary point of contact for customer complaints, resolving issues directly and leveraging them as a training opportunity for the team to enhance their skills</li>
+                                <li class="editable" contenteditable="false">Gained extensive hands-on experience with a wide range of telecommunications hardware, including products from Adtran, Comtrend, Zyxel, and Calix</li>
+                                <li class="editable" contenteditable="false">Assisted with Copper Pair records and cable assignment, demonstrating a comprehensive understanding of co-tech operations</li>
+                                <li class="editable" contenteditable="false">Initiated and managed the "Redbird Replay" live streaming project, utilizing skills in video, audio, and graphic design to create a new high school sports broadcast platform</li>
+                                <li class="editable" contenteditable="false">Developed custom scripts and workflows to streamline the live streaming process and improve end-user functionality</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="job">
+                        <div class="job-header">
+                            <div class="company editable" contenteditable="false">MTCO Communications</div>
+                            <div class="position editable" contenteditable="false">Network Technician</div>
+                            <div class="duration editable" contenteditable="false">2004 - May 2014 | Metamora, IL</div>
+                        </div>
+                        <div class="job-description editable" contenteditable="false">
+                            As a Network Technician, I was responsible for the installation and troubleshooting of ADSL and VDSL services within customer homes. I gained hands-on experience with key industry hardware and played a role in training new installers, ensuring high-quality service delivery and technical proficiency across the team.
+                        </div>
+                        
+                        <div class="responsibilities">
+                            <h4>Key Responsibilities & Accomplishments</h4>
+                            <ul>
+                                <li class="editable" contenteditable="false">Installed and configured ADSL and VDSL services directly in customer homes, ensuring seamless connectivity and customer satisfaction</li>
+                                <li class="editable" contenteditable="false">Troubleshot and resolved copper pair issues to maintain network integrity and service reliability</li>
+                                <li class="editable" contenteditable="false">Gained proficiency with industry-standard hardware from vendors such as Adtran and Zyxel</li>
+                                <li class="editable" contenteditable="false">Acted as a company representative in co-located offices, meeting with layered service providers like AT&T and Verizon to collaborate on troubleshooting efforts</li>
+                                <li class="editable" contenteditable="false">Contributed to team development by training other installers on technical procedures and best practices</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="job">
+                        <div class="job-header">
+                            <div class="company editable" contenteditable="false">MTCO Communications</div>
+                            <div class="position editable" contenteditable="false">Phone Support Technician</div>
+                            <div class="duration editable" contenteditable="false">October 1999 - 2004 | Metamora, IL</div>
+                        </div>
+                        <div class="job-description editable" contenteditable="false">
+                            As a Phone Support Technician, I provided technical assistance for dial-up internet services, supporting a wide range of operating systems from Windows 3.1 to Windows XP. My role included resolving service issues, installing hardware, and ensuring a positive experience for both new and existing customers through direct callbacks.
+                        </div>
+                        
+                        <div class="responsibilities">
+                            <h4>Key Responsibilities & Accomplishments</h4>
+                            <ul>
+                                <li class="editable" contenteditable="false">Provided comprehensive technical support for dial-up services, effectively troubleshooting issues for customers using various operating systems (Windows 3.1, 95, 98, ME, 2000, and XP)</li>
+                                <li class="editable" contenteditable="false">Conducted on-site service calls to install and replace modems, ensuring service was properly configured and functional</li>
+                                <li class="editable" contenteditable="false">Proactively managed customer satisfaction by performing callbacks to new customers, confirming their service was working correctly and addressing any remaining questions</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="job">
+                        <div class="job-header">
+                            <div class="company editable" contenteditable="false">Metamora IGA</div>
+                            <div class="position editable" contenteditable="false">Stocking and Bag Boy</div>
+                            <div class="duration editable" contenteditable="false">May 1999 - October 1999 | Metamora, IL</div>
+                        </div>
+                        <div class="job-description editable" contenteditable="false">
+                            As a Stocking and Bag Boy at IGA, I was responsible for ensuring the store was clean, well-stocked, and presented a positive experience for all customers. I developed a strong work ethic and a customer-focused mindset while performing a variety of duties to support store operations.
+                        </div>
+                        
+                        <div class="responsibilities">
+                            <h4>Key Responsibilities</h4>
+                            <ul>
+                                <li class="editable" contenteditable="false">Managed stocking and inventory, ensuring shelves were consistently filled, organized, and properly labeled for easy customer access</li>
+                                <li class="editable" contenteditable="false">Provided direct customer service by bagging groceries efficiently and assisting customers with their purchases</li>
+                                <li class="editable" contenteditable="false">Maintained store cleanliness and organization, creating a welcoming and safe environment for shoppers</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <i class="fas fa-graduation-cap"></i>
+                        Education
+                    </h2>
+                    <div class="education-item">
+                        <div class="school editable" contenteditable="false">Illinois Central College</div>
+                        <div class="degree editable" contenteditable="false">Associate's Degree: Business Administration</div>
+                        <div class="year editable" contenteditable="false">2002-2004 | East Peoria, IL</div>
+                    </div>
+                    <div class="education-item">
+                        <div class="school editable" contenteditable="false">Metamora Township High School</div>
+                        <div class="degree editable" contenteditable="false">High School Diploma</div>
+                        <div class="year editable" contenteditable="false">1998-2001 | Metamora, IL</div>
+                    </div>
+                </div>
+
+                <div class="section personal">
+                    <h2 class="section-title">
+                        <i class="fas fa-heart"></i>
+                        Beyond The Office
+                    </h2>
+                    <div class="editable" contenteditable="false">
+                        I am a lifelong resident of Metamora, Illinois, where I'm a proud husband and father of four. My passion for building and tinkering with custom electronics, from 3D printers to CNC machines, reflects a creative and determined mindset. This hands-on, problem-solving approach extends to my professional life, where I enjoy the challenge of troubleshooting complex systems and creating innovative solutions. I am driven by a desire for continuous improvement, both at work and in my personal projects.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="export-btn" onclick="exportToPDF()">
+        <i class="fas fa-download"></i>
+        Export PDF
+    </button>
+
+    <script>
+        function toggleCustomizer() {
+            const customizer = document.getElementById('customizer');
+            const mainContent = document.getElementById('mainContent');
+            customizer.classList.toggle('open');
+            mainContent.classList.toggle('shifted');
+        }
+
+        function updateColor(property, value) {
+            document.documentElement.style.setProperty(property, value);
+            updateHeaderGradient();
+        }
+
+        function updateHeaderGradient() {
+            const secondary = getComputedStyle(document.documentElement).getPropertyValue('--secondary-color').trim();
+            const darkerSecondary = adjustBrightness(secondary, -20);
+            document.documentElement.style.setProperty('--header-bg', `linear-gradient(135deg, ${secondary} 0%, ${darkerSecondary} 100%)`);
+        }
+
+        function adjustBrightness(hex, percent) {
+            const num = parseInt(hex.replace("#", ""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+        }
+
+        function updateFont(fontFamily) {
+            document.documentElement.style.setProperty('--font-primary', fontFamily);
+        }
+
+        function updateFontSize(size) {
+            document.documentElement.style.setProperty('--font-size-base', size + 'px');
+            document.getElementById('fontSizeValue').textContent = size + 'px';
+        }
+
+        function updateBorderRadius(radius) {
+            document.documentElement.style.setProperty('--border-radius', radius + 'px');
+            document.getElementById('borderRadiusValue').textContent = radius + 'px';
+        }
+
+        function updateBackground(style) {
+            let gradient;
+            switch(style) {
+                case 'gradient1':
+                    gradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                    break;
+                case 'gradient2':
+                    gradient = 'linear-gradient(135deg, #74b9ff 0%, #0984e3 100%)';
+                    break;
+                case 'gradient3':
+                    gradient = 'linear-gradient(135deg, #00b894 0%, #00a085 100%)';
+                    break;
+                case 'gradient4':
+                    gradient = 'linear-gradient(135deg, #fdcb6e 0%, #e17055 100%)';
+                    break;
+                case 'solid':
+                    gradient = '#f8f9fa';
+                    break;
+                default:
+                    gradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            }
+            document.documentElement.style.setProperty('--main-bg', gradient);
+        }
+
+        function toggleEditMode(enabled) {
+            const editableElements = document.querySelectorAll('.editable');
+            editableElements.forEach(element => {
+                element.contentEditable = enabled;
+                if (enabled) {
+                    element.style.cursor = 'text';
+                    element.title = 'Click to edit';
+                } else {
+                    element.style.cursor = '';
+                    element.title = '';
+                }
+            });
+        }
+
+        function resetToDefaults() {
+            // Reset CSS variables to defaults
+            document.documentElement.style.setProperty('--primary-color', '#3498db');
+            document.documentElement.style.setProperty('--secondary-color', '#2c3e50');
+            document.documentElement.style.setProperty('--accent-color', '#e74c3c');
+            document.documentElement.style.setProperty('--font-primary', "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif");
+            document.documentElement.style.setProperty('--font-size-base', '16px');
+            document.documentElement.style.setProperty('--border-radius', '20px');
+            document.documentElement.style.setProperty('--main-bg', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)');
+            updateHeaderGradient();
+            
+            // Reset form controls
+            document.getElementById('primaryColor').value = '#3498db';
+            document.getElementById('secondaryColor').value = '#2c3e50';
+            document.getElementById('accentColor').value = '#e74c3c';
+            document.getElementById('fontFamily').value = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+            document.getElementById('fontSize').value = '16';
+            document.getElementById('fontSizeValue').textContent = '16px';
+            document.getElementById('borderRadius').value = '20';
+            document.getElementById('borderRadiusValue').textContent = '20px';
+            document.getElementById('bgStyle').value = 'gradient1';
+            document.getElementById('editMode').checked = false;
+            
+            // Disable edit mode
+            toggleEditMode(false);
+        }
+
+        function exportToPDF() {
+            // Hide customizer and toggle button for print
+            const customizer = document.getElementById('customizer');
+            const toggleBtn = document.querySelector('.toggle-btn');
+            const exportBtn = document.querySelector('.export-btn');
+            const mainContent = document.getElementById('mainContent');
+            
+            customizer.style.display = 'none';
+            toggleBtn.style.display = 'none';
+            exportBtn.style.display = 'none';
+            mainContent.classList.remove('shifted');
+            
+            // Disable edit mode for printing
+            const editMode = document.getElementById('editMode').checked;
+            if (editMode) {
+                toggleEditMode(false);
+            }
+            
+            window.print();
+            
+            // Restore elements after print
+            setTimeout(() => {
+                customizer.style.display = 'block';
+                toggleBtn.style.display = 'block';
+                exportBtn.style.display = 'block';
+                if (customizer.classList.contains('open')) {
+                    mainContent.classList.add('shifted');
+                }
+                if (editMode) {
+                    document.getElementById('editMode').checked = true;
+                    toggleEditMode(true);
+                }
+            }, 1000);
+        }
+
+        // Add subtle animations on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all job entries for scroll animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const jobs = document.querySelectorAll('.job');
+            jobs.forEach((job, index) => {
+                job.style.opacity = '0';
+                job.style.transform = 'translateY(20px)';
+                job.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+                observer.observe(job);
+            });
+
+            // Initialize header gradient
+            updateHeaderGradient();
+        });
+
+        // Close customizer when clicking outside
+        document.addEventListener('click', (e) => {
+            const customizer = document.getElementById('customizer');
+            const toggleBtn = document.querySelector('.toggle-btn');
+            
+            if (!customizer.contains(e.target) && !toggleBtn.contains(e.target) && customizer.classList.contains('open')) {
+                if (window.innerWidth <= 768) { // Only auto-close on mobile
+                    toggleCustomizer();
+                }
+            }
+        });
+
+        // Handle keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'p':
+                        e.preventDefault();
+                        exportToPDF();
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        const editMode = document.getElementById('editMode');
+                        editMode.checked = !editMode.checked;
+                        toggleEditMode(editMode.checked);
+                        break;
+                    case '`':
+                        e.preventDefault();
+                        toggleCustomizer();
+                        break;
+                }
+            }
+            
+            if (e.key === 'Escape') {
+                const customizer = document.getElementById('customizer');
+                if (customizer.classList.contains('open')) {
+                    toggleCustomizer();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
