@@ -1,11 +1,26 @@
-<!-- radio-player.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Radio Player</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    audio {
+      width: 100%;
+    }
+  </style>
 </head>
-<body style="margin:0;padding:0;overflow:hidden;">
-  <audio controls autoplay loop style="width:100%;">
+<body>
+  <audio controls autoplay loop>
     <source src="https://streaming.radio.co/sd71de59b3/listen" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
