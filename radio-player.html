@@ -1,59 +1,13 @@
+<!-- radio-player.html -->
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Jamband Radio Player</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: transparent; /* Makes the background of the frame invisible */
-    }
-    .player-button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #fff;
-      font-size: 20px;
-      transition: transform 0.2s;
-      padding: 0;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .player-button:hover {
-      transform: scale(1.1);
-    }
-    /* This style is new to ensure the button is visible on its own */
-    .custom-audio-player {
-      background-color: #333;
-      padding: 10px 15px;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    }
-  </style>
+  <title>Radio Player</title>
 </head>
-<body>
-  <div class="custom-audio-player">
-    <button id="play-pause-button" class="player-button">▶️</button>
-    <span class="player-info">Jamband Radio</span>
-  </div>
-
-  <audio id="audio-player" src="https://streaming.radio.co/sd71de59b3/listen" type="audio/mpeg" loop></audio>
-
-  <script>
-    const audioPlayer = document.getElementById('audio-player');
-    const playPauseButton = document.getElementById('play-pause-button');
-    playPauseButton.addEventListener('click', function() {
-      if (audioPlayer.paused) {
-        audioPlayer.play();
-        playPauseButton.innerHTML = '⏸️';
-      } else {
-        audioPlayer.pause();
-        playPauseButton.innerHTML = '▶️';
-      }
-    });
-  </script>
+<body style="margin:0;padding:0;overflow:hidden;">
+  <audio controls autoplay loop style="width:100%;">
+    <source src="https://streaming.radio.co/sd71de59b3/listen" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
 </body>
 </html>
