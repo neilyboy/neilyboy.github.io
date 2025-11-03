@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neil T. Hagan - Resume</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Calibri', 'Arial', sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: #000;
+            background: #fff;
+            padding: 0.5in 0.75in;
+            max-width: 8.5in;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 0.3in;
+            padding-bottom: 0.15in;
+            border-bottom: 2px solid #2c3e50;
+        }
+
+        .name {
+            font-size: 24pt;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 4pt;
+        }
+
+        .title {
+            font-size: 13pt;
+            color: #34495e;
+            font-weight: 600;
+            margin-bottom: 8pt;
+        }
+
+        .contact {
+            font-size: 10pt;
+            color: #555;
+        }
+
+        /* Section Headers */
+        .section {
+            margin-bottom: 0.25in;
+        }
+
+        .section-title {
+            font-size: 13pt;
+            font-weight: bold;
+            color: #2c3e50;
+            text-transform: uppercase;
+            border-bottom: 1.5pt solid #3498db;
+            padding-bottom: 3pt;
+            margin-bottom: 10pt;
+            letter-spacing: 0.5pt;
+        }
+
+        /* Summary */
+        .summary-text {
+            text-align: justify;
+            margin-bottom: 12pt;
+        }
+
+        /* Job Entry */
+        .job {
+            margin-bottom: 16pt;
+            page-break-inside: avoid;
+        }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 4pt;
+        }
+
+        .job-title {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .company {
+            font-size: 11pt;
+            font-style: italic;
+            color: #555;
+            margin-bottom: 4pt;
+        }
+
+        .date {
+            font-size: 10pt;
+            color: #666;
+            white-space: nowrap;
+            font-weight: 600;
+        }
+
+        .job-description {
+            margin-bottom: 6pt;
+            text-align: justify;
+        }
+
+        .subsection-title {
+            font-size: 10.5pt;
+            font-weight: bold;
+            color: #34495e;
+            margin-top: 8pt;
+            margin-bottom: 4pt;
+        }
+
+        /* Lists */
+        ul {
+            margin-left: 0.25in;
+            margin-bottom: 8pt;
+        }
+
+        li {
+            margin-bottom: 3pt;
+            text-align: justify;
+        }
+
+        /* Skills Grid */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12pt;
+            margin-top: 8pt;
+        }
+
+        .skill-category {
+            page-break-inside: avoid;
+        }
+
+        .skill-category-title {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 4pt;
+        }
+
+        .skill-category ul {
+            margin-left: 16pt;
+            margin-bottom: 0;
+        }
+
+        .skill-category li {
+            margin-bottom: 2pt;
+        }
+
+        /* Education */
+        .education-item {
+            margin-bottom: 10pt;
+            page-break-inside: avoid;
+        }
+
+        .education-title {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .school {
+            font-size: 10pt;
+            color: #555;
+            font-style: italic;
+        }
+
+        /* Print Optimization */
+        @media print {
+            body {
+                padding: 0.4in 0.6in;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .job {
+                page-break-inside: avoid;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 9pt;
+            color: #999;
+            margin-top: 0.2in;
+            padding-top: 0.1in;
+            border-top: 1pt solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="name">NEIL T. HAGAN</div>
+        <div class="title">Outside Plant Engineer</div>
+        <div class="contact">nhagan@corp.mtco.com</div>
+    </div>
+
+    <!-- Professional Summary -->
+    <div class="section">
+        <div class="section-title">Professional Summary</div>
+        <p class="summary-text">
+            Dedicated telecommunications specialist with over 20 years of progressive experience in fiber optic network engineering, 
+            project management, and technical operations. Expert in full fiber network layout design, including duct systems, vault 
+            placement, and fiber count optimization. Proven track record in managing fiber splicing operations, maintaining comprehensive 
+            splice records, and leading field teams. Known for creative problem-solving, exceptional technical expertise, and commitment 
+            to project excellence from conception to completion.
+        </p>
+    </div>
+
+    <!-- Professional Experience -->
+    <div class="section">
+        <div class="section-title">Professional Experience</div>
+        
+        <!-- Current Position -->
+        <div class="job">
+            <div class="job-header">
+                <div>
+                    <div class="job-title">Outside Plant Engineer</div>
+                    <div class="company">MTCO Communications, Metamora, IL</div>
+                </div>
+                <span class="date">July 2021 – Present</span>
+            </div>
+            <p class="job-description">
+                Manage both technical and operational aspects of fiber optic network infrastructure, ensuring efficient 
+                construction of new plant and maintenance of existing systems. Specialize in complete fiber network design 
+                and field operations oversight.
+            </p>
+            
+            <div class="subsection-title">Engineering & Project Management</div>
+            <ul>
+                <li>Design comprehensive fiber network layouts including duct systems, vault placement, and fiber count optimization for new service areas</li>
+                <li>Create and submit permit applications and easement documentation for new construction projects</li>
+                <li>Maintain detailed fiber records, including splitter configurations and optical specifications</li>
+                <li>Develop splice designs and daily work instructions for field teams</li>
+                <li>Integrate and digitize historical splice data into modern record-keeping systems</li>
+            </ul>
+            
+            <div class="subsection-title">Field Operations & Team Leadership</div>
+            <ul>
+                <li>Oversee fiber splicing teams, providing technical guidance and daily instructions for new construction and emergency repairs</li>
+                <li>Perform advanced fiber optic troubleshooting and network diagnostics</li>
+                <li>Maintain hands-on involvement in field operations, leveraging extensive installation and support background</li>
+                <li>Manage all field equipment inventory, including splicing hardware and specialized tools</li>
+            </ul>
+            
+            <div class="subsection-title">Vendor & Customer Relations</div>
+            <ul>
+                <li>Serve as primary liaison with equipment vendors and industry partners</li>
+                <li>Stay current on emerging technologies and industry best practices through trade shows and vendor meetings</li>
+                <li>Collaborate directly with enterprise customers on custom fiber solutions</li>
+            </ul>
+        </div>
+
+        <!-- Network Tech Supervisor -->
+        <div class="job">
+            <div class="job-header">
+                <div>
+                    <div class="job-title">Network Tech Supervisor</div>
+                    <div class="company">MTCO Communications, Metamora, IL</div>
+                </div>
+                <span class="date">May 2014 – July 2021</span>
+            </div>
+            <p class="job-description">
+                Led high-performing team of 5-7 installers, ensuring successful deployment of ADSL, VDSL, and fiber optic services.
+            </p>
+            <ul>
+                <li>Managed daily schedules and work assignments, maintaining high standards of quality and efficiency</li>
+                <li>Served as primary escalation point for customer complaints, resolving issues and using them as team training opportunities</li>
+                <li>Developed expertise with diverse equipment platforms including Adtran, Comtrend, Zyxel, and Calix systems</li>
+                <li>Maintained copper pair records and cable assignment databases</li>
+                <li>Initiated and managed "Redbird Replay" live streaming project for high school sports broadcasts</li>
+                <li>Developed custom scripts and automated workflows to improve operational efficiency</li>
+            </ul>
+        </div>
+
+        <!-- Network Technician -->
+        <div class="job">
+            <div class="job-header">
+                <div>
+                    <div class="job-title">Network Technician</div>
+                    <div class="company">MTCO Communications, Metamora, IL</div>
+                </div>
+                <span class="date">2004 – May 2014</span>
+            </div>
+            <ul>
+                <li>Installed and configured ADSL and VDSL services for diverse customer base</li>
+                <li>Troubleshot and resolved copper pair and connectivity issues</li>
+                <li>Gained proficiency with industry-standard hardware from Adtran, Comtrend, and Zyxel</li>
+                <li>Mentored new team members on installation best practices and technical procedures</li>
+            </ul>
+        </div>
+
+        <!-- Phone Support Technician -->
+        <div class="job">
+            <div class="job-header">
+                <div>
+                    <div class="job-title">Phone Support Technician</div>
+                    <div class="company">MTCO Communications, Metamora, IL</div>
+                </div>
+                <span class="date">October 1999 – 2004</span>
+            </div>
+            <ul>
+                <li>Provided technical support for dial-up internet services across multiple Windows operating systems</li>
+                <li>Conducted on-site service calls for hardware installation and advanced troubleshooting</li>
+                <li>Proactively managed customer satisfaction through follow-up callbacks</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Core Competencies -->
+    <div class="section">
+        <div class="section-title">Core Competencies</div>
+        <div class="skills-grid">
+            <div class="skill-category">
+                <div class="skill-category-title">Network Engineering</div>
+                <ul>
+                    <li>Fiber Network Design & Layout</li>
+                    <li>Duct System Planning</li>
+                    <li>Vault Placement & Design</li>
+                    <li>Fiber Count Optimization</li>
+                    <li>Splice Design & Documentation</li>
+                </ul>
+            </div>
+            <div class="skill-category">
+                <div class="skill-category-title">Technical Operations</div>
+                <ul>
+                    <li>Fiber Optic Splicing</li>
+                    <li>OTDR Testing & Analysis</li>
+                    <li>Network Troubleshooting</li>
+                    <li>Equipment Management</li>
+                    <li>Record Keeping Systems</li>
+                </ul>
+            </div>
+            <div class="skill-category">
+                <div class="skill-category-title">Project Management</div>
+                <ul>
+                    <li>Permit Applications</li>
+                    <li>Easement Documentation</li>
+                    <li>Team Leadership & Oversight</li>
+                    <li>Vendor Relations</li>
+                    <li>Customer Coordination</li>
+                </ul>
+            </div>
+            <div class="skill-category">
+                <div class="skill-category-title">Technical Proficiencies</div>
+                <ul>
+                    <li>Fiber Optic Systems</li>
+                    <li>ADSL/VDSL Technologies</li>
+                    <li>Adtran, Calix, Zyxel Platforms</li>
+                    <li>Scripting & Automation</li>
+                    <li>GIS Mapping Tools</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Education -->
+    <div class="section">
+        <div class="section-title">Education</div>
+        <div class="education-item">
+            <div class="education-title">Associate's Degree in Business Administration</div>
+            <div class="school">Illinois Central College, East Peoria, IL (2002–2004)</div>
+        </div>
+        <div class="education-item">
+            <div class="education-title">High School Diploma</div>
+            <div class="school">Metamora Township High School, Metamora, IL (1998–2001)</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Resume of Neil T. Hagan | nhagan@corp.mtco.com
+    </div>
+</body>
+</html>
