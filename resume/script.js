@@ -229,12 +229,6 @@ function createPrintButton() {
 // Add Keyboard Navigation
 function initKeyboardNavigation() {
     document.addEventListener('keydown', (e) => {
-        // Press 'P' to print
-        if (e.key === 'p' && e.ctrlKey) {
-            e.preventDefault();
-            window.print();
-        }
-        
         // Press 'T' to scroll to top
         if (e.key === 't' && e.ctrlKey) {
             e.preventDefault();
@@ -256,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Optional features
     initParallaxEffect();
-    createPrintButton();
+    // createPrintButton(); // Disabled - use PDF download button instead
     // createThemeToggle(); // Uncomment to enable theme toggle
     
     // Add subtle animations to list items
