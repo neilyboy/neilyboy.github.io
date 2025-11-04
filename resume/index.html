@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neil T. Hagan - Outside Plant Engineer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #151b3d;
+            --bg-card: #1a2045;
+            --accent-primary: #4a9eff;
+            --accent-secondary: #6eb6ff;
+            --text-primary: #e4e6eb;
+            --text-secondary: #b0b3b8;
+            --text-muted: #8a8d93;
+            --border-color: #2d3561;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            padding: 3rem 0 2rem;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-weight: 300;
+        }
+
+        .contact {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .contact a {
+            color: var(--accent-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .contact a:hover {
+            color: var(--accent-primary);
+        }
+
+        .section {
+            margin-bottom: 3rem;
+            animation: fadeInUp 0.8s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .section:nth-child(2) { animation-delay: 0.1s; }
+        .section:nth-child(3) { animation-delay: 0.2s; }
+        .section:nth-child(4) { animation-delay: 0.3s; }
+        .section:nth-child(5) { animation-delay: 0.4s; }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--accent-primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+            display: inline-block;
+            width: 100%;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--accent-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-primary);
+            box-shadow: 0 4px 6px var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .summary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px var(--shadow);
+        }
+
+        .summary p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .job {
+            background: var(--bg-card);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-secondary);
+            box-shadow: 0 4px 6px var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .job:hover {
+            transform: translateX(10px);
+            box-shadow: 0 8px 12px var(--shadow);
+        }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .job-title {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .job-date {
+            color: var(--text-muted);
+            font-style: italic;
+            white-space: nowrap;
+            margin-left: 1rem;
+        }
+
+        .company {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .job-section {
+            margin-top: 1.5rem;
+        }
+
+        .job-section h4 {
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        ul {
+            list-style: none;
+            margin-left: 1rem;
+        }
+
+        ul li {
+            color: var(--text-secondary);
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        ul li:before {
+            content: "▹";
+            color: var(--accent-primary);
+            position: absolute;
+            left: 0;
+            font-size: 1.2rem;
+        }
+
+        .competencies {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .competency-card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-top: 3px solid var(--accent-primary);
+            box-shadow: 0 4px 6px var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .competency-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px var(--shadow);
+        }
+
+        .competency-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-secondary);
+        }
+
+        .competency-card ul li {
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .education {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .education-item {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-primary);
+            box-shadow: 0 4px 6px var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .education-item:hover {
+            transform: translateX(10px);
+        }
+
+        .education-item h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .education-item p {
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+
+        .scroll-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--accent-primary);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 6px var(--shadow);
+            font-size: 1.5rem;
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-5px);
+            background: var(--accent-secondary);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .title {
+                font-size: 1.2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .job-header {
+                flex-direction: column;
+            }
+
+            .job-date {
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .competencies {
+                grid-template-columns: 1fr;
+            }
+
+            .education {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Neil T. Hagan</h1>
+            <div class="title">Outside Plant Engineer</div>
+            <div class="contact">
+                <a href="mailto:nhagan@corp.mtco.com">nhagan@corp.mtco.com</a>
+            </div>
+        </header>
+
+        <section class="section">
+            <h2>Professional Summary</h2>
+            <div class="summary">
+                <p>
+                    Dedicated telecommunications specialist with over 20 years of progressive experience in fiber optic network engineering, project management, and technical operations. Expert in full fiber network layout design, including duct systems, vault placement, and fiber count optimization. Proven track record in managing fiber splicing operations, maintaining comprehensive splice records, and leading field teams. Known for creative problem-solving, exceptional technical expertise, and commitment to project excellence from conception to completion.
+                </p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Professional Experience</h2>
+
+            <div class="job">
+                <div class="job-header">
+                    <div class="job-title">
+                        <h3>Outside Plant Engineer</h3>
+                        <div class="company">MTCO Communications, Metamora, IL</div>
+                    </div>
+                    <div class="job-date">July 2021 – Present</div>
+                </div>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                    Manage both technical and operational aspects of fiber optic network infrastructure, ensuring efficient construction of new plant and maintenance of existing systems. Specialize in complete fiber network design and field operations oversight.
+                </p>
+                
+                <div class="job-section">
+                    <h4>Engineering & Project Management</h4>
+                    <ul>
+                        <li>Design comprehensive fiber network layouts including duct systems, vault placement, and fiber count optimization for new service areas</li>
+                        <li>Create and submit permit applications and easement documentation for new construction projects</li>
+                        <li>Maintain detailed fiber records, including splitter configurations and optical specifications</li>
+                        <li>Develop splice designs and daily work instructions for field teams</li>
+                        <li>Integrate and digitize historical splice data into modern record-keeping systems</li>
+                    </ul>
+                </div>
+
+                <div class="job-section">
+                    <h4>Field Operations & Team Leadership</h4>
+                    <ul>
+                        <li>Oversee fiber splicing teams, providing technical guidance and daily instructions for new construction and emergency repairs</li>
+                        <li>Perform advanced fiber optic troubleshooting and network diagnostics</li>
+                        <li>Maintain hands-on involvement in field operations, leveraging extensive installation and support background</li>
+                        <li>Manage all field equipment inventory, including splicing hardware and specialized tools</li>
+                    </ul>
+                </div>
+
+                <div class="job-section">
+                    <h4>Vendor & Customer Relations</h4>
+                    <ul>
+                        <li>Serve as primary liaison with equipment vendors and industry partners</li>
+                        <li>Stay current on emerging technologies and industry best practices through trade shows and vendor meetings</li>
+                        <li>Collaborate directly with enterprise customers on custom fiber solutions</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="job">
+                <div class="job-header">
+                    <div class="job-title">
+                        <h3>Network Tech Supervisor</h3>
+                        <div class="company">MTCO Communications, Metamora, IL</div>
+                    </div>
+                    <div class="job-date">May 2014 – July 2021</div>
+                </div>
+                <ul>
+                    <li>Led high-performing team of 5-7 installers, ensuring successful deployment of ADSL, VDSL, and fiber optic services</li>
+                    <li>Managed daily schedules and work assignments, maintaining high standards of quality and efficiency</li>
+                    <li>Served as primary escalation point for customer complaints, resolving issues and using them as team training opportunities</li>
+                    <li>Developed expertise with diverse equipment platforms including Adtran, Comtrend, Zyxel, and Calix systems</li>
+                    <li>Maintained copper pair records and cable assignment databases</li>
+                    <li>Initiated and managed "Redbird Replay" live streaming project for high school sports broadcasts</li>
+                    <li>Developed custom scripts and automated workflows to improve operational efficiency</li>
+                </ul>
+            </div>
+
+            <div class="job">
+                <div class="job-header">
+                    <div class="job-title">
+                        <h3>Network Technician</h3>
+                        <div class="company">MTCO Communications, Metamora, IL</div>
+                    </div>
+                    <div class="job-date">2004 – May 2014</div>
+                </div>
+                <ul>
+                    <li>Installed and configured ADSL and VDSL services for diverse customer base</li>
+                    <li>Troubleshot and resolved copper pair and connectivity issues</li>
+                    <li>Gained proficiency with industry-standard hardware from Adtran, Comtrend, and Zyxel</li>
+                    <li>Mentored new team members on installation best practices and technical procedures</li>
+                </ul>
+            </div>
+
+            <div class="job">
+                <div class="job-header">
+                    <div class="job-title">
+                        <h3>Phone Support Technician</h3>
+                        <div class="company">MTCO Communications, Metamora, IL</div>
+                    </div>
+                    <div class="job-date">October 1999 – 2004</div>
+                </div>
+                <ul>
+                    <li>Provided technical support for dial-up internet services across multiple Windows operating systems</li>
+                    <li>Conducted on-site service calls for hardware installation and advanced troubleshooting</li>
+                    <li>Proactively managed customer satisfaction through follow-up callbacks</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Core Competencies</h2>
+            <div class="competencies">
+                <div class="competency-card">
+                    <h3>Network Engineering</h3>
+                    <ul>
+                        <li>Fiber Network Design & Layout</li>
+                        <li>Duct System Planning</li>
+                        <li>Vault Placement & Design</li>
+                        <li>Fiber Count Optimization</li>
+                        <li>Splice Design & Documentation</li>
+                    </ul>
+                </div>
+
+                <div class="competency-card">
+                    <h3>Technical Operations</h3>
+                    <ul>
+                        <li>Fiber Optic Splicing</li>
+                        <li>OTDR Testing & Analysis</li>
+                        <li>Network Troubleshooting</li>
+                        <li>Equipment Management</li>
+                        <li>Record Keeping Systems</li>
+                    </ul>
+                </div>
+
+                <div class="competency-card">
+                    <h3>Project Management</h3>
+                    <ul>
+                        <li>Permit Applications</li>
+                        <li>Easement Documentation</li>
+                        <li>Team Leadership & Oversight</li>
+                        <li>Vendor Relations</li>
+                        <li>Customer Coordination</li>
+                    </ul>
+                </div>
+
+                <div class="competency-card">
+                    <h3>Technical Proficiencies</h3>
+                    <ul>
+                        <li>Fiber Optic Systems</li>
+                        <li>ADSL/VDSL Technologies</li>
+                        <li>Adtran, Calix, Zyxel Platforms</li>
+                        <li>Scripting & Automation</li>
+                        <li>GIS Mapping Tools</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Education</h2>
+            <div class="education">
+                <div class="education-item">
+                    <h3>Associate's Degree in Business Administration</h3>
+                    <p>Illinois Central College, East Peoria, IL</p>
+                    <p style="color: var(--text-muted);">2002 – 2004</p>
+                </div>
+
+                <div class="education-item">
+                    <h3>High School Diploma</h3>
+                    <p>Metamora Township High School, Metamora, IL</p>
+                    <p style="color: var(--text-muted);">1998 – 2001</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="scroll-top" id="scrollTop">↑</div>
+
+    <script>
+        // Smooth scrolling for scroll-to-top button
+        const scrollTopBtn = document.getElementById('scrollTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollTopBtn.classList.add('visible');
+            } else {
+                scrollTopBtn.classList.remove('visible');
+            }
+        });
+
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Add intersection observer for enhanced animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all job cards and competency cards
+        document.querySelectorAll('.job, .competency-card, .education-item').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
