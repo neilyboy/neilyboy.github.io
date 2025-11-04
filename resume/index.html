@@ -318,9 +318,220 @@
             box-shadow: 0 6px 16px rgba(10, 158, 158, 0.4);
         }
 
+        /* Hide skills section on web, only show in print */
+        .skills-print {
+            display: none;
+        }
+
         @media print {
+            body {
+                background: white;
+                font-size: 11pt;
+            }
+
+            .container {
+                max-width: 100%;
+                margin: 0;
+                box-shadow: none;
+                display: block;
+                grid-template-columns: none;
+            }
+
             .download-btn {
                 display: none;
+            }
+
+            /* Hide sidebar elements in print */
+            .sidebar {
+                display: none;
+            }
+
+            /* Full-width main content for print */
+            .main-content {
+                padding: 0.5in 0.75in;
+                max-width: 100%;
+            }
+
+            /* Professional header for print */
+            .header {
+                text-align: center;
+                margin-bottom: 25px;
+                padding-bottom: 15px;
+                border-bottom: 2px solid #333;
+            }
+
+            .header h1 {
+                font-size: 28pt;
+                color: #000;
+                margin-bottom: 8px;
+                letter-spacing: 1px;
+            }
+
+            .header .title {
+                font-size: 14pt;
+                color: #333;
+                font-weight: 600;
+                margin-bottom: 12px;
+            }
+
+            .contact-info {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 15px;
+                font-size: 10pt;
+                color: #333;
+            }
+
+            .contact-item::before {
+                content: "";
+                display: none;
+            }
+
+            .contact-item {
+                display: inline;
+            }
+
+            .contact-info .contact-item:not(:last-child)::after {
+                content: " | ";
+                margin: 0 5px;
+                color: #666;
+            }
+
+            /* Section styling for print */
+            .section {
+                margin-bottom: 20px;
+                page-break-inside: avoid;
+            }
+
+            .section h2 {
+                font-size: 13pt;
+                font-weight: 700;
+                color: #000;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin-bottom: 10px;
+                padding-bottom: 5px;
+                border-bottom: 1.5px solid #333;
+                page-break-after: avoid;
+            }
+
+            .summary-text {
+                font-size: 10.5pt;
+                line-height: 1.5;
+                color: #000;
+                text-align: left;
+            }
+
+            /* Job entries for print */
+            .job {
+                margin-bottom: 18px;
+                page-break-inside: avoid;
+            }
+
+            .job-header {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 5px;
+            }
+
+            .job h3 {
+                font-size: 11.5pt;
+                font-weight: 700;
+                color: #000;
+            }
+
+            .job .company {
+                font-size: 10.5pt;
+                color: #000;
+                font-weight: 600;
+            }
+
+            .job .date {
+                font-size: 10pt;
+                color: #333;
+                text-align: right;
+            }
+
+            .job .location {
+                font-size: 10pt;
+                color: #333;
+            }
+
+            .job-description {
+                font-size: 10pt;
+                line-height: 1.4;
+                color: #000;
+                margin: 5px 0;
+            }
+
+            .job-subsection h4 {
+                font-size: 10.5pt;
+                font-weight: 600;
+                color: #000;
+                margin: 8px 0 5px 0;
+            }
+
+            .job ul {
+                margin-top: 5px;
+            }
+
+            .job ul li {
+                font-size: 10pt;
+                line-height: 1.4;
+                color: #000;
+                padding-left: 15px;
+                margin-bottom: 3px;
+            }
+
+            .job ul li::before {
+                content: "•";
+                color: #000;
+            }
+
+            /* Education grid for print */
+            .education-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+            }
+
+            .education-item {
+                page-break-inside: avoid;
+            }
+
+            .education-item h3 {
+                font-size: 10.5pt;
+                font-weight: 600;
+                color: #000;
+            }
+
+            .education-item p {
+                font-size: 10pt;
+                color: #333;
+                line-height: 1.4;
+            }
+
+            /* Prevent orphans and widows */
+            p, li {
+                orphans: 3;
+                widows: 3;
+            }
+
+            /* Skills section only for print */
+            .skills-print {
+                display: block !important;
+            }
+
+            .skills-print .skills-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px 15px;
+                font-size: 10pt;
+            }
+
+            .skills-print .skill-item {
+                color: #000;
             }
         }
 
@@ -555,6 +766,22 @@
                         <p>Metamora, IL</p>
                         <p>1998 - 2001</p>
                     </div>
+                </div>
+            </section>
+
+            <section class="section skills-print">
+                <h2>SKILLS & EXPERTISE</h2>
+                <div class="skills-grid">
+                    <div class="skill-item">• Fiber Network Design</div>
+                    <div class="skill-item">• OTDR Testing & Analysis</div>
+                    <div class="skill-item">• AutoCAD & GIS Mapping</div>
+                    <div class="skill-item">• Splice Design & Documentation</div>
+                    <div class="skill-item">• Project Management</div>
+                    <div class="skill-item">• ADSL/VDSL Technologies</div>
+                    <div class="skill-item">• Calix • Adtran • Zyxel</div>
+                    <div class="skill-item">• Network Troubleshooting</div>
+                    <div class="skill-item">• Scripting & Automation</div>
+                    <div class="skill-item">• Permit Applications</div>
                 </div>
             </section>
         </main>
