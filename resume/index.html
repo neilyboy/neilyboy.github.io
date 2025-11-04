@@ -39,31 +39,49 @@
         }
 
         header {
-            text-align: center;
-            padding: 3rem 0 2rem;
-            border-bottom: 2px solid var(--border-color);
+            background: var(--bg-card);
+            padding: 3rem 2rem;
+            border-radius: 10px;
+            border-bottom: 3px solid var(--accent-primary);
             margin-bottom: 3rem;
+            box-shadow: 0 4px 6px var(--shadow);
             animation: fadeInDown 0.8s ease-out;
         }
 
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .header-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
         h1 {
-            font-size: 3rem;
-            color: var(--accent-primary);
+            font-size: 2.5rem;
+            color: var(--text-primary);
             margin-bottom: 0.5rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
         }
 
         .title {
-            font-size: 1.5rem;
-            color: var(--text-secondary);
+            font-size: 1.3rem;
+            color: var(--accent-primary);
             margin-bottom: 1rem;
-            font-weight: 300;
+            font-weight: 400;
         }
 
         .contact {
-            color: var(--text-muted);
-            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .contact a {
@@ -74,6 +92,38 @@
 
         .contact a:hover {
             color: var(--accent-primary);
+        }
+
+        .header-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--accent-primary);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px var(--shadow);
+        }
+
+        .download-btn:hover {
+            background: var(--accent-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--shadow);
+        }
+
+        .download-btn svg {
+            width: 20px;
+            height: 20px;
         }
 
         .section {
@@ -317,6 +367,20 @@
                 font-size: 1.5rem;
             }
 
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-actions {
+                width: 100%;
+                align-items: stretch;
+            }
+
+            .download-btn {
+                justify-content: center;
+            }
+
             .job-header {
                 flex-direction: column;
             }
@@ -343,10 +407,28 @@
 <body>
     <div class="container">
         <header>
-            <h1>Neil T. Hagan</h1>
-            <div class="title">Outside Plant Engineer</div>
-            <div class="contact">
-                <a href="mailto:nhagan@corp.mtco.com">nhagan@corp.mtco.com</a>
+            <div class="header-content">
+                <div class="header-info">
+                    <h1>Neil T. Hagan</h1>
+                    <div class="title">Outside Plant Engineer</div>
+                    <div class="contact">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="20" height="16" x="2" y="4" rx="2"/>
+                            <path d="m2 7 8.97 5.7a1.94 1.94 0 0 0 2.06 0L22 7"/>
+                        </svg>
+                        <a href="mailto:nhagan@corp.mtco.com">nhagan@corp.mtco.com</a>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <a href="Neil_Hagan_Resume.pdf" class="download-btn" download>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" x2="12" y1="15" y2="3"/>
+                        </svg>
+                        Download PDF
+                    </a>
+                </div>
             </div>
         </header>
 
