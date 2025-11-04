@@ -14,656 +14,576 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --bg-primary: #0a0e27;
-            --bg-secondary: #151b3d;
-            --bg-card: #1a2045;
-            --accent-primary: #4a9eff;
-            --accent-secondary: #6eb6ff;
-            --text-primary: #e4e6eb;
-            --text-secondary: #b0b3b8;
-            --text-muted: #8a8d93;
-            --border-color: #2d3561;
-            --shadow: rgba(0, 0, 0, 0.3);
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-            color: var(--text-primary);
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
-            min-height: 100vh;
+            color: #333;
+            background: #f5f5f5;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
         }
 
-        header {
-            background: var(--bg-card);
-            padding: 3rem 2rem;
-            border-radius: 10px;
-            border-bottom: 3px solid var(--accent-primary);
-            margin-bottom: 3rem;
-            box-shadow: 0 4px 6px var(--shadow);
-            animation: fadeInDown 0.8s ease-out;
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 2rem;
-        }
-
-        .header-info {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
-
-        .title {
-            font-size: 1.3rem;
-            color: var(--accent-primary);
-            margin-bottom: 1rem;
-            font-weight: 400;
-        }
-
-        .contact {
-            color: var(--text-secondary);
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .contact a {
-            color: var(--accent-secondary);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .contact a:hover {
-            color: var(--accent-primary);
-        }
-
-        .header-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            align-items: flex-end;
-        }
-
-        .download-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--accent-primary);
+        /* Left Sidebar */
+        .sidebar {
+            background: #0a5e5e;
             color: white;
-            padding: 0.8rem 1.5rem;
-            border-radius: 5px;
+            padding: 40px 30px;
+        }
+
+        .profile-photo {
+            width: 140px;
+            height: 140px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 0 auto 30px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .profile-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .sidebar h3 {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin: 30px 0 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar p {
+            font-size: 13px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.9);
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+
+        .philosophy-quote {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .strength-item {
+            margin-bottom: 20px;
+        }
+
+        .strength-item h4 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .strength-item h4::before {
+            content: "⚡";
+            font-size: 16px;
+        }
+
+        .strength-item p {
+            font-size: 12px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.85);
+            font-style: normal;
+        }
+
+        .skills-list {
+            list-style: none;
+        }
+
+        .skills-list li {
+            font-size: 12px;
+            padding: 6px 0;
+            color: rgba(255, 255, 255, 0.9);
+            position: relative;
+            padding-left: 12px;
+        }
+
+        .skills-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #4db8b8;
+            font-weight: bold;
+        }
+
+        /* Right Content */
+        .main-content {
+            padding: 40px 50px;
+        }
+
+        .header {
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
+        }
+
+        .header .title {
+            font-size: 18px;
+            color: #0a9e9e;
+            margin-bottom: 15px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .contact-item::before {
+            content: "📞";
+            font-size: 14px;
+        }
+
+        .contact-item:nth-child(2)::before {
+            content: "✉️";
+        }
+
+        .contact-item:nth-child(3)::before {
+            content: "📍";
+        }
+
+        .contact-item a {
+            color: #666;
             text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px var(--shadow);
         }
 
-        .download-btn:hover {
-            background: var(--accent-secondary);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px var(--shadow);
-        }
-
-        .download-btn svg {
-            width: 20px;
-            height: 20px;
+        .contact-item a:hover {
+            color: #0a9e9e;
         }
 
         .section {
-            margin-bottom: 3rem;
-            animation: fadeInUp 0.8s ease-out;
-            animation-fill-mode: both;
+            margin-bottom: 35px;
         }
 
-        .section:nth-child(2) { animation-delay: 0.1s; }
-        .section:nth-child(3) { animation-delay: 0.2s; }
-        .section:nth-child(4) { animation-delay: 0.3s; }
-        .section:nth-child(5) { animation-delay: 0.4s; }
-
-        h2 {
-            font-size: 2rem;
-            color: var(--accent-primary);
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--border-color);
-            display: inline-block;
-            width: 100%;
+        .section h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e0e0e0;
         }
 
-        h3 {
-            font-size: 1.5rem;
-            color: var(--accent-secondary);
-            margin-bottom: 0.5rem;
-        }
-
-        .summary {
-            background: var(--bg-card);
-            padding: 2rem;
-            border-radius: 10px;
-            border-left: 4px solid var(--accent-primary);
-            box-shadow: 0 4px 6px var(--shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .summary:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 12px var(--shadow);
-        }
-
-        .summary p {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
+        .summary-text {
+            font-size: 14px;
             line-height: 1.8;
+            color: #555;
+            text-align: justify;
         }
 
         .job {
-            background: var(--bg-card);
-            padding: 2rem;
-            margin-bottom: 2rem;
-            border-radius: 10px;
-            border-left: 4px solid var(--accent-secondary);
-            box-shadow: 0 4px 6px var(--shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .job:hover {
-            transform: translateX(10px);
-            box-shadow: 0 8px 12px var(--shadow);
+            margin-bottom: 30px;
         }
 
         .job-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
+            margin-bottom: 8px;
         }
 
-        .job-title {
-            flex: 1;
-            min-width: 250px;
+        .job h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d2d2d;
+            margin-bottom: 2px;
         }
 
-        .job-date {
-            color: var(--text-muted);
-            font-style: italic;
+        .job .company {
+            font-size: 14px;
+            color: #0a9e9e;
+            font-weight: 500;
+        }
+
+        .job .date {
+            font-size: 13px;
+            color: #888;
             white-space: nowrap;
-            margin-left: 1rem;
+            text-align: right;
         }
 
-        .company {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
+        .job .location {
+            font-size: 13px;
+            color: #888;
         }
 
-        .job-section {
-            margin-top: 1.5rem;
+        .job-description {
+            font-size: 13px;
+            line-height: 1.7;
+            color: #555;
+            margin: 10px 0;
         }
 
-        .job-section h4 {
-            color: var(--accent-primary);
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-        }
-
-        ul {
+        .job ul {
             list-style: none;
-            margin-left: 1rem;
+            margin-top: 10px;
         }
 
-        ul li {
-            color: var(--text-secondary);
-            margin-bottom: 0.8rem;
-            padding-left: 1.5rem;
+        .job ul li {
+            font-size: 13px;
+            line-height: 1.7;
+            color: #555;
+            padding-left: 18px;
             position: relative;
+            margin-bottom: 6px;
         }
 
-        ul li:before {
-            content: "▹";
-            color: var(--accent-primary);
+        .job ul li::before {
+            content: "▸";
             position: absolute;
             left: 0;
-            font-size: 1.2rem;
+            color: #0a9e9e;
+            font-weight: bold;
         }
 
-        .competencies {
+        .job-subsection {
+            margin-top: 15px;
+        }
+
+        .job-subsection h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 8px;
+        }
+
+        .education-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .competency-card {
-            background: var(--bg-card);
-            padding: 1.5rem;
-            border-radius: 10px;
-            border-top: 3px solid var(--accent-primary);
-            box-shadow: 0 4px 6px var(--shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .competency-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 12px var(--shadow);
-        }
-
-        .competency-card h3 {
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-            color: var(--accent-secondary);
-        }
-
-        .competency-card ul li {
-            font-size: 0.95rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .education {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .education-item {
-            background: var(--bg-card);
-            padding: 1.5rem;
-            border-radius: 10px;
-            border-left: 4px solid var(--accent-primary);
-            box-shadow: 0 4px 6px var(--shadow);
-            transition: transform 0.3s ease;
-        }
-
-        .education-item:hover {
-            transform: translateX(10px);
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
         }
 
         .education-item h3 {
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
+            font-size: 15px;
+            font-weight: 600;
+            color: #2d2d2d;
+            margin-bottom: 5px;
         }
 
         .education-item p {
-            color: var(--text-secondary);
-            margin-bottom: 0.3rem;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
         }
 
-        .scroll-top {
+        .download-btn {
             position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: var(--accent-primary);
+            bottom: 30px;
+            right: 30px;
+            background: #0a9e9e;
             color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(10, 158, 158, 0.3);
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            box-shadow: 0 4px 6px var(--shadow);
-            font-size: 1.5rem;
+            gap: 8px;
         }
 
-        .scroll-top.visible {
-            opacity: 1;
+        .download-btn:hover {
+            background: #0a7e7e;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(10, 158, 158, 0.4);
         }
 
-        .scroll-top:hover {
-            transform: translateY(-5px);
-            background: var(--accent-secondary);
-        }
-
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+        @media print {
+            .download-btn {
+                display: none;
             }
         }
 
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
+            .container {
+                grid-template-columns: 1fr;
+                margin: 0;
             }
 
-            .title {
-                font-size: 1.2rem;
+            .sidebar {
+                padding: 30px 20px;
             }
 
-            h2 {
-                font-size: 1.5rem;
+            .main-content {
+                padding: 30px 20px;
             }
 
-            .header-content {
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .contact-info {
                 flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .header-actions {
-                width: 100%;
-                align-items: stretch;
-            }
-
-            .download-btn {
-                justify-content: center;
+                gap: 10px;
             }
 
             .job-header {
                 flex-direction: column;
             }
 
-            .job-date {
-                margin-left: 0;
-                margin-top: 0.5rem;
-            }
-
-            .container {
-                padding: 1rem;
-            }
-
-            .competencies {
-                grid-template-columns: 1fr;
-            }
-
-            .education {
-                grid-template-columns: 1fr;
+            .download-btn {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 20px;
+                font-size: 13px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <div class="header-content">
-                <div class="header-info">
-                    <h1>Neil T. Hagan</h1>
-                    <div class="title">Outside Plant Engineer</div>
-                    <div class="contact">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect width="20" height="16" x="2" y="4" rx="2"/>
-                            <path d="m2 7 8.97 5.7a1.94 1.94 0 0 0 2.06 0L22 7"/>
-                        </svg>
-                        <a href="mailto:nhagan@corp.mtco.com">nhagan@corp.mtco.com</a>
-                    </div>
-                </div>
-                <div class="header-actions">
-                    <a href="Neil_Hagan_Resume.pdf" class="download-btn" download>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7 10 12 15 17 10"/>
-                            <line x1="12" x2="12" y1="15" y2="3"/>
-                        </svg>
-                        Download PDF
-                    </a>
-                </div>
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="profile-photo">
+                <img src="resume_photo.png" alt="Neil T. Hagan">
             </div>
-        </header>
 
-        <section class="section">
-            <h2>Professional Summary</h2>
-            <div class="summary">
-                <p>
+            <section>
+                <h3>MY PHILOSOPHY</h3>
+                <p>Excellence in telecommunications isn't just about connecting networks—it's about connecting people and communities. Every fiber splice, every network design is an opportunity to build infrastructure that empowers growth.</p>
+                <p class="philosophy-quote">- Neil Hagan</p>
+            </section>
+
+            <section>
+                <h3>STRENGTHS</h3>
+                
+                <div class="strength-item">
+                    <h4>Technical Excellence</h4>
+                    <p>Over 20 years of hands-on expertise in fiber optic network engineering, from design to implementation, ensuring robust and future-proof infrastructure.</p>
+                </div>
+
+                <div class="strength-item">
+                    <h4>Problem-Solving</h4>
+                    <p>Creative approach to complex network challenges, combining technical knowledge with innovative solutions that optimize performance and reduce costs.</p>
+                </div>
+
+                <div class="strength-item">
+                    <h4>Team Leadership</h4>
+                    <p>Proven ability to lead and mentor field teams, fostering collaboration and maintaining high standards of quality and safety.</p>
+                </div>
+            </section>
+
+            <section>
+                <h3>SKILLS</h3>
+                <ul class="skills-list">
+                    <li>Fiber Network Design</li>
+                    <li>OTDR Testing & Analysis</li>
+                    <li>AutoCAD & GIS Mapping</li>
+                    <li>Splice Design & Documentation</li>
+                    <li>Project Management</li>
+                    <li>ADSL/VDSL Technologies</li>
+                    <li>Calix • Adtran • Zyxel</li>
+                    <li>Network Troubleshooting</li>
+                    <li>Scripting & Automation</li>
+                    <li>Permit Applications</li>
+                </ul>
+            </section>
+        </aside>
+
+        <!-- Right Content -->
+        <main class="main-content">
+            <header class="header">
+                <h1>NEIL T. HAGAN</h1>
+                <div class="title">Outside Plant Engineer</div>
+                <div class="contact-info">
+                    <div class="contact-item">(309) 364-8336</div>
+                    <div class="contact-item">
+                        <a href="mailto:nhagan@corp.mtco.com">nhagan@corp.mtco.com</a> • 
+                        <a href="mailto:neilyboy@gmail.com">neilyboy@gmail.com</a>
+                    </div>
+                    <div class="contact-item">Metamora, IL</div>
+                </div>
+            </header>
+
+            <section class="section">
+                <h2>SUMMARY</h2>
+                <p class="summary-text">
                     Dedicated telecommunications specialist with over 20 years of progressive experience in fiber optic network engineering, project management, and technical operations. Expert in full fiber network layout design, including duct systems, vault placement, and fiber count optimization. Proven track record in managing fiber splicing operations, maintaining comprehensive splice records, and leading field teams. Known for creative problem-solving, exceptional technical expertise, and commitment to project excellence from conception to completion.
                 </p>
-            </div>
-        </section>
+            </section>
 
-        <section class="section">
-            <h2>Professional Experience</h2>
+            <section class="section">
+                <h2>EXPERIENCE</h2>
 
-            <div class="job">
-                <div class="job-header">
-                    <div class="job-title">
-                        <h3>Outside Plant Engineer</h3>
-                        <div class="company">MTCO Communications, Metamora, IL</div>
+                <div class="job">
+                    <div class="job-header">
+                        <div>
+                            <h3>Outside Plant Engineer</h3>
+                            <div class="company">MTCO Communications</div>
+                        </div>
+                        <div class="date">
+                            July 2021 - Present<br>
+                            <span class="location">Metamora, IL</span>
+                        </div>
                     </div>
-                    <div class="job-date">July 2021 – Present</div>
-                </div>
-                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                    Manage both technical and operational aspects of fiber optic network infrastructure, ensuring efficient construction of new plant and maintenance of existing systems. Specialize in complete fiber network design and field operations oversight.
-                </p>
-                
-                <div class="job-section">
-                    <h4>Engineering & Project Management</h4>
-                    <ul>
-                        <li>Design comprehensive fiber network layouts including duct systems, vault placement, and fiber count optimization for new service areas</li>
-                        <li>Create and submit permit applications and easement documentation for new construction projects</li>
-                        <li>Maintain detailed fiber records, including splitter configurations and optical specifications</li>
-                        <li>Develop splice designs and daily work instructions for field teams</li>
-                        <li>Integrate and digitize historical splice data into modern record-keeping systems</li>
-                    </ul>
-                </div>
-
-                <div class="job-section">
-                    <h4>Field Operations & Team Leadership</h4>
-                    <ul>
-                        <li>Oversee fiber splicing teams, providing technical guidance and daily instructions for new construction and emergency repairs</li>
-                        <li>Perform advanced fiber optic troubleshooting and network diagnostics</li>
-                        <li>Maintain hands-on involvement in field operations, leveraging extensive installation and support background</li>
-                        <li>Manage all field equipment inventory, including splicing hardware and specialized tools</li>
-                    </ul>
-                </div>
-
-                <div class="job-section">
-                    <h4>Vendor & Customer Relations</h4>
-                    <ul>
-                        <li>Serve as primary liaison with equipment vendors and industry partners</li>
-                        <li>Stay current on emerging technologies and industry best practices through trade shows and vendor meetings</li>
-                        <li>Collaborate directly with enterprise customers on custom fiber solutions</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="job">
-                <div class="job-header">
-                    <div class="job-title">
-                        <h3>Network Tech Supervisor</h3>
-                        <div class="company">MTCO Communications, Metamora, IL</div>
+                    <p class="job-description">
+                        Manage both technical and operational aspects of fiber optic network infrastructure, ensuring efficient construction of new plant and maintenance of existing systems. Specialize in complete fiber network design and field operations oversight.
+                    </p>
+                    
+                    <div class="job-subsection">
+                        <h4>Engineering & Project Management</h4>
+                        <ul>
+                            <li>Design comprehensive fiber network layouts including duct systems, vault placement, and fiber count optimization for new service areas.</li>
+                            <li>Create and submit permit applications and easement documentation for new construction projects.</li>
+                            <li>Maintain detailed fiber records, including splitter configurations and optical specifications.</li>
+                            <li>Develop splice designs and daily work instructions for field teams.</li>
+                            <li>Integrate and digitize historical splice data into modern record-keeping systems.</li>
+                        </ul>
                     </div>
-                    <div class="job-date">May 2014 – July 2021</div>
-                </div>
-                <ul>
-                    <li>Led high-performing team of 5-7 installers, ensuring successful deployment of ADSL, VDSL, and fiber optic services</li>
-                    <li>Managed daily schedules and work assignments, maintaining high standards of quality and efficiency</li>
-                    <li>Served as primary escalation point for customer complaints, resolving issues and using them as team training opportunities</li>
-                    <li>Developed expertise with diverse equipment platforms including Adtran, Comtrend, Zyxel, and Calix systems</li>
-                    <li>Maintained copper pair records and cable assignment databases</li>
-                    <li>Initiated and managed "Redbird Replay" live streaming project for high school sports broadcasts</li>
-                    <li>Developed custom scripts and automated workflows to improve operational efficiency</li>
-                </ul>
-            </div>
 
-            <div class="job">
-                <div class="job-header">
-                    <div class="job-title">
-                        <h3>Network Technician</h3>
-                        <div class="company">MTCO Communications, Metamora, IL</div>
+                    <div class="job-subsection">
+                        <h4>Field Operations & Team Leadership</h4>
+                        <ul>
+                            <li>Oversee fiber splicing teams, providing technical guidance and daily instructions for new construction and emergency repairs.</li>
+                            <li>Perform advanced fiber optic troubleshooting and network diagnostics.</li>
+                            <li>Maintain hands-on involvement in field operations, leveraging extensive installation and support background.</li>
+                            <li>Manage all field equipment inventory, including splicing hardware and specialized tools.</li>
+                        </ul>
                     </div>
-                    <div class="job-date">2004 – May 2014</div>
-                </div>
-                <ul>
-                    <li>Installed and configured ADSL and VDSL services for diverse customer base</li>
-                    <li>Troubleshot and resolved copper pair and connectivity issues</li>
-                    <li>Gained proficiency with industry-standard hardware from Adtran, Comtrend, and Zyxel</li>
-                    <li>Mentored new team members on installation best practices and technical procedures</li>
-                </ul>
-            </div>
 
-            <div class="job">
-                <div class="job-header">
-                    <div class="job-title">
-                        <h3>Phone Support Technician</h3>
-                        <div class="company">MTCO Communications, Metamora, IL</div>
+                    <div class="job-subsection">
+                        <h4>Vendor & Customer Relations</h4>
+                        <ul>
+                            <li>Serve as primary liaison with equipment vendors and industry partners.</li>
+                            <li>Stay current on emerging technologies and industry best practices through trade shows and vendor meetings.</li>
+                            <li>Collaborate directly with enterprise customers on custom fiber solutions.</li>
+                        </ul>
                     </div>
-                    <div class="job-date">October 1999 – 2004</div>
                 </div>
-                <ul>
-                    <li>Provided technical support for dial-up internet services across multiple Windows operating systems</li>
-                    <li>Conducted on-site service calls for hardware installation and advanced troubleshooting</li>
-                    <li>Proactively managed customer satisfaction through follow-up callbacks</li>
-                </ul>
-            </div>
-        </section>
 
-        <section class="section">
-            <h2>Core Competencies</h2>
-            <div class="competencies">
-                <div class="competency-card">
-                    <h3>Network Engineering</h3>
+                <div class="job">
+                    <div class="job-header">
+                        <div>
+                            <h3>Network Tech Supervisor</h3>
+                            <div class="company">MTCO Communications</div>
+                        </div>
+                        <div class="date">
+                            May 2014 - July 2021<br>
+                            <span class="location">Metamora, IL</span>
+                        </div>
+                    </div>
                     <ul>
-                        <li>Fiber Network Design & Layout</li>
-                        <li>Duct System Planning</li>
-                        <li>Vault Placement & Design</li>
-                        <li>Fiber Count Optimization</li>
-                        <li>Splice Design & Documentation</li>
+                        <li>Led high-performing team of 5-7 installers, ensuring successful deployment of ADSL, VDSL, and fiber optic services.</li>
+                        <li>Managed daily schedules and work assignments, maintaining high standards of quality and efficiency.</li>
+                        <li>Served as primary escalation point for customer complaints, resolving issues and using them as team training opportunities.</li>
+                        <li>Developed expertise with diverse equipment platforms including Adtran, Comtrend, Zyxel, and Calix systems.</li>
+                        <li>Initiated and managed "Redbird Replay" live streaming project for high school sports broadcasts.</li>
+                        <li>Developed custom scripts and automated workflows to improve operational efficiency.</li>
                     </ul>
                 </div>
 
-                <div class="competency-card">
-                    <h3>Technical Operations</h3>
+                <div class="job">
+                    <div class="job-header">
+                        <div>
+                            <h3>Network Technician</h3>
+                            <div class="company">MTCO Communications</div>
+                        </div>
+                        <div class="date">
+                            2004 - May 2014<br>
+                            <span class="location">Metamora, IL</span>
+                        </div>
+                    </div>
                     <ul>
-                        <li>Fiber Optic Splicing</li>
-                        <li>OTDR Testing & Analysis</li>
-                        <li>Network Troubleshooting</li>
-                        <li>Equipment Management</li>
-                        <li>Record Keeping Systems</li>
+                        <li>Installed and configured ADSL and VDSL services for diverse customer base.</li>
+                        <li>Troubleshot and resolved copper pair and connectivity issues.</li>
+                        <li>Gained proficiency with industry-standard hardware from Adtran, Comtrend, and Zyxel.</li>
+                        <li>Mentored new team members on installation best practices and technical procedures.</li>
                     </ul>
                 </div>
 
-                <div class="competency-card">
-                    <h3>Project Management</h3>
+                <div class="job">
+                    <div class="job-header">
+                        <div>
+                            <h3>Phone Support Technician</h3>
+                            <div class="company">MTCO Communications</div>
+                        </div>
+                        <div class="date">
+                            Oct 1999 - 2004<br>
+                            <span class="location">Metamora, IL</span>
+                        </div>
+                    </div>
                     <ul>
-                        <li>Permit Applications</li>
-                        <li>Easement Documentation</li>
-                        <li>Team Leadership & Oversight</li>
-                        <li>Vendor Relations</li>
-                        <li>Customer Coordination</li>
+                        <li>Provided technical support for dial-up internet services across multiple Windows operating systems.</li>
+                        <li>Conducted on-site service calls for hardware installation and advanced troubleshooting.</li>
+                        <li>Proactively managed customer satisfaction through follow-up callbacks.</li>
                     </ul>
                 </div>
+            </section>
 
-                <div class="competency-card">
-                    <h3>Technical Proficiencies</h3>
-                    <ul>
-                        <li>Fiber Optic Systems</li>
-                        <li>ADSL/VDSL Technologies</li>
-                        <li>Adtran, Calix, Zyxel Platforms</li>
-                        <li>Scripting & Automation</li>
-                        <li>GIS Mapping Tools</li>
-                    </ul>
+            <section class="section">
+                <h2>EDUCATION</h2>
+                <div class="education-grid">
+                    <div class="education-item">
+                        <h3>Associate's Degree in Business Administration</h3>
+                        <p>Illinois Central College</p>
+                        <p>East Peoria, IL</p>
+                        <p>2002 - 2004</p>
+                    </div>
+                    <div class="education-item">
+                        <h3>High School Diploma</h3>
+                        <p>Metamora Township High School</p>
+                        <p>Metamora, IL</p>
+                        <p>1998 - 2001</p>
+                    </div>
                 </div>
-            </div>
-        </section>
-
-        <section class="section">
-            <h2>Education</h2>
-            <div class="education">
-                <div class="education-item">
-                    <h3>Associate's Degree in Business Administration</h3>
-                    <p>Illinois Central College, East Peoria, IL</p>
-                    <p style="color: var(--text-muted);">2002 – 2004</p>
-                </div>
-
-                <div class="education-item">
-                    <h3>High School Diploma</h3>
-                    <p>Metamora Township High School, Metamora, IL</p>
-                    <p style="color: var(--text-muted);">1998 – 2001</p>
-                </div>
-            </div>
-        </section>
+            </section>
+        </main>
     </div>
 
-    <div class="scroll-top" id="scrollTop">↑</div>
+    <a href="Neil_Hagan_Resume.pdf" class="download-btn" download>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" x2="12" y1="15" y2="3"/>
+        </svg>
+        Download PDF
+    </a>
 
     <script>
         // Cache-busting: Force reload for users with old cached version
         (function() {
-            const CURRENT_VERSION = '2.0';
+            const CURRENT_VERSION = '3.0';
             const storedVersion = localStorage.getItem('resumeVersion');
             
-            // If no version stored or old version, force reload once
             if (storedVersion !== CURRENT_VERSION) {
                 localStorage.setItem('resumeVersion', CURRENT_VERSION);
-                // Only reload if we haven't just reloaded (prevent infinite loop)
                 const urlParams = new URLSearchParams(window.location.search);
                 if (!urlParams.has('refreshed')) {
                     window.location.href = window.location.pathname + '?refreshed=1';
                 }
             }
         })();
-
-        // Smooth scrolling for scroll-to-top button
-        const scrollTopBtn = document.getElementById('scrollTop');
-        
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > 300) {
-                scrollTopBtn.classList.add('visible');
-            } else {
-                scrollTopBtn.classList.remove('visible');
-            }
-        });
-
-        scrollTopBtn.addEventListener('click', () => {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-
-        // Add intersection observer for enhanced animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        // Observe all job cards and competency cards
-        document.querySelectorAll('.job, .competency-card, .education-item').forEach(el => {
-            observer.observe(el);
-        });
     </script>
 </body>
 </html>
