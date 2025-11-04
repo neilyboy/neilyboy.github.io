@@ -611,6 +611,22 @@
     <div class="scroll-top" id="scrollTop">↑</div>
 
     <script>
+        // Cache-busting: Force reload for users with old cached version
+        (function() {
+            const CURRENT_VERSION = '2.0';
+            const storedVersion = localStorage.getItem('resumeVersion');
+            
+            // If no version stored or old version, force reload once
+            if (storedVersion !== CURRENT_VERSION) {
+                localStorage.setItem('resumeVersion', CURRENT_VERSION);
+                // Only reload if we haven't just reloaded (prevent infinite loop)
+                const urlParams = new URLSearchParams(window.location.search);
+                if (!urlParams.has('refreshed')) {
+                    window.location.href = window.location.pathname + '?refreshed=1';
+                }
+            }
+        })();
+
         // Smooth scrolling for scroll-to-top button
         const scrollTopBtn = document.getElementById('scrollTop');
         
