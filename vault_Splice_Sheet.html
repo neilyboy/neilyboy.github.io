@@ -5,120 +5,183 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Splice Sheet Generator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <style>
         body, html {
             margin: 0;
             padding: 0;
-            font-family: 'Arial', sans-serif;
-            line-height: 1.4;
-            color: #333;
-            font-size: 12px;
-            background-color: #fff;
+            font-family: 'Roboto', 'Segoe UI', Tahoma, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            font-size: 13px;
+            background-color: #f0f2f5;
         }
+
         #container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h2 {
-            color: #2c3e50;
-            text-align: center;
-            margin: 0 0 20px 0;
-            padding: 0;
-            font-size: 20px;
-        }
-        .controls {
-            background-color: #f4f4f4;
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 40px;
+            background-color: #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
         }
-        #file-upload {
-            display: none;
+
+        h2 {
+            color: #1a202c;
+            text-align: left;
+            margin: 0 0 30px 0;
+            padding-bottom: 15px;
+            font-size: 24px;
+            font-weight: 700;
+            border-bottom: 2px solid #e2e8f0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .btn {
-            display: inline-block;
-            background-color: #3498db;
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+
+        /* --- Control Panel --- */
+        .controls {
+            background-color: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        #file-upload { display: none; }
+
+        #title-input, #notes-input {
+            padding: 10px 15px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
             font-size: 14px;
+            outline: none;
+            flex-grow: 1;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #3182ce;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
             border: none;
-            margin: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .btn:hover {
-            background-color: #2980b9;
-        }
-        #output {
-            width: 100%;
-        }
+
+        .btn:hover { background-color: #2c5282; }
+
+        /* --- Table Styling --- */
         table {
             width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
+            border-collapse: collapse; /* This keeps grid lines neat */
+            font-size: 13px;
+            margin-top: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 4px;
+
+        thead tr {
+            background-color: #2d3748;
+            color: #ffffff;
             text-align: left;
         }
+
+        th, td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
         th {
-            background-color: #34495e;
-            color: #fff;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr:nth-of-type(even) { background-color: #f7fafc; }
+        tbody tr:hover { background-color: #ebf8ff; }
+
+        /* --- THE COLOR PILL STYLE --- */
+        /* This creates the rounded badge inside the square cell */
+        .color-pill {
+            display: block;
+            margin: 0 auto; /* Center it */
+            padding: 4px 8px;
+            border-radius: 12px; /* Smooth rounded corners */
             font-weight: bold;
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.15); /* Subtle border for screen */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            width: fit-content;
+            min-width: 60px; /* Ensures consistent size */
         }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        #title-input {
-            width: calc(100% - 110px);
-            margin: 5px;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        #notes-input {
-            width: calc(100% - 110px);
-            margin: 5px;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
+
+        /* --- Image & Notes --- */
         #uploadedImage {
             display: block;
             max-width: 100%;
             height: auto;
-            margin: 20px auto;
+            margin: 30px auto;
+            border: 1px solid #e2e8f0;
         }
-        .color-cell {
-            text-shadow: none;
+
+        .notes-section {
+            font-style: italic;
+            color: #718096;
+            border-left: 4px solid #3182ce;
+            padding: 15px;
+            background: #f8fafc;
+            margin-top: 20px;
         }
+
+        /* --- Print Styles --- */
         @media print {
             @page {
                 size: landscape;
+                margin: 0.25in;
             }
             body {
-                margin: 0;
-                padding: 0;
+                background-color: #fff;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
             #container {
-                padding: 0;
+                width: 100%;
                 max-width: none;
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
             }
-            .controls {
-                display: none;
-            }
-            h2 { font-size: 18px; }
+            .controls { display: none; }
+            
             table { font-size: 10px; }
-            th, td { padding: 2px; }
+            
+            th, td {
+                padding: 4px;
+                border: 1px solid #ccc; /* Grid lines remain square */
+            }
+            
+            /* The pill keeps its rounded shape in print */
+            .color-pill {
+                border: 1px solid #000 !important; /* Darker border for print contrast */
+                border-radius: 10px !important; /* Force rounding */
+                box-shadow: none;
+            }
+            
             #uploadedImage {
-                max-height: 600px;
+                max-height: 500px;
                 object-fit: contain;
+                border: none;
             }
         }
     </style>
@@ -128,12 +191,15 @@
         <div class="controls">
             <label for="file-upload" class="btn">Choose XLSX File</label>
             <input type="file" id="file-upload" accept=".xlsx" />
-            <input type="text" id="title-input" placeholder="Enter title" required>
-            <input type="text" id="notes-input" placeholder="Enter notes" required>
+            
+            <input type="text" id="title-input" placeholder="Report Title" required>
+            <input type="text" id="notes-input" placeholder="Notes..." required>
+            
             <label for="imageFile" class="btn">Upload Image</label>
             <input type="file" id="imageFile" accept=".png,.jpg,.jpeg" style="display:none;">
+            
             <button id="process-btn" class="btn">Process File</button>
-            <button id="print-btn" class="btn" style="display: none;">Print</button>
+            <button id="print-btn" class="btn" style="display: none;">Print Report</button>
         </div>
         <div id="output"></div>
     </div>
@@ -176,7 +242,11 @@
         const titleInput = document.getElementById('title-input').value;
         const notesInput = document.getElementById('notes-input').value;
         const imageFile = document.getElementById('imageFile').files[0];
-        const output = document.getElementById('output');
+        
+        if (!fileInput.files.length) {
+            alert("Please select an XLSX file first.");
+            return;
+        }
 
         const file = fileInput.files[0];
         const reader = new FileReader();
@@ -193,22 +263,21 @@
         reader.readAsArrayBuffer(file);
     }
 
-function processData(data, title, imageFile, notes) {
+    function processData(data, title, imageFile, notes) {
         const processedData = [];
+        
         for (let i = 2; i < data.length; i++) {
             const row = data[i];
-            // Ensure the row has enough data to prevent errors if trailing empty rows exist
             if (!row || row.length < 2) continue;
 
             try {
-                // COLUMNS 1 & 2 (Unchanged)
                 const vaultInfo = (row[1] || '').split(':::');
                 const beginningVault = (vaultInfo[0] || '').replace(/\([^)]*\)/g, '').trim();
                 const endingVault = ((vaultInfo[1] || '').split('BFO')[0] || '').trim();
                 const fiberCountMatch = (row[1] || '').match(/(\d+)I/);
                 const fiberCount = fiberCountMatch ? fiberCountMatch[1] + ' Fiber' : 'N/A';
-                const incomingFiber = row[2] || '';
                 
+                const incomingFiber = row[2] || '';
                 let tubeColor = { name: '', hex: '' };
                 let fiberColor = { name: '', hex: '' };
                 
@@ -218,24 +287,20 @@ function processData(data, title, imageFile, notes) {
                     fiberColor = getFiberColor(fiberNumber);
                 }
 
-                // COLUMN 3 (Unchanged)
                 const groupInfo = (row[3] || '').split('=');
                 const groupFiberCount = (groupInfo[1] || '').trim();
                 
-                // UPDATED: Changed from row[5] to row[6]
-                const originatingInfo = (row[6] || '').split(':::'); 
+                const originatingInfo = (row[6] || '').split(':::');
                 const originatingVault = (originatingInfo[0] || '').trim();
                 const addressOrVault = ((originatingInfo[1] || '').split(/SEBF|BFO/)[0] || '').trim();
                 const outFiberCountMatch = (row[6] || '').match(/(\d+)I/);
                 const outFiberCount = outFiberCountMatch ? outFiberCountMatch[1] + ' Fiber' : 'N/A';
                 
-                // UPDATED: Changed from row[6] to row[7]
-                const outFiber = row[7] || ''; 
+                const outFiber = row[7] || '';
                 let outFiberColor = { name: '', hex: '' };
                 
                 if (!outFiber.includes('-')) {
                     const outFiberNumber = parseInt(outFiber) || 0;
-                    // Check if parseInt returned a valid number to avoid undefined colors
                     if (outFiberNumber > 0) {
                         outFiberColor = getFiberColor(outFiberNumber);
                     }
@@ -265,10 +330,10 @@ function processData(data, title, imageFile, notes) {
 
     function displayReport(data, title, imageFile, notes) {
         const output = document.getElementById('output');
-        let html = `<h2>${title}</h2>`;
+        let html = `<h2>${title || 'Splice Sheet Report'}</h2>`;
         
         if (data.length === 0) {
-            html += '<p class="error">No valid data found in the Excel file. Please check the file format and try again.</p>';
+            html += '<p class="error">No valid data found in the Excel file.</p>';
         } else {
             html += `
                 <table>
@@ -295,14 +360,26 @@ function processData(data, title, imageFile, notes) {
                                 <td>${row.endingVault}</td>
                                 <td>${row.fiberCount}</td>
                                 <td>${row.incomingFiber}</td>
-                                <td class="color-cell" style="background-color: ${row.tubeColor.hex}; color: ${row.tubeColor.name === 'Black' ? 'white' : 'black'}">${row.tubeColor.name}</td>
-                                <td class="color-cell" style="background-color: ${row.fiberColor.hex}; color: ${row.fiberColor.name === 'Black' ? 'white' : 'black'}">${row.fiberColor.name}</td>
+                                <td>
+                                    <div class="color-pill" style="background-color: ${row.tubeColor.hex}; color: ${row.tubeColor.name === 'Black' ? 'white' : 'black'}">
+                                        ${row.tubeColor.name}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="color-pill" style="background-color: ${row.fiberColor.hex}; color: ${row.fiberColor.name === 'Black' ? 'white' : 'black'}">
+                                        ${row.fiberColor.name}
+                                    </div>
+                                </td>
                                 <td>${row.groupFiberCount}</td>
                                 <td>${row.originatingVault}</td>
                                 <td>${row.addressOrVault}</td>
                                 <td>${row.outFiberCount}</td>
                                 <td>${row.outFiber}</td>
-                                <td class="color-cell" style="background-color: ${row.outFiberColor.hex}; color: ${row.outFiberColor.name === 'Black' ? 'white' : 'black'}">${row.outFiberColor.name}</td>
+                                <td>
+                                    <div class="color-pill" style="background-color: ${row.outFiberColor.hex}; color: ${row.outFiberColor.name === 'Black' ? 'white' : 'black'}">
+                                        ${row.outFiberColor.name}
+                                    </div>
+                                </td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -310,29 +387,26 @@ function processData(data, title, imageFile, notes) {
             `;
         }
 
-        // Add image placeholder
-        html += '<img id="uploadedImage" alt="Uploaded Image" />';
+        html += '<img id="uploadedImage" alt="" />';
 
-        // Add notes section
         if (notes) {
-            html += `<p>Notes: ${notes}</p>`;
+            html += `<p class="notes-section"><strong>Notes:</strong> ${notes}</p>`;
         }
 
         output.innerHTML = html;
 
-        // Load and display the image
         if (imageFile) {
             const imageReader = new FileReader();
             imageReader.onload = function(e) {
                 document.getElementById('uploadedImage').src = e.target.result;
             };
             imageReader.readAsDataURL(imageFile);
+        } else {
+            document.getElementById('uploadedImage').style.display = 'none';
         }
 
-        document.getElementById('print-btn').style.display = 'inline-block';
+        document.getElementById('print-btn').style.display = 'inline-flex';
     }
 </script>
 </body>
-</html></document_content>
-</document>
-</documents>
+</html>
