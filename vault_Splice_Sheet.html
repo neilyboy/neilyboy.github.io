@@ -83,7 +83,7 @@
         /* --- Table Styling --- */
         table {
             width: 100%;
-            border-collapse: collapse; /* This keeps grid lines neat */
+            border-collapse: collapse;
             font-size: 13px;
             margin-top: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
@@ -112,18 +112,17 @@
         tbody tr:hover { background-color: #ebf8ff; }
 
         /* --- THE COLOR PILL STYLE --- */
-        /* This creates the rounded badge inside the square cell */
         .color-pill {
             display: block;
-            margin: 0 auto; /* Center it */
+            margin: 0 auto;
             padding: 4px 8px;
-            border-radius: 12px; /* Smooth rounded corners */
+            border-radius: 12px;
             font-weight: bold;
             text-align: center;
-            border: 1px solid rgba(0,0,0,0.15); /* Subtle border for screen */
+            border: 1px solid rgba(0,0,0,0.15);
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
             width: fit-content;
-            min-width: 60px; /* Ensures consistent size */
+            min-width: 60px;
         }
 
         /* --- Image & Notes --- */
@@ -168,13 +167,12 @@
             
             th, td {
                 padding: 4px;
-                border: 1px solid #ccc; /* Grid lines remain square */
+                border: 1px solid #ccc;
             }
             
-            /* The pill keeps its rounded shape in print */
             .color-pill {
-                border: 1px solid #000 !important; /* Darker border for print contrast */
-                border-radius: 10px !important; /* Force rounding */
+                border: 1px solid #000 !important;
+                border-radius: 10px !important;
                 box-shadow: none;
             }
             
@@ -235,6 +233,14 @@
 
     function getTubeColor(fiberNumber) {
         return fiberColors[Math.floor((fiberNumber - 1) / 12) % 12];
+    }
+
+    function getPillTextColor(colorName) {
+        // Use white text for dark colors (Black and Violet)
+        if (colorName === 'Black' || colorName === 'Violet' || colorName === 'Brown' || colorName === 'Green') {
+            return 'white';
+        }
+        return 'black';
     }
 
     function processFile() {
@@ -354,34 +360,40 @@
                         </tr>
                     </thead>
                     <tbody>
-                        ${data.map(row => `
-                            <tr>
-                                <td>${row.beginningVault}</td>
-                                <td>${row.endingVault}</td>
-                                <td>${row.fiberCount}</td>
-                                <td>${row.incomingFiber}</td>
-                                <td>
-                                    <div class="color-pill" style="background-color: ${row.tubeColor.hex}; color: ${row.tubeColor.name === 'Black' ? 'white' : 'black'}">
-                                        ${row.tubeColor.name}
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="color-pill" style="background-color: ${row.fiberColor.hex}; color: ${row.fiberColor.name === 'Black' ? 'white' : 'black'}">
-                                        ${row.fiberColor.name}
-                                    </div>
-                                </td>
-                                <td>${row.groupFiberCount}</td>
-                                <td>${row.originatingVault}</td>
-                                <td>${row.addressOrVault}</td>
-                                <td>${row.outFiberCount}</td>
-                                <td>${row.outFiber}</td>
-                                <td>
-                                    <div class="color-pill" style="background-color: ${row.outFiberColor.hex}; color: ${row.outFiberColor.name === 'Black' ? 'white' : 'black'}">
-                                        ${row.outFiberColor.name}
-                                    </div>
-                                </td>
-                            </tr>
-                        `).join('')}
+                        ${data.map(row => {
+                            const tubeTextColor = getPillTextColor(row.tubeColor.name);
+                            const fiberTextColor = getPillTextColor(row.fiberColor.name);
+                            const outFiberTextColor = getPillTextColor(row.outFiberColor.name);
+
+                            return `
+                                <tr>
+                                    <td>${row.beginningVault}</td>
+                                    <td>${row.endingVault}</td>
+                                    <td>${row.fiberCount}</td>
+                                    <td>${row.incomingFiber}</td>
+                                    <td>
+                                        <div class="color-pill" style="background-color: ${row.tubeColor.hex}; color: ${tubeTextColor}">
+                                            ${row.tubeColor.name}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="color-pill" style="background-color: ${row.fiberColor.hex}; color: ${fiberTextColor}">
+                                            ${row.fiberColor.name}
+                                        </div>
+                                    </td>
+                                    <td>${row.groupFiberCount}</td>
+                                    <td>${row.originatingVault}</td>
+                                    <td>${row.addressOrVault}</td>
+                                    <td>${row.outFiberCount}</td>
+                                    <td>${row.outFiber}</td>
+                                    <td>
+                                        <div class="color-pill" style="background-color: ${row.outFiberColor.hex}; color: ${outFiberTextColor}">
+                                            ${row.outFiberColor.name}
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
                     </tbody>
                 </table>
             `;
