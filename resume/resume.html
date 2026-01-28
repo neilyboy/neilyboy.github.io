@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume - Technical Specialist</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #f39c12; /* Caterpillar Gold/Yellow feel */
+            --text: #333;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.4;
+            color: var(--text);
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-top: 8px solid var(--accent);
+        }
+        header {
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        h1 { margin: 0; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
+        .contact { font-size: 0.9em; color: #666; margin-top: 10px; }
+        h2 { 
+            color: var(--primary); 
+            border-left: 4px solid var(--accent); 
+            padding-left: 10px; 
+            text-transform: uppercase; 
+            font-size: 1.1em;
+            margin-top: 25px;
+        }
+        .summary { font-style: italic; color: #444; }
+        .skills-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .job { margin-bottom: 15px; }
+        .job-title { font-weight: bold; display: flex; justify-content: space-between; }
+        .company { color: var(--accent); font-weight: 600; }
+        .date { color: #888; font-size: 0.85em; }
+        ul { padding-left: 20px; margin: 5px 0; }
+        li { margin-bottom: 3px; }
+        .interest-item { margin-bottom: 10px; }
+        .interest-item strong { color: var(--primary); }
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>[YOUR NAME]</h1>
+        <div class="contact">
+            Phone: [Your Phone] | Email: [Your Email] <br>
+            GitHub: github.com/neilyboy | Location: [Your City, ST]
+        </div>
+    </header>
+
+    <section class="summary">
+        <p>
+            Adaptable Technical Systems Specialist with a lifelong passion for hardware-software integration and complex troubleshooting. 
+            Proven track record in high-reliability infrastructure (Fiber/Network Engineering) with extensive personal expertise in Linux, 
+            IoT development, and AI-assisted prototyping. Rapidly masters new technologies to deliver efficient, scalable solutions.
+        </p>
+    </section>
+
+    <h2>Technical Expertise & Software</h2>
+    <div class="skills-grid">
+        <div>
+            <strong>Software & Systems:</strong>
+            <ul>
+                <li>Microsoft Office Suite (Expert)</li>
+                <li>Linux (Ubuntu/Debian) & Bash</li>
+                <li>Docker & Self-Hosted Containers</li>
+                <li>AI Prompt Engineering (Web Apps)</li>
+            </ul>
+        </div>
+        <div>
+            <strong>Hardware & Engineering:</strong>
+            <ul>
+                <li>IoT (ESP32, Raspberry Pi)</li>
+                <li>3D Printer & CNC Build/Repair</li>
+                <li>Fiber Optic Network Design</li>
+                <li>Critical Systems Troubleshooting</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2>Professional Experience</h2>
+    
+    <div class="job">
+        <div class="job-title">
+            <span>Fiber Network Engineer</span>
+            <span class="date">20XX – Present</span>
+        </div>
+        <div class="company">Previous Company Name</div>
+        <ul>
+            <li>Managed end-to-end network reliability for critical infrastructure, ensuring high-speed connectivity for enterprise clients.</li>
+            <li>Troubleshot complex hardware/software interface issues, reducing system downtime by [X]% through proactive monitoring.</li>
+            <li>Authored technical documentation and SOPs that streamlined multi-departmental deployments.</li>
+            <li><strong>Transferable Success:</strong> Bridged the gap between physical hardware constraints and software management tools to optimize network flow.</li>
+        </ul>
+    </div>
+
+    <div class="job">
+        <div class="job-title">
+            <span>Technical Specialist / [Previous Role]</span>
+            <span class="date">20XX – 20XX</span>
+        </div>
+        <div class="company">Previous Company Name</div>
+        <ul>
+            <li>Coordinated large-scale hardware rollouts, maintaining 100% compliance with safety and technical specifications.</li>
+            <li>Utilized advanced diagnostic tools to identify and resolve system bottlenecks in high-pressure environments.</li>
+        </ul>
+    </div>
+
+    <h2>Technical Interests & Personal Projects</h2>
+    
+    <div class="interest-item">
+        <strong>Vintage Arcade Restoration:</strong> Fully restore legacy arcade cabinets, including CRT maintenance, PCB soldering, and integrating Raspberry Pi controllers for modern emulation.
+    </div>
+
+    <div class="interest-item">
+        <strong>IoT & Home Automation:</strong> Build and deploy custom IoT solutions using ESP32 and Raspberry Pi. Maintain a Linux-based home lab running Docker containers for private cloud services.
+    </div>
+
+    <div class="interest-item">
+        <strong>Additive Manufacturing:</strong> Constructed and calibrated multiple 3D printers and CNC machines from the ground up; proficient in mechanical troubleshooting and firmware flashing (Klipper/Marlin).
+    </div>
+
+    <div class="interest-item">
+        <strong>AI Development:</strong> Actively leverage LLMs to write and deploy functional web applications, focusing on automating complex workflows and data visualization.
+    </div>
+
+    <h2>Education & Training</h2>
+    <p>
+        <strong>[Degree/Certification Name]</strong> | [Institution Name] <br>
+        <em>Continued Learning: Python for Automation, Docker Certified Associate (Study), Fiber Optic Association (FOA) Certs.</em>
+    </p>
+
+</div>
+
+</body>
+</html>
