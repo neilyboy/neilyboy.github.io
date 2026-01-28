@@ -3,64 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume - Technical Specialist</title>
+    <title>Neil [Last Name] - Technical Systems Specialist</title>
     <style>
         :root {
-            --primary: #2c3e50;
-            --accent: #f39c12; /* Caterpillar Gold/Yellow feel */
+            --primary: #232323;
+            --accent: #FFCD00; /* Caterpillar Yellow */
             --text: #333;
+            --bg: #f4f4f4;
         }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.4;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.35;
             color: var(--text);
-            max-width: 850px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 40px 20px;
-            background: #f4f4f4;
+            padding: 20px;
+            background: var(--bg);
         }
         .container {
             background: white;
-            padding: 40px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            border-top: 8px solid var(--accent);
+            padding: 35px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            border-top: 10px solid var(--accent);
         }
         header {
             text-align: center;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 20px;
             margin-bottom: 20px;
         }
-        h1 { margin: 0; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
-        .contact { font-size: 0.9em; color: #666; margin-top: 10px; }
+        h1 { margin: 0; color: var(--primary); font-size: 2.2em; text-transform: uppercase; }
+        .contact { font-size: 0.9em; color: #666; margin-top: 5px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
         h2 { 
             color: var(--primary); 
-            border-left: 4px solid var(--accent); 
-            padding-left: 10px; 
-            text-transform: uppercase; 
+            border-bottom: 2px solid var(--accent); 
+            display: inline-block;
             font-size: 1.1em;
-            margin-top: 25px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
         }
-        .summary { font-style: italic; color: #444; }
+        .summary { font-style: italic; color: #555; margin-bottom: 15px; font-size: 0.95em; }
         .skills-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 5px;
+            gap: 20px;
+            margin-bottom: 10px;
         }
         .job { margin-bottom: 15px; }
-        .job-title { font-weight: bold; display: flex; justify-content: space-between; }
-        .company { color: var(--accent); font-weight: 600; }
-        .date { color: #888; font-size: 0.85em; }
-        ul { padding-left: 20px; margin: 5px 0; }
-        li { margin-bottom: 3px; }
-        .interest-item { margin-bottom: 10px; }
-        .interest-item strong { color: var(--primary); }
+        .job-header { display: flex; justify-content: space-between; align-items: baseline; }
+        .job-title { font-weight: bold; color: var(--primary); font-size: 1.05em; }
+        .company { color: #666; font-weight: 600; font-size: 0.95em; }
+        .date { color: #888; font-size: 0.85em; font-weight: normal; }
+        ul { padding-left: 18px; margin: 5px 0; }
+        li { margin-bottom: 2px; font-size: 0.9em; }
+        .interest-item { margin-bottom: 8px; font-size: 0.9em; border-left: 3px solid #eee; padding-left: 10px; }
         @media print {
             body { background: white; padding: 0; }
-            .container { box-shadow: none; padding: 0; }
+            .container { box-shadow: none; padding: 10px; width: 100%; }
         }
     </style>
 </head>
@@ -68,39 +66,35 @@
 
 <div class="container">
     <header>
-        <h1>[YOUR NAME]</h1>
+        <h1>NEIL [LAST NAME]</h1>
         <div class="contact">
-            Phone: [Your Phone] | Email: [Your Email] <br>
-            GitHub: github.com/neilyboy | Location: [Your City, ST]
+            Washington, IL | [Phone Number] | [Email Address] <br>
+            <strong>Portfolio:</strong> neilyboy.github.io | <strong>GitHub:</strong> github.com/neilyboy
         </div>
     </header>
 
     <section class="summary">
-        <p>
-            Adaptable Technical Systems Specialist with a lifelong passion for hardware-software integration and complex troubleshooting. 
-            Proven track record in high-reliability infrastructure (Fiber/Network Engineering) with extensive personal expertise in Linux, 
-            IoT development, and AI-assisted prototyping. Rapidly masters new technologies to deliver efficient, scalable solutions.
-        </p>
+        Highly analytical Technical Specialist with 15+ years of experience in mission-critical infrastructure. Expert in complex system troubleshooting, from fiber optic networks to Linux-based IoT ecosystems. Passionate about leveraging AI, containerization (Docker), and rapid hardware prototyping to solve industrial challenges.
     </section>
 
-    <h2>Technical Expertise & Software</h2>
+    <h2>Technical Mastery & Tools</h2>
     <div class="skills-grid">
         <div>
-            <strong>Software & Systems:</strong>
+            <strong>Systems & Software:</strong>
             <ul>
-                <li>Microsoft Office Suite (Expert)</li>
-                <li>Linux (Ubuntu/Debian) & Bash</li>
-                <li>Docker & Self-Hosted Containers</li>
-                <li>AI Prompt Engineering (Web Apps)</li>
+                <li><strong>Microsoft Office Suite (Advanced/Expert)</strong></li>
+                <li>Linux Administration (Ubuntu/Debian)</li>
+                <li>Docker, Self-Hosted Services, & Git</li>
+                <li>AI-Assisted Web App Prototyping</li>
             </ul>
         </div>
         <div>
             <strong>Hardware & Engineering:</strong>
             <ul>
-                <li>IoT (ESP32, Raspberry Pi)</li>
-                <li>3D Printer & CNC Build/Repair</li>
-                <li>Fiber Optic Network Design</li>
-                <li>Critical Systems Troubleshooting</li>
+                <li>IoT Development (ESP32, Raspberry Pi)</li>
+                <li>CNC & 3D Printer Design/Maintenance</li>
+                <li>Fiber Optics (OTDR, Fusion Splicing)</li>
+                <li>Network Architecture & Security</li>
             </ul>
         </div>
     </div>
@@ -108,53 +102,65 @@
     <h2>Professional Experience</h2>
     
     <div class="job">
-        <div class="job-title">
-            <span>Fiber Network Engineer</span>
-            <span class="date">20XX – Present</span>
+        <div class="job-header">
+            <span class="job-title">Staff Engineer – Fiber Construction</span>
+            <span class="date">2015 – 2024</span>
         </div>
-        <div class="company">Previous Company Name</div>
+        <div class="company">Windstream / Kinetic</div>
         <ul>
-            <li>Managed end-to-end network reliability for critical infrastructure, ensuring high-speed connectivity for enterprise clients.</li>
-            <li>Troubleshot complex hardware/software interface issues, reducing system downtime by [X]% through proactive monitoring.</li>
-            <li>Authored technical documentation and SOPs that streamlined multi-departmental deployments.</li>
-            <li><strong>Transferable Success:</strong> Bridged the gap between physical hardware constraints and software management tools to optimize network flow.</li>
+            <li>Engineered and managed large-scale fiber-to-the-home (FTTH) and business deployments across multiple regions.</li>
+            <li>Utilized advanced GIS and CAD tools to design network paths, ensuring 100% compliance with local regulations.</li>
+            <li>Resolved high-level technical bottlenecks in the field, reducing deployment delays by identifying hardware failures early.</li>
+            <li>Mastered Microsoft Excel for project tracking and data analysis, managing multi-million dollar infrastructure assets.</li>
         </ul>
     </div>
 
     <div class="job">
-        <div class="job-title">
-            <span>Technical Specialist / [Previous Role]</span>
-            <span class="date">20XX – 20XX</span>
+        <div class="job-header">
+            <span class="job-title">OSP Design Engineer</span>
+            <span class="date">2012 – 2015</span>
         </div>
-        <div class="company">Previous Company Name</div>
+        <div class="company">CHESS Group, Inc.</div>
         <ul>
-            <li>Coordinated large-scale hardware rollouts, maintaining 100% compliance with safety and technical specifications.</li>
-            <li>Utilized advanced diagnostic tools to identify and resolve system bottlenecks in high-pressure environments.</li>
+            <li>Led the design of Outside Plant (OSP) infrastructure, focusing on network longevity and scalable architecture.</li>
+            <li>Collaborated with municipal stakeholders and utility companies to secure permits and site access.</li>
         </ul>
     </div>
 
-    <h2>Technical Interests & Personal Projects</h2>
+    <div class="job">
+        <div class="job-header">
+            <span class="job-title">Lead Field Technician / Foreman</span>
+            <span class="date">2007 – 2012</span>
+        </div>
+        <div class="company">S&S Directional Boring</div>
+        <ul>
+            <li>Directed field crews in complex underground utility installations, maintaining a zero-incident safety record.</li>
+            <li>Troubleshot mechanical issues on heavy machinery and electronic locating equipment in real-time.</li>
+        </ul>
+    </div>
+
+    <h2>Technical Interests & "The Maker Mindset"</h2>
     
     <div class="interest-item">
-        <strong>Vintage Arcade Restoration:</strong> Fully restore legacy arcade cabinets, including CRT maintenance, PCB soldering, and integrating Raspberry Pi controllers for modern emulation.
+        <strong>Vintage Arcade Restoration:</strong> I restore 1980s/90s arcade cabinets, which involves high-voltage CRT repair, PCB soldering, and custom Raspberry Pi/Linux integration. 
     </div>
 
     <div class="interest-item">
-        <strong>IoT & Home Automation:</strong> Build and deploy custom IoT solutions using ESP32 and Raspberry Pi. Maintain a Linux-based home lab running Docker containers for private cloud services.
+        <strong>IoT & Industrial Tinkering:</strong> I design and deploy custom IoT sensors using <strong>ESP32</strong> and <strong>Raspberry Pi</strong>. I maintain a home lab cluster running <strong>Docker</strong> containers to host personal web applications and network security tools.
     </div>
 
     <div class="interest-item">
-        <strong>Additive Manufacturing:</strong> Constructed and calibrated multiple 3D printers and CNC machines from the ground up; proficient in mechanical troubleshooting and firmware flashing (Klipper/Marlin).
+        <strong>Custom CNC & 3D Printing:</strong> I have built and optimized multiple 3D printers and CNC machines, mastering the calibration of stepper motors, firmware flashing (Marlin/Klipper), and mechanical repair.
     </div>
 
     <div class="interest-item">
-        <strong>AI Development:</strong> Actively leverage LLMs to write and deploy functional web applications, focusing on automating complex workflows and data visualization.
+        <strong>AI Integration:</strong> While not a software engineer, I am proficient in using AI tools to write custom Python scripts and web apps, demonstrating a "learn-anything-fast" approach to modern technology.
     </div>
 
-    <h2>Education & Training</h2>
-    <p>
-        <strong>[Degree/Certification Name]</strong> | [Institution Name] <br>
-        <em>Continued Learning: Python for Automation, Docker Certified Associate (Study), Fiber Optic Association (FOA) Certs.</em>
+    <h2>Education</h2>
+    <p style="font-size: 0.9em;">
+        <strong>[Relevant Degree/Certification]</strong> | [College/Institution Name] <br>
+        <em>Key Focus: Advanced Troubleshooting, Microsoft Office Certification, Fiber Optic Theory.</em>
     </p>
 
 </div>
